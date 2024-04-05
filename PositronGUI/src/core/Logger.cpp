@@ -9,96 +9,96 @@
 
 namespace PGUI::Core::ErrorHandling
 {
-	std::string GetLogLevelStr(LogLevel logLevel)
+	constexpr std::wstring GetLogLevelStr(LogLevel logLevel) noexcept
 	{
 		switch (logLevel)
 		{
 			using enum PGUI::Core::ErrorHandling::LogLevel;
 
 			case DEBUG:
-				return "DEBUG";
+				return L"DEBUG";
 			case TRACE:
-				return "TRACE";
+				return L"TRACE";
 			case INFO:
-				return "INFO";
+				return L"INFO";
 			case WARNING:
-				return "WARNING";
+				return L"WARNING";
 			case ERROR:
-				return "ERROR";
+				return L"ERROR";
 			case FATAL:
-				return "FATAL";
+				return L"FATAL";
 		}
 		std::unreachable();
 	}
 
-	void Logger::LogStackTrace()
+	void Logger::LogStackTrace() noexcept
 	{
 		for (auto& entry : std::stacktrace::current())
 		{
-			logger->Log(LogLevel::TRACE, std::to_string(entry) + "\n");
+			logger->Log(LogLevel::TRACE, StringToWString(std::to_string(entry)) + L"\n");
 		}
 	}
 
-	void Logger::Log(LogLevel _logLevel, std::string_view string)
+	void Logger::Log(LogLevel _logLevel, std::wstring_view string) noexcept
 	{
 		logger->Log(_logLevel, string);
 	}
 
-	void Logger::Log(std::string_view string)
+	void Logger::Log(std::wstring_view string) noexcept
 	{
 		Log(logLevel, string);
 	}
 
-	void Logger::Trace(std::string_view string)
+	void Logger::Trace(std::wstring_view string) noexcept
 	{
 		Log(LogLevel::TRACE, string);
 	}
-	void Logger::Debug(std::string_view string)
+	void Logger::Debug(std::wstring_view string) noexcept
 	{
 		Log(LogLevel::DEBUG, string);
 	}
-	void Logger::Info(std::string_view string)
+	void Logger::Info(std::wstring_view string) noexcept
 	{
 		Log(LogLevel::INFO, string);
 	}
-	void Logger::Warning(std::string_view string)
+	void Logger::Warning(std::wstring_view string) noexcept
 	{
 		Log(LogLevel::WARNING, string);
 	}
-	void Logger::Error(std::string_view string)
+	void Logger::Error(std::wstring_view string) noexcept
 	{
 		Log(LogLevel::ERROR, string);
 	}
-	void Logger::Fatal(std::string_view string)
+	void Logger::Fatal(std::wstring_view string) noexcept
 	{
 		Log(LogLevel::FATAL, string);
 	}
 
-	void Logger::SetLogger(ILogger* _logger)
+	void Logger::SetLogger(ILogger* _logger) noexcept
 	{
 		logger = _logger;
 	}
 
-	ILogger* Logger::GetLogger()
+	ILogger* Logger::GetLogger() noexcept
 	{
 		return logger;
 	}
 
-	void Logger::SetLogLevel(LogLevel _logLevel)
+	void Logger::SetLogLevel(LogLevel _logLevel) noexcept
 	{
 		logLevel = _logLevel;
 	}
-	LogLevel Logger::GetLogLevel()
+	LogLevel Logger::GetLogLevel() noexcept
 	{
 		return logLevel;
 	}
 
-	void DebugConsoleLogger::Log(LogLevel logLevel, std::string_view string)
+	void DebugConsoleLogger::Log(LogLevel logLevel, std::wstring_view string) noexcept
 	{
-		OutputDebugStringA("[");
-		OutputDebugStringA(GetLogLevelStr(logLevel).c_str());
-		OutputDebugStringA("] ");
-		OutputDebugStringA(string.data());
-		OutputDebugStringA("\n");
+		OutputDebugStringW(L"[");
+		OutputDebugStringW(GetLogLevelStr(logLevel).c_str());
+		OutputDebugStringW(L"] ");
+		OutputDebugStringW(string.data());
+		OutputDebugStringW(L"\n");
 	}
 }

@@ -19,25 +19,47 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\ui\Brush.cpp" />
+    <ClCompile Include="src\ui\controls\StaticText.cpp" />
+    <ClCompile Include="src\ui\TextLayout.cpp" />
+    <ClCompile Include="src\ui\font\FontCollection.cpp" />
+    <ClCompile Include="src\ui\font\FontFamily.cpp" />
+    <ClCompile Include="src\ui\font\FontSet.cpp" />
+    <ClCompile Include="src\ui\font\LocalizedFontFamilyNames.cpp" />
+    <ClCompile Include="src\ui\Gradient.cpp" />
+    <ClCompile Include="src\ui\ComponentHolder.cpp" />
+    <ClCompile Include="src\ui\Control.cpp" />
     <ClCompile Include="src\ui\AppWindow.cpp" />
-    <ClCompile Include="src\ui\ClipGeometry.cpp" />
+    <ClCompile Include="src\ui\Clip.cpp" />
+    <ClCompile Include="src\ui\TextFormat.cpp" />
     <ClCompile Include="src\ui\UIComponent.cpp" />
     <ClCompile Include="src\core\DirectCompositionWindow.cpp" />
     <ClCompile Include="src\core\Logger.cpp" />
-    <ClCompile Include="src\helpers\StringConversions.cpp" />
-    <ClCompile Include="src\core\Color.cpp" />
+    <ClCompile Include="src\ui\Color.cpp" />
     <ClCompile Include="src\core\Exceptions.cpp" />
     <ClCompile Include="src\core\MessageLoop.cpp" />
     <ClCompile Include="src\core\Window.cpp" />
     <ClCompile Include="src\core\WindowClass.cpp" />
     <ClCompile Include="src\helpers\HelperFunctions.cpp" />
-    <ClCompile Include="src\ui\Style.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="include\core\Color.hpp" />
+    <ClInclude Include="include\core\Ellipse.hpp" />
+    <ClInclude Include="include\ui\controls\PGUI.ui.controls.hpp" />
+    <ClInclude Include="include\ui\controls\StaticText.hpp" />
+    <ClInclude Include="include\ui\PositioningMode.hpp" />
+    <ClInclude Include="include\helpers\ComPtrHolder.hpp" />
+    <ClInclude Include="include\ui\Color.hpp" />
     <ClInclude Include="include\core\DirectCompositionWindow.hpp" />
     <ClInclude Include="include\core\Event.hpp" />
     <ClInclude Include="include\core\Exceptions.hpp" />
+    <ClInclude Include="include\ui\Colors.hpp" />
+    <ClInclude Include="include\ui\font\FontCollection.hpp" />
+    <ClInclude Include="include\ui\font\FontEnums.hpp" />
+    <ClInclude Include="include\ui\font\FontFamily.hpp" />
+    <ClInclude Include="include\ui\font\FontSet.hpp" />
+    <ClInclude Include="include\ui\font\LocalizedFontFamilyNames.hpp" />
+    <ClInclude Include="include\ui\font\PGUI.ui.font.hpp" />
+    <ClInclude Include="include\ui\Gradient.hpp" />
     <ClInclude Include="include\core\Logger.hpp" />
     <ClInclude Include="include\core\MessageLoop.hpp" />
     <ClInclude Include="include\core\PGUI.core.hpp" />
@@ -55,13 +77,17 @@
     <ClInclude Include="include\helpers\EnumOperators.hpp" />
     <ClInclude Include="include\helpers\HelperFunctions.hpp" />
     <ClInclude Include="include\helpers\PGUI.helpers.hpp" />
-    <ClInclude Include="include\helpers\StringConversions.hpp" />
     <ClInclude Include="include\PGUI.hpp" />
     <ClInclude Include="include\ui\AppWindow.hpp" />
-    <ClInclude Include="include\ui\ClipGeometry.hpp" />
+    <ClInclude Include="include\ui\Clip.hpp" />
+    <ClInclude Include="include\ui\ComponentHolder.hpp" />
+    <ClInclude Include="include\ui\ComponentsHolder.hpp" />
+    <ClInclude Include="include\ui\Control.hpp" />
     <ClInclude Include="include\ui\PGUI.ui.hpp" />
+    <ClInclude Include="include\ui\TextFormat.hpp" />
+    <ClInclude Include="include\ui\TextLayout.hpp" />
     <ClInclude Include="include\ui\UIComponent.hpp" />
-    <ClInclude Include="include\ui\Style.hpp" />
+    <ClInclude Include="include\ui\Brush.hpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>
@@ -153,7 +179,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
     <Lib>
-      <AdditionalDependencies>dwmapi.lib;d2d1.lib;dxgi.lib;dcomp.lib;d3d11.lib</AdditionalDependencies>
+      <AdditionalDependencies>dwmapi.lib;d2d1.lib;dwrite.lib;dxgi.lib;dcomp.lib;d3d11.lib</AdditionalDependencies>
       <AdditionalOptions> /ignore:4006 %(AdditionalOptions)</AdditionalOptions>
     </Lib>
   </ItemDefinitionGroup>
@@ -179,7 +205,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
     <Lib>
-      <AdditionalDependencies>dwmapi.lib;d2d1.lib;dxgi.lib;dcomp.lib;d3d11.lib</AdditionalDependencies>
+      <AdditionalDependencies>dwmapi.lib;d2d1.lib;dwrite.lib;dxgi.lib;dcomp.lib;d3d11.lib</AdditionalDependencies>
       <AdditionalOptions> /ignore:4006 %(AdditionalOptions)</AdditionalOptions>
     </Lib>
   </ItemDefinitionGroup>
@@ -201,7 +227,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
     <Lib>
-      <AdditionalDependencies>dwmapi.lib;d2d1.lib;dxgi.lib;dcomp.lib;d3d11.lib</AdditionalDependencies>
+      <AdditionalDependencies>dwmapi.lib;d2d1.lib;dwrite.lib;dxgi.lib;dcomp.lib;d3d11.lib</AdditionalDependencies>
       <AdditionalOptions> /ignore:4006 %(AdditionalOptions)</AdditionalOptions>
     </Lib>
   </ItemDefinitionGroup>
@@ -227,7 +253,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
     <Lib>
-      <AdditionalDependencies>dwmapi.lib;d2d1.lib;dxgi.lib;dcomp.lib;d3d11.lib</AdditionalDependencies>
+      <AdditionalDependencies>dwmapi.lib;d2d1.lib;dwrite.lib;dxgi.lib;dcomp.lib;d3d11.lib</AdditionalDependencies>
       <AdditionalOptions> /ignore:4006 %(AdditionalOptions)</AdditionalOptions>
     </Lib>
   </ItemDefinitionGroup>

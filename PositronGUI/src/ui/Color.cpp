@@ -1,4 +1,4 @@
-#include "core/Color.hpp"
+#include "ui/Color.hpp"
 
 #include <cmath>
 #include <algorithm>
@@ -6,32 +6,28 @@
 #undef max
 #undef min
 
-namespace PGUI
+namespace PGUI::UI
 {
 	#pragma region RGB
 
-	RGB::RGB() : 
-		r(0.0f), g(0.0f), b(0.0f)
-	{
-	}
-	RGB::RGB(FLOAT _r, FLOAT _g, FLOAT _b) : 
+	RGB::RGB(FLOAT _r, FLOAT _g, FLOAT _b) noexcept :
 		r(_r), g(_g), b(_b)
 	{
 	}
-	RGB::RGB(std::uint8_t _r, std::uint8_t _g, std::uint8_t _b) : 
+	RGB::RGB(std::uint8_t _r, std::uint8_t _g, std::uint8_t _b) noexcept :
 		r(_r / 255.0f), g(_g / 255.0f), b(_b / 255.0f)
 	{
 	}
-	RGB::RGB(std::uint32_t rgb) : 
+	RGB::RGB(std::uint32_t rgb) noexcept :
 		r(((rgb & 0xff << 16) >> 16) / 255.0f), g(((rgb & 0xff << 8) >> 8) / 255.0f), b((rgb & 0xff) / 255.0f)
 	{
 	}
 
-	RGB::RGB(const RGBA& rgba) : 
+	RGB::RGB(const RGBA& rgba) noexcept :
 		r(rgba.r), g(rgba.g), b(rgba.b)
 	{
 	}
-	RGB::RGB(const HSL hsl)
+	RGB::RGB(const HSL hsl) noexcept
 	{
 		auto C = (1 - std::abs(2 * hsl.l - 1)) * hsl.s;
 		auto hPrime = hsl.h / 60.0f;
@@ -79,7 +75,7 @@ namespace PGUI
 		g = gPrime + m;
 		b = bPrime + m;
 	}
-	RGB::RGB(const HSV hsv)
+	RGB::RGB(const HSV hsv) noexcept
 	{
 		auto C = hsv.v * hsv.s;
 
@@ -129,31 +125,31 @@ namespace PGUI
 		b = bPrime + m;
 
 	}
-	RGB::RGB(const CMYK cmyk) : 
+	RGB::RGB(const CMYK cmyk) noexcept :
 		r((1 - cmyk.c)* (1 - cmyk.k)), 
 		g((1 - cmyk.m)* (1 - cmyk.k)),
 		b((1 - cmyk.y) * (1 - cmyk.k))
 	{
 	}
 
-	RGB::RGB(const D2D1_COLOR_F& color) : 
+	RGB::RGB(const D2D1_COLOR_F& color) noexcept :
 		r(color.r), g(color.g), b(color.b)
 	{
 	}
 
-	RGB::operator D2D1_COLOR_F() const
+	RGB::operator D2D1_COLOR_F() const noexcept
 	{
 		return D2D1::ColorF(r, g, b);
 	}
 
-	void RGB::Lighten(FLOAT amount)
+	constexpr void RGB::Lighten(FLOAT amount) noexcept
 	{
 		r = std::clamp(r + amount, 0.0f, 1.0f);
 		g = std::clamp(g + amount, 0.0f, 1.0f);
 		b = std::clamp(b + amount, 0.0f, 1.0f);
 	}
 
-	void RGB::Darken(FLOAT amount)
+	constexpr void RGB::Darken(FLOAT amount) noexcept
 	{
 		r = std::clamp(r - amount, 0.0f, 1.0f);
 		g = std::clamp(g - amount, 0.0f, 1.0f);
@@ -164,49 +160,45 @@ namespace PGUI
 
 	#pragma region RGBA
 
-	RGBA::RGBA() : 
-		r(0.0f), g(0.0f), b(0.0f), a(0.0f)
-	{
-	}
-	RGBA::RGBA(FLOAT _r, FLOAT _g, FLOAT _b, FLOAT _a) : 
+	RGBA::RGBA(FLOAT _r, FLOAT _g, FLOAT _b, FLOAT _a) noexcept : 
 		r(_r), g(_g), b(_b), a(_a)
 	{
 	}
-	RGBA::RGBA(std::uint8_t _r, std::uint8_t _g, std::uint8_t _b, std::uint8_t _a) : 
+	RGBA::RGBA(std::uint8_t _r, std::uint8_t _g, std::uint8_t _b, std::uint8_t _a) noexcept : 
 		r(_r / 255.0f), g(_g / 255.0f), b(_b / 255.0f), a(_a / 255.0f)
 	{
 	}
-	RGBA::RGBA(std::uint32_t rgb, FLOAT _a) : 
+	RGBA::RGBA(std::uint32_t rgb, FLOAT _a) noexcept : 
 		r(((rgb & 0xff << 16) >> 16) / 255.0f), g(((rgb & 0xff << 8) >> 8) / 255.0f), b((rgb & 0xff) / 255.0f), a(_a)
 	{
 	}
 
-	RGBA::RGBA(const RGB& rgb) :
+	RGBA::RGBA(const RGB& rgb) noexcept :
 		r(rgb.r), g(rgb.g), b(rgb.b), a(1.0f)
 	{
 	}
-	RGBA::RGBA(const D2D1_COLOR_F& color) : 
+	RGBA::RGBA(const D2D1_COLOR_F& color) noexcept : 
 		r(color.r), g(color.g), b(color.b), a(color.a)
 	{
 	}
 
-	RGBA::operator RGB()
+	RGBA::operator RGB() noexcept
 	{
 		return RGB{ *this };
 	}
-	RGBA::operator D2D1_COLOR_F() const
+	RGBA::operator D2D1_COLOR_F() const noexcept
 	{
 		return D2D1::ColorF(r, g, b, a);
 	}
 
-	void RGBA::Lighten(FLOAT amount)
+	constexpr void RGBA::Lighten(FLOAT amount) noexcept
 	{
 		r = std::clamp(r + amount, 0.0f, 1.0f);
 		g = std::clamp(g + amount, 0.0f, 1.0f);
 		b = std::clamp(b + amount, 0.0f, 1.0f);
 	}
 
-	void RGBA::Darken(FLOAT amount)
+	constexpr void RGBA::Darken(FLOAT amount) noexcept
 	{
 		r = std::clamp(r - amount, 0.0f, 1.0f);
 		g = std::clamp(g - amount, 0.0f, 1.0f);
@@ -217,16 +209,12 @@ namespace PGUI
 
 	#pragma region HSL
 
-	HSL::HSL() : 
-		h(0.0f), s(0.0f), l(0.0f)
-	{
-	}
-	HSL::HSL(FLOAT _h, FLOAT _s, FLOAT _l) : 
+	HSL::HSL(FLOAT _h, FLOAT _s, FLOAT _l) noexcept : 
 		h(_h), s(_s), l(_l)
 	{
 	}
 
-	HSL::HSL(const RGB& rgb)
+	HSL::HSL(const RGB& rgb) noexcept
 	{
 		float cMax = std::max({ rgb.r, rgb.g, rgb.b });
 		float cMin = std::min({ rgb.r, rgb.g, rgb.b });
@@ -255,7 +243,7 @@ namespace PGUI
 		h *= 60.0f;
 	}
 
-	HSL::operator RGB() const
+	HSL::operator RGB() const noexcept
 	{
 		return RGB{ *this };
 	}
@@ -264,16 +252,12 @@ namespace PGUI
 
 	#pragma region HSV
 
-	HSV::HSV() : 
-		h(0.0f), s(0.0f), v(0.0f)
-	{
-	}
-	HSV::HSV(FLOAT _h, FLOAT _s, FLOAT _v) : 
+	HSV::HSV(FLOAT _h, FLOAT _s, FLOAT _v) noexcept : 
 		h(_h), s(_s), v(_v)
 	{
 	}
 
-	HSV::HSV(const RGB& rgb)
+	HSV::HSV(const RGB& rgb) noexcept
 	{
 		float cMax = std::max({ rgb.r, rgb.g, rgb.b });
 		float cMin = std::min({ rgb.r, rgb.g, rgb.b });
@@ -310,7 +294,7 @@ namespace PGUI
 		}
 	}
 
-	HSV::operator RGB() const
+	HSV::operator RGB() const noexcept
 	{
 		return RGB{ *this };
 	}
@@ -319,16 +303,12 @@ namespace PGUI
 
 	#pragma region CMYK
 
-	CMYK::CMYK() : 
-		c(0.0f), m(0.0f), y(0.0f), k(0.0f)
-	{
-	}
-	CMYK::CMYK(FLOAT _c, FLOAT _m, FLOAT _y, FLOAT _k) : 
+	CMYK::CMYK(FLOAT _c, FLOAT _m, FLOAT _y, FLOAT _k) noexcept : 
 		c(_c), m(_m), y(_y), k(_k) 
 	{
 	}
 
-	CMYK::CMYK(const RGB& rgb)
+	CMYK::CMYK(const RGB& rgb) noexcept
 	{
 		k = std::max({ rgb.r, rgb.g, rgb.b });
 
@@ -337,7 +317,7 @@ namespace PGUI
 		y = (1 - rgb.b - k) / (1 - k);
 	}
 
-	CMYK::operator RGB() const
+	CMYK::operator RGB() const noexcept
 	{
 		return RGB{ *this };
 	}

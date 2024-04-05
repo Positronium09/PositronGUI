@@ -12,7 +12,7 @@ namespace PGUI::Core
 		using EventHandler = std::function<void(Args...)>;
 
 		public:
-		void Subscribe(const EventHandler& handler)
+		void Subscribe(const EventHandler& handler) noexcept
 		{
 			eventHandlers.push_back(handler);
 		}
@@ -35,7 +35,7 @@ namespace PGUI::Core
 		using EventHandler = std::function<void(void)>;
 
 		public:
-		void Subscribe(const EventHandler& handler)
+		void Subscribe(const EventHandler& handler) noexcept
 		{
 			eventHandlers.push_back(handler);
 		}

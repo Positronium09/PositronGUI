@@ -9,15 +9,17 @@ namespace PGUI::UI
 	{
 
 		public:
-		AppWindow();
+		AppWindow() noexcept;
 
-		bool IsFullScreen() const;
-		void EnterFullScreenMode();
-		void ExitFullScreenMode();
-		void SetMinimumSize(SizeI size);
+		[[nodiscard]] bool IsFullScreen() const noexcept;
+		void EnterFullScreenMode() noexcept;
+		void ExitFullScreenMode() noexcept;
 
-		void Title(std::wstring_view title) const;
-		const std::wstring& Title() const;
+		[[nodiscard]] SizeI GetMinimumSize() const noexcept;
+		void SetMinimumSize(SizeI size) noexcept;
+
+		void Title(std::wstring_view title) const noexcept;
+		[[nodiscard]] const std::wstring& Title() const noexcept;
 
 		private:
 		std::wstring titleText;

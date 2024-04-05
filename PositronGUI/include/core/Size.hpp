@@ -16,64 +16,64 @@ namespace PGUI
 		T cx;
 		T cy;
 
-		constexpr Size() = default;
-		constexpr Size(const T& cx_, const T& cy_) :
+		constexpr Size() noexcept = default;
+		constexpr Size(const T& cx_, const T& cy_) noexcept :
 			cx{ cx_ }, cy{ cy_ }
 		{
 		}
-		explicit(false) constexpr Size(const SIZE& sz) :
+		explicit(false) constexpr Size(const SIZE& sz) noexcept :
 			cx{ (T)sz.cx }, cy{ (T)sz.cy }
 		{
 		}
-		explicit(false) constexpr Size(const D2D1_SIZE_F& sz) :
+		explicit(false) constexpr Size(const D2D1_SIZE_F& sz) noexcept :
 			cx{ (T)sz.width }, cy{ (T)sz.height }
 		{
 		}
-		explicit(false) constexpr Size(const D2D1_SIZE_U& sz) :
+		explicit(false) constexpr Size(const D2D1_SIZE_U& sz) noexcept :
 			cx{ (T)sz.width }, cy{ (T)sz.height }
 		{
 		}
-		~Size() = default;
+		~Size() noexcept = default;
 
-		constexpr bool operator==(const Size<T>& other) const = default;
+		constexpr [[nodiscard]] bool operator==(const Size<T>& other) const noexcept = default;
 
-		constexpr Size& operator*=(const T& factor)
+		constexpr Size& operator*=(const T& factor) noexcept
 		{
 			cx *= factor;
 			cx *= factor;
 			return *this;
 		}
-		constexpr Size& operator/=(const T& factor)
+		constexpr Size& operator/=(const T& factor) noexcept
 		{
 			cx /= factor;
 			cx /= factor;
 			return *this;
 		}
 
-		constexpr Size operator*(T factor) const
+		[[nodiscard]] constexpr Size operator*(T factor) const noexcept
 		{
 			return Size(cx * factor, cy * factor);
 		}
-		constexpr Size operator/(T factor) const
+		[[nodiscard]] constexpr Size operator/(T factor) const noexcept
 		{
 			return Size(cx / factor, cy / factor);
 		}
 
 		template<typename U>
-		explicit operator Size<U>() const
+		explicit(false) operator Size<U>() const noexcept
 		{
 			return Size<U>{ static_cast<U>(cx), static_cast<U>(cy) };
 		}
 
-		explicit(false) operator SIZE() const
+		explicit(false) operator SIZE() const noexcept
 		{
 			return SIZE{ static_cast<LONG>(cx), static_cast<LONG>(cy) };
 		}
-		explicit(false) operator D2D1_SIZE_F() const
+		explicit(false) operator D2D1_SIZE_F() const noexcept
 		{
 			return D2D1_SIZE_F{ static_cast<FLOAT>(cx), static_cast<FLOAT>(cy) };
 		}
-		explicit(false) operator D2D1_SIZE_U() const
+		explicit(false) operator D2D1_SIZE_U() const noexcept
 		{
 			return D2D1_SIZE_U{ static_cast<UINT32>(cx), static_cast<UINT32>(cy) };
 		}

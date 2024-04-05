@@ -18,90 +18,90 @@ namespace PGUI
 		T x = (T)0;
 		T y = (T)0;
 
-		[[nodiscard]] static T Distance(Point<T> A, Point<T> B)
+		[[nodiscard]] static T Distance(Point<T> A, Point<T> B) noexcept
 		{
 			return std::hypot(A.x - B.x, A.y - B.y);
 		}
 
-		constexpr Point() = default;
-		constexpr Point(const T& x_, const T& y_) :
+		constexpr Point() noexcept = default;
+		constexpr Point(const T& x_, const T& y_) noexcept :
 			x{ x_ }, y{ y_ }
 		{
 		}
-		explicit(false) constexpr Point(const POINT& p) :
+		explicit(false) constexpr Point(const POINT& p) noexcept :
 			x{ (T)p.x }, y{ (T)p.y }
 		{
 		}
-		explicit(false) constexpr Point(const POINTS& p) :
+		explicit(false) constexpr Point(const POINTS& p) noexcept :
 			x{ (T)p.x }, y{ (T)p.y }
 		{
 		}
-		explicit(false) constexpr Point(const D2D1_POINT_2F& p) :
+		explicit(false) constexpr Point(const D2D1_POINT_2F& p) noexcept :
 			x{ (T)p.x }, y{ (T)p.y }
 		{
 		}
-		explicit(false) constexpr Point(const D2D1_POINT_2U& p) :
+		explicit(false) constexpr Point(const D2D1_POINT_2U& p) noexcept :
 			x{ (T)p.x }, y{ (T)p.y }
 		{
 		}
-		~Point() = default;
+		~Point() noexcept = default;
 
-		constexpr Point& operator+=(const Point<T>& other)
+		constexpr Point& operator+=(const Point<T>& other) noexcept
 		{
 			x += other.x;
 			y += other.y;
 			return *this;
 		}
-		constexpr Point& operator-=(const Point<T>& other)
+		constexpr Point& operator-=(const Point<T>& other) noexcept
 		{
 			x -= other.x;
 			y -= other.y;
 			return *this;
 		}
-		constexpr Point& operator*=(const T& factor)
+		constexpr Point& operator*=(const T& factor) noexcept
 		{
 			x *= factor;
 			y *= factor;
 			return *this;
 		}
-		constexpr Point& operator/=(const T& factor)
+		constexpr Point& operator/=(const T& factor) noexcept
 		{
 			x /= factor;
 			y /= factor;
 			return *this;
 		}
-		constexpr Point operator+(const Point& other) const
+		[[nodiscard]] constexpr Point operator+(const Point& other) const noexcept
 		{
 			return Point(x + other.x, y + other.y);
 		}
-		constexpr Point operator-(const Point& other) const
+		[[nodiscard]] constexpr Point operator-(const Point& other) const noexcept
 		{
 			return Point(x - other.x, y - other.y);
 		}
-		constexpr Point operator*(T factor) const
+		[[nodiscard]] constexpr Point operator*(T factor) const noexcept
 		{
 			return Point(x * factor, y * factor);
 		}
-		constexpr Point operator/(T factor) const
+		[[nodiscard]] constexpr Point operator/(T factor) const noexcept
 		{
 			return Point(x / factor, y / factor);
 		}
-		constexpr Point operator-() const
+		[[nodiscard]] constexpr Point operator-() const noexcept
 		{
 			return Point(-x, -y);
 		}
-		constexpr Point operator+() const
+		constexpr Point operator+() const noexcept
 		{
 			return *this;
 		}
 
-		constexpr bool operator==(const Point<T>& other) const = default;
+		[[nodiscard]] constexpr bool operator==(const Point<T>& other) const noexcept = default;
 
-		[[nodiscard]] T Distance(const Point<T>& other) const
+		[[nodiscard]] T Distance(const Point<T>& other) const noexcept
 		{
 			return Point::Distance(*this, other);
 		}
-		void Rotate(float angleDegrees, Point<T> point = Point<T>{ })
+		void Rotate(float angleDegrees, Point<T> point = Point<T>{ }) noexcept
 		{
 			x -= point.x;
 			y -= point.y;
@@ -116,7 +116,7 @@ namespace PGUI
 			y += point.y;
 		}
 
-		[[nodiscard]] Point<T> Rotated(float angleDegrees, Point<T> centerPoint = Point<T>{ })
+		[[nodiscard]] Point<T> Rotated(float angleDegrees, Point<T> centerPoint = Point<T>{ }) noexcept
 		{
 			auto point = *this;
 			point.Rotate(angleDegrees, centerPoint);
@@ -124,49 +124,49 @@ namespace PGUI
 		}
 
 		template<typename U>
-		explicit operator Point<U>() const
+		explicit(false) operator Point<U>() const noexcept
 		{
 			return Point<U>{ static_cast<U>(x), static_cast<U>(y) };
 		}
 
-		explicit(false) operator POINT() const
+		explicit(false) operator POINT() const noexcept
 		{
 			return POINT{ static_cast<LONG>(x), static_cast<LONG>(y) };
 		}
-		explicit(false) operator POINTS() const
+		explicit(false) operator POINTS() const noexcept
 		{
 			return POINTS{ static_cast<SHORT>(x), static_cast<SHORT>(y) };
 		}
-		explicit(false) operator D2D1_POINT_2F() const
+		explicit(false) operator D2D1_POINT_2F() const noexcept
 		{
 			return D2D1_POINT_2F{ static_cast<FLOAT>(x), static_cast<FLOAT>(y) };
 		}
-		explicit(false) operator D2D1_POINT_2U() const
+		explicit(false) operator D2D1_POINT_2U() const noexcept
 		{
 			return D2D1_POINT_2U{ static_cast<UINT32>(x), static_cast<UINT32>(y) };
 		}
 	};
 
 	template<_pt_arithmetic T>
-	Point<T> operator*(T factor, const Point<T>& v)
+	[[nodiscard]] Point<T> operator*(T factor, const Point<T>& v) noexcept
 	{
 		return Point<T>(v.x * factor, v.y * factor);
 	}
 
 	template<_pt_arithmetic T>
-	Point<T> operator/(T factor, const Point<T>& v)
+	[[nodiscard]] Point<T> operator/(T factor, const Point<T>& v) noexcept
 	{
 		return Point<T>(v.x / factor, v.y / factor);
 	}
 
 	template<_pt_arithmetic T>
-	Point<T> operator*(const Point<T>& v, T factor)
+	[[nodiscard]] Point<T> operator*(const Point<T>& v, T factor) noexcept
 	{
 		return Point<T>(v.x * factor, v.y * factor);
 	}
 
 	template<_pt_arithmetic T>
-	Point<T> operator/(const Point<T>& v, T factor)
+	[[nodiscard]] Point<T> operator/(const Point<T>& v, T factor) noexcept
 	{
 		return Point<T>(v.x / factor, v.y / factor);
 	}

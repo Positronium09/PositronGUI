@@ -6,7 +6,7 @@ namespace PGUI::Core
 	class IMessageLoop
 	{
 		public:
-		virtual ~IMessageLoop() = default;
+		virtual ~IMessageLoop() noexcept = default;
 
 		virtual int Run() = 0;
 	};
@@ -14,7 +14,7 @@ namespace PGUI::Core
 	class GetMessageLoop : public IMessageLoop
 	{
 		public:
-		[[nodiscard]] int Run() override;
+		[[nodiscard]] int Run() noexcept override;
 	};
 
 	class PeekMessageLoop : public IMessageLoop

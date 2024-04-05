@@ -15,7 +15,7 @@ namespace PGUI::Core
 
 		static WindowClassPtr Create(std::wstring_view _className,
 			UINT style = CS_HREDRAW | CS_VREDRAW, HBRUSH backgroundBrush = nullptr,
-			HICON icon = nullptr, HCURSOR cursor = nullptr, HICON smIcon = nullptr);
+			HICON icon = nullptr, HCURSOR cursor = nullptr, HICON smIcon = nullptr) noexcept;
 
 		WindowClass(const WindowClass&) = delete;
 		WindowClass& operator=(const WindowClass&) = delete;

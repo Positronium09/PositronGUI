@@ -12,36 +12,35 @@ namespace PGUI::Core::ErrorHandling
 	class PGUIException : public std::exception
 	{
 		public:
-		explicit PGUIException(HRESULT errorCode);
+		explicit PGUIException(HRESULT errorCode) noexcept;
 
-		~PGUIException() override = default;
+		~PGUIException() noexcept override = default;
 
-		[[nodiscard]] HRESULT GetErrorCode() const;
-
-		[[nodiscard]] const char* what() const override;
+		[[nodiscard]] HRESULT GetErrorCode() const noexcept;
+		[[nodiscard]] const std::wstring& GetErrorMessage() const noexcept;
 
 		private:
 		HRESULT errorCode;
-		std::string errorMessage;
+		std::wstring errorMessage;
 	};
 
 	class Win32Exception : public PGUIException
 	{
 		public:
-		Win32Exception();
-		explicit Win32Exception(DWORD errorCode);
+		Win32Exception() noexcept;
+		explicit Win32Exception(DWORD errorCode) noexcept;
 	};
 
 	class HresultException : public PGUIException
 	{
 		public:
-		explicit HresultException(HRESULT hResult);
+		explicit HresultException(HRESULT hResult) noexcept;
 	};
 }
 
 namespace PGUI
 {
-	static inline void HR_T(HRESULT hr)
+	static inline void HR_T(HRESULT hr)  noexcept(false)
 	{
 		if (FAILED(hr))
 		{

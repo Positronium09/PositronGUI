@@ -3,21 +3,21 @@
 #include "core/Exceptions.hpp"
 #include "helpers/ComPtr.hpp"
 
-#include <d2d1_2.h>
+#include <d2d1_3.h>
 #include <d2d1.h>
 #include <Windows.h>
 
 
 namespace PGUI
 {
-	class Direct2DFactory
+	class D2DFactory
 	{
 		public:
-		Direct2DFactory() = delete;
-		Direct2DFactory(Direct2DFactory&) = delete;
-		void operator=(const Direct2DFactory&) = delete;
+		D2DFactory() = delete;
+		D2DFactory(D2DFactory&) = delete;
+		void operator=(const D2DFactory&) = delete;
 
-		static ComPtr<ID2D1Factory2> GetFactory()
+		static ComPtr<ID2D1Factory8> GetFactory()
 		{
 			if (!direct2DFactory)
 			{
@@ -27,16 +27,13 @@ namespace PGUI
 				options.debugLevel = D2D1_DEBUG_LEVEL_ERROR;
 				#endif
 
-				HRESULT hr = D2D1CreateFactory(D2D1_FACTORY_TYPE_SINGLE_THREADED, options, direct2DFactory.GetAddressOf());
-				if (FAILED(hr))
-				{
-					throw Core::ErrorHandling::HresultException{ hr };
-				}
+				HRESULT hr = D2D1CreateFactory(D2D1_FACTORY_TYPE_SINGLE_THREADED, 
+					options, direct2DFactory.GetAddressOf()); HR_T(hr);
 			}
 			return direct2DFactory;
 		}
 
 		private:
-		static inline ComPtr<ID2D1Factory2> direct2DFactory = nullptr;
+		static inline ComPtr<ID2D1Factory8> direct2DFactory = nullptr;
 	};
 }

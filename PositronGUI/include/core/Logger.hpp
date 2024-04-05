@@ -20,35 +20,35 @@ namespace PGUI::Core::ErrorHandling
 		FATAL = 5
 	};
 
-	std::string GetLogLevelStr(LogLevel logLevel);
+	constexpr [[nodiscard]] std::wstring GetLogLevelStr(LogLevel logLevel) noexcept;
 
 	class ILogger
 	{
 		public:
-		virtual ~ILogger() = default;
+		virtual ~ILogger() noexcept = default;
 
-		virtual void Log(LogLevel logLevel, std::string_view string) = 0;
+		virtual void Log(LogLevel logLevel, std::wstring_view string) noexcept = 0;
 	};
 
 	class Logger final
 	{
 		public:
-		static void LogStackTrace();
-		static void Log(LogLevel logLevel, std::string_view string);
-		static void Log(std::string_view string);
+		static void LogStackTrace() noexcept;
+		static void Log(LogLevel logLevel, std::wstring_view string) noexcept;
+		static void Log(std::wstring_view string) noexcept;
 
-		static void Trace(std::string_view string);
-		static void Debug(std::string_view string);
-		static void Info(std::string_view string);
-		static void Warning(std::string_view string);
-		static void Error(std::string_view string);
-		static void Fatal(std::string_view string);
+		static void Trace(std::wstring_view string) noexcept;
+		static void Debug(std::wstring_view string) noexcept;
+		static void Info(std::wstring_view string) noexcept;
+		static void Warning(std::wstring_view string) noexcept;
+		static void Error(std::wstring_view string) noexcept;
+		static void Fatal(std::wstring_view string) noexcept;
 
-		static void SetLogger(ILogger* logger);
-		[[nodiscard]] static ILogger* GetLogger();
+		static void SetLogger(ILogger* logger) noexcept;
+		[[nodiscard]] static ILogger* GetLogger() noexcept;
 
-		static void SetLogLevel(LogLevel logLevel);
-		[[nodiscard]] static LogLevel GetLogLevel();
+		static void SetLogLevel(LogLevel logLevel) noexcept;
+		[[nodiscard]] static LogLevel GetLogLevel() noexcept;
 
 		private:
 		static inline ILogger* logger;
@@ -63,13 +63,13 @@ namespace PGUI::Core::ErrorHandling
 	class DebugConsoleLogger : public ILogger
 	{
 		public:
-		void Log(LogLevel logLevel, std::string_view string) override;
+		void Log(LogLevel logLevel, std::wstring_view string) noexcept override;
 	};
 }
 
 namespace PGUI
 {
-	static inline void HR_L(HRESULT hr)
+	static inline void HR_L(HRESULT hr) noexcept
 	{
 		if (FAILED(hr))
 		{

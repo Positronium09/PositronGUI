@@ -7,7 +7,7 @@
 
 namespace PGUI::UI
 {
-	AppWindow::AppWindow() : 
+	AppWindow::AppWindow() noexcept :
 		DirectCompositionWindow{ Core::WindowClass::Create(L"AppWindow") }
 	{
 		RegisterMessageHandler(WM_NCCREATE, &AppWindow::OnNCCreate);
@@ -17,11 +17,11 @@ namespace PGUI::UI
 		RegisterMessageHandler(WM_GETMINMAXINFO, &AppWindow::OnGetMinMaxInfo);
 	}
 
-	bool AppWindow::IsFullScreen() const
+	bool AppWindow::IsFullScreen() const noexcept
 	{
 		return isFullScreen;
 	}
-	void AppWindow::EnterFullScreenMode()
+	void AppWindow::EnterFullScreenMode() noexcept
 	{
 		if (isFullScreen)
 		{
@@ -45,7 +45,7 @@ namespace PGUI::UI
 
 		isFullScreen = true;
 	}
-	void AppWindow::ExitFullScreenMode()
+	void AppWindow::ExitFullScreenMode() noexcept
 	{
 		if (!isFullScreen)
 		{
@@ -61,16 +61,22 @@ namespace PGUI::UI
 
 		isFullScreen = false;
 	}
-	void AppWindow::SetMinimumSize(SizeI size)
+
+	SizeI AppWindow::GetMinimumSize() const noexcept
+	{
+		return minSize;
+	}
+
+	void AppWindow::SetMinimumSize(SizeI size) noexcept
 	{
 		minSize = size;
 	}
 
-	void AppWindow::Title(std::wstring_view title) const
+	void AppWindow::Title(std::wstring_view title) const noexcept
 	{
 		SendMessage(Hwnd(), WM_SETTEXT, NULL, std::bit_cast<LPARAM>(title.data()));
 	}
-	const std::wstring& AppWindow::Title() const
+	const std::wstring& AppWindow::Title() const noexcept
 	{
 		return titleText;
 	}

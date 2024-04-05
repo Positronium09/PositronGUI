@@ -5,32 +5,31 @@
 
 namespace PGUI::Core::ErrorHandling
 {
-	ErrorHandling::PGUIException::PGUIException(HRESULT _errorCode) : 
+	ErrorHandling::PGUIException::PGUIException(HRESULT _errorCode) noexcept :
 		errorCode(_errorCode), errorMessage(GetHresultErrorMessage(_errorCode))
 	{
 	}
 	
-	HRESULT ErrorHandling::PGUIException::GetErrorCode() const
+	HRESULT ErrorHandling::PGUIException::GetErrorCode() const noexcept
 	{
 		return errorCode;
 	}
-
-	const char* ErrorHandling::PGUIException::what() const
+	const std::wstring& ErrorHandling::PGUIException::GetErrorMessage() const noexcept
 	{
-		return errorMessage.c_str();
+		return errorMessage;
 	}
 
-	ErrorHandling::Win32Exception::Win32Exception() : 
+	ErrorHandling::Win32Exception::Win32Exception() noexcept :
 		PGUIException{ HRESULT_FROM_WIN32(GetLastError()) }
 	{
 	}
 
-	ErrorHandling::Win32Exception::Win32Exception(DWORD errorCode) : 
+	ErrorHandling::Win32Exception::Win32Exception(DWORD errorCode) noexcept :
 		PGUIException{ HRESULT_FROM_WIN32(errorCode) }
 	{
 	}
 
-	ErrorHandling::HresultException::HresultException(HRESULT hResult) : 
+	ErrorHandling::HresultException::HresultException(HRESULT hResult) noexcept :
 		PGUIException{ hResult }
 	{
 	}

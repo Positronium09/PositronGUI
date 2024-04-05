@@ -42,7 +42,7 @@ namespace PGUI::Core
 	}
 
 	WindowClass::WindowClassPtr WindowClass::Create(std::wstring_view className, UINT style,
-		HBRUSH backgroundBrush, HICON icon, HCURSOR cursor, HICON smIcon)
+		HBRUSH backgroundBrush, HICON icon, HCURSOR cursor, HICON smIcon) noexcept
 	{
 		WNDCLASSEXW w{ };
 		auto atom = static_cast<ATOM>(GetClassInfoExW(GetHInstance(), className.data(), &w));

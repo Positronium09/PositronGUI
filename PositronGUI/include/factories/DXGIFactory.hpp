@@ -3,7 +3,7 @@
 #include "core/Exceptions.hpp"
 #include "helpers/ComPtr.hpp"
 
-#include <dxgi1_3.h>
+#include <dxgi1_6.h>
 #include <Windows.h>
 
 
@@ -16,7 +16,7 @@ namespace PGUI
 		DXGIFactory(DXGIFactory&) = delete;
 		void operator=(const DXGIFactory&) = delete;
 
-		static [[nodiscard]] ComPtr<IDXGIFactory2> GetFactory()
+		static [[nodiscard]] ComPtr<IDXGIFactory7> GetFactory()
 		{
 			if (!dxgiFactory)
 			{
@@ -26,16 +26,13 @@ namespace PGUI
 				flags = DXGI_CREATE_FACTORY_DEBUG;
 				#endif
 
-				HRESULT hr = CreateDXGIFactory2(flags, __uuidof(IDXGIFactory2), (void**)(dxgiFactory.GetAddressOf()));
-				if (FAILED(hr))
-				{
-					throw Core::ErrorHandling::HresultException{ hr };
-				}
+				HRESULT hr = CreateDXGIFactory2(flags, 
+					__uuidof(IDXGIFactory7), (void**)(dxgiFactory.GetAddressOf())); HR_T(hr);
 			}
 			return dxgiFactory;
 		}
 
 		private:
-		static inline ComPtr<IDXGIFactory2> dxgiFactory = nullptr;
+		static inline ComPtr<IDXGIFactory7> dxgiFactory = nullptr;
 	};
 }

@@ -24,11 +24,7 @@ namespace PGUI
 					CLSID_WICImagingFactory,
 					nullptr,
 					CLSCTX_INPROC_SERVER,
-					__uuidof(IWICImagingFactory), std::bit_cast<void**>(wicFactory.GetAddressOf()));
-				if (FAILED(hr))
-				{
-					throw Core::ErrorHandling::HresultException{ hr };
-				}
+					__uuidof(IWICImagingFactory), std::bit_cast<void**>(wicFactory.GetAddressOf())); HR_T(hr);
 			}
 			return wicFactory;
 		}

@@ -8,7 +8,7 @@
 #include "Size.hpp"
 #include "Rect.hpp"
 #include "RoundedRect.hpp"
-#include "Color.hpp"
+#include "Ellipse.hpp"
 #include "Event.hpp"
 #include "DirectCompositionWindow.hpp"
 #include "Logger.hpp"

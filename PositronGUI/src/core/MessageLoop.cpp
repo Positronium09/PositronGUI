@@ -7,7 +7,7 @@
 
 namespace PGUI::Core
 {
-	int GetMessageLoop::Run()
+	int GetMessageLoop::Run() noexcept
 	{
 		MSG msg{ };
 

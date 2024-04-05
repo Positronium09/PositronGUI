@@ -5,61 +5,61 @@
 
 namespace PGUI::Core
 {
-	Window* GetWindowFromHwnd(HWND hWnd)
+	Window* GetWindowFromHwnd(HWND hWnd) noexcept
 	{
 		return std::bit_cast<Window*>(GetWindowLongPtrW(hWnd, GWLP_USERDATA));
 	}
 
-	void Window::Invalidate() const
+	void Window::Invalidate() const noexcept
 	{
 		InvalidateRect(hWnd, nullptr, false);
 	}
 
-	Window::Window(const WindowClass::WindowClassPtr& wndClass) :
+	Window::Window(const WindowClass::WindowClassPtr& wndClass) noexcept :
 		windowClass{ wndClass }
 	{
 	}
 
-	Window::~Window()
+	Window::~Window() noexcept
 	{
 		DestroyWindow(hWnd);
 	}
 
-	void Window::Show(int show)
+	void Window::Show(int show) noexcept
 	{
 		ShowWindow(hWnd, show);
 	}
 
-	const ChildWindowList& Window::GetChildWindowList() const
+	const ChildWindowList& Window::GetChildWindowList() const noexcept
 	{
 		return childWindows;
 	}
 
-	RectL Window::GetWindowRect() const
+	RectL Window::GetWindowRect() const noexcept
 	{
 		RECT windowRect{ };
 		::GetWindowRect(hWnd, &windowRect);
 		return windowRect;
 	}
 
-	RectL Window::GetClientRect() const
+	RectL Window::GetClientRect() const noexcept
 	{
 		RECT clientRect{ };
 		::GetClientRect(hWnd, &clientRect);
 		return clientRect;
 	}
 
-	void Window::Move(PointL newPos) const
+	void Window::Move(PointL newPos) const noexcept
 	{
 		SetWindowPos(Hwnd(), nullptr, newPos.x, newPos.y, NULL, NULL, SWP_NOSIZE | SWP_NOZORDER);
 	}
 
-	void Window::Resize(SizeL newSize) const
+	void Window::Resize(SizeL newSize) const noexcept
 	{
 		SetWindowPos(Hwnd(), nullptr, NULL, NULL, newSize.cx, newSize.cy, SWP_NOMOVE | SWP_NOZORDER);
 	}
 
-	PointL Window::ScreenToClient(PointL point) const
+	PointL Window::ScreenToClient(PointL point) const noexcept
 	{
 		POINT p = point;
 		::ScreenToClient(hWnd, &p);
@@ -67,7 +67,7 @@ namespace PGUI::Core
 		return p;
 	}
 
-	RectL Window::ScreenToClient(RectL rect) const
+	RectL Window::ScreenToClient(RectL rect) const noexcept
 	{
 		RECT rc = rect;
 		::ScreenToClient(hWnd, std::bit_cast<LPPOINT>(&rc));
@@ -76,7 +76,7 @@ namespace PGUI::Core
 		return rc;
 	}
 
-	PointL Window::ClientToScreen(PointL point) const
+	PointL Window::ClientToScreen(PointL point) const noexcept
 	{
 		POINT p = point;
 		::ClientToScreen(hWnd, &p);
@@ -84,7 +84,7 @@ namespace PGUI::Core
 		return p;
 	}
 
-	RectL Window::ClientToScreen(RectL rect) const
+	RectL Window::ClientToScreen(RectL rect) const noexcept
 	{
 		RECT rc = rect;
 		::ClientToScreen(hWnd, std::bit_cast<LPPOINT>(&rc));
@@ -93,22 +93,22 @@ namespace PGUI::Core
 		return rc;
 	}
 
-	SizeL Window::GetWindowSize() const
+	SizeL Window::GetWindowSize() const noexcept
 	{
 		return GetWindowRect().Size();
 	}
 
-	SizeL Window::GetClientSize() const
+	SizeL Window::GetClientSize() const noexcept
 	{
 		return GetClientRect().Size();
 	}
 
-	void Window::RegisterMessageHandler(UINT msg, const Handler& handler)
+	void Window::RegisterMessageHandler(UINT msg, const Handler& handler) noexcept
 	{
 		handlerMap[msg].push_back(handler);
 	}
 
-	bool Window::operator==(const Window& other) const
+	bool Window::operator==(const Window& other) const noexcept
 	{
 		return hWnd == other.hWnd;
 	}
@@ -123,6 +123,7 @@ namespace PGUI::Core
 			auto window = GetWindowFromHwnd(hWnd);
 
 			window->hWnd = hWnd;
+			window->parenthWnd = createStruct->hwndParent;
 		}
 
 		auto window = GetWindowFromHwnd(hWnd);

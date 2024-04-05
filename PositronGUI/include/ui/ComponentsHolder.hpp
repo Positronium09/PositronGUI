@@ -3,7 +3,7 @@
 
 namespace PGUI::UI
 {
-	class Style
+	class ComponentsHolder
 	{
 
 	};

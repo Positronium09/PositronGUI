@@ -35,35 +35,43 @@ namespace PGUI::Core
 		LRESULT result;
 		HandlerResultFlags flags;
 
-		HandlerResult(LRESULT _result, HandlerResultFlags _flags = HandlerResultFlags::Nothing) :
+		HandlerResult(LRESULT _result, HandlerResultFlags _flags = HandlerResultFlags::Nothing) noexcept :
 			result(_result), flags(_flags)
 		{ }
 	};
 
 	struct WindowCreateParams
-		{
-			std::wstring windowName;
-			PointI position;
-			SizeI size;
-			DWORD style;
-			DWORD exStyle;
+	{
+		std::wstring windowName;
+		PointI position;
+		SizeI size;
+		DWORD style;
+		DWORD exStyle;
 
-			WindowCreateParams(std::wstring_view _windowName,
-				PointI _position, SizeI _size,
-				DWORD _style, DWORD _exStyle=NULL) : 
-				windowName(_windowName),
-				position(_position), size(_size),
-				style(_style), exStyle(_exStyle)
-			{ }
-		};
+		WindowCreateParams(std::wstring_view _windowName,
+			PointI _position, SizeI _size,
+			DWORD _style, DWORD _exStyle=NULL) noexcept :
+			windowName(_windowName),
+			position(_position), size(_size),
+			style(_style), exStyle(_exStyle)
+		{ }
+	};
 
 	using Handler = std::function<HandlerResult(UINT, WPARAM, LPARAM)>;
 	using HandlerMap = std::unordered_map<UINT, std::vector<Handler>>;
 
 	class Window;
-	using ChildWindowList = std::vector<std::unique_ptr<Window>>;
 
-	Window* GetWindowFromHwnd(HWND hWnd);
+	template<typename T>
+	concept IsWindowType = std::is_same_v<T, Window> || std::derived_from<T, Window>;
+
+	template<IsWindowType T>
+	using WindowPtr = std::shared_ptr<T>;
+
+	using ChildWindowList = std::vector<WindowPtr<Window>>;
+
+
+	[[nodiscard]] Window* GetWindowFromHwnd(HWND hWnd) noexcept;
 
 	class Window
 	{
@@ -71,66 +79,111 @@ namespace PGUI::Core
 
 		public:
 		template <std::derived_from<Window> T, typename ...Args>
-		static std::unique_ptr<T> Create(const WindowCreateParams& createParams, Args... args)
+		static WindowPtr<T> Create(const WindowCreateParams& createParams, Args... args)
 		{
-			auto window = std::make_unique<T>(args...);
+			auto window = std::make_shared<T>(args...);
 
 			CreateWindowExW(createParams.exStyle, 
 				window->windowClass->ClassName().data(), createParams.windowName.data(),
 				createParams.style,
-				createParams.position.x, createParams.position.x, 
+				createParams.position.x, createParams.position.y, 
 				createParams.size.cx, createParams.size.cy,
 				NULL, NULL, GetHInstance(),
 				static_cast<LPVOID>(window.get()));
 
 			if (window->hWnd == NULL)
 			{
+				ErrorHandling::Logger::Error(L"CreateWindow failed in Window::Create");
+				auto errorCode = GetLastError();
+				ErrorHandling::Logger::Error(std::format(L"Code: {}", errorCode));
+				ErrorHandling::Logger::Error(GetWin32ErrorMessage(errorCode));
 				throw ErrorHandling::Win32Exception{ };
 			}
 
 			return window;
 		}
+		template <std::derived_from<Window> T, typename ...Args>
+		WindowPtr<T> AddChildWindow(const WindowCreateParams& createParams, Args... args)
+		{
+			auto window = std::make_shared<T>(args...);
 
-		explicit Window(const WindowClass::WindowClassPtr& wndClass);
-		virtual ~Window();
+			CreateWindowExW(createParams.exStyle,
+				window->windowClass->ClassName().data(), createParams.windowName.data(),
+				createParams.style | WS_CHILD,
+				createParams.position.x, createParams.position.y,
+				createParams.size.cx, createParams.size.cy,
+				Hwnd(), NULL, GetHInstance(),
+				static_cast<LPVOID>(window.get()));
+
+			if (window->hWnd == NULL)
+			{
+				ErrorHandling::Logger::Error(L"CreateWindow failed in Window::AddChildWindow");
+				auto errorCode = GetLastError();
+				ErrorHandling::Logger::Error(std::format(L"Code: {}", errorCode));
+				ErrorHandling::Logger::Error(GetWin32ErrorMessage(errorCode));
+				throw ErrorHandling::Win32Exception{ };
+			}
+		
+			childWindows.push_back(window);
+
+			return window;
+		}
+		template <std::derived_from<Window> T>
+		WindowPtr<T> AddChildWindow(const std::shared_ptr<T> window)
+		{
+			auto style = GetWindowLongPtrW(window->Hwnd(), GWL_STYLE);
+			SetWindowLongPtrW(window->Hwnd(), GWL_STYLE, static_cast<LONG_PTR>(style | WS_CHILD));
+
+			SetParent(window->Hwnd(), Hwnd());
+
+			childWindows.push_back(window);
+
+			return window;
+		}
+
+		explicit Window(const WindowClass::WindowClassPtr& wndClass) noexcept;
+		virtual ~Window() noexcept;
 		
 		Window(const Window&) = delete;
 		Window& operator=(const Window&) = delete;
 		Window(Window&&) noexcept = delete;
 		Window& operator=(Window&) noexcept = delete;
 		
-		explicit(false) operator HWND() const { return hWnd; }
-		[[nodiscard]] HWND Hwnd() const { return hWnd; }
+		explicit(false) operator HWND() const noexcept { return hWnd; }
+		[[nodiscard]] HWND Hwnd() const noexcept { return hWnd; }
+		[[nodiscard]] HWND ParentHwnd() const noexcept { return parenthWnd; }
 
-		void Show(int show=SW_SHOW);
+		void Show(int show=SW_SHOW) noexcept;
 
-		void Move(PointL newPos) const;
-		void Resize(SizeL newSize) const;
+		void Move(PointL newPos) const noexcept;
+		void Resize(SizeL newSize) const noexcept;
 
-		[[nodiscard]] PointL ScreenToClient(PointL point) const;
-		[[nodiscard]] RectL ScreenToClient(RectL rect) const;
+		[[nodiscard]] PointL ScreenToClient(PointL point) const noexcept;
+		[[nodiscard]] RectL ScreenToClient(RectL rect) const noexcept;
 
-		[[nodiscard]] PointL ClientToScreen(PointL point) const;
-		[[nodiscard]] RectL ClientToScreen(RectL rect) const;
+		[[nodiscard]] PointL ClientToScreen(PointL point) const noexcept;
+		[[nodiscard]] RectL ClientToScreen(RectL rect) const noexcept;
 
-		[[nodiscard]] const ChildWindowList& GetChildWindowList() const;
+		[[nodiscard]] const ChildWindowList& GetChildWindowList() const noexcept;
 
-		[[nodiscard]] RectL GetWindowRect() const;
-		[[nodiscard]] RectL GetClientRect() const;
-		[[nodiscard]] SizeL GetWindowSize() const;
-		[[nodiscard]] SizeL GetClientSize() const;
+		[[nodiscard]] RectL GetWindowRect() const noexcept;
+		[[nodiscard]] RectL GetClientRect() const noexcept;
+		[[nodiscard]] SizeL GetWindowSize() const noexcept;
+		[[nodiscard]] SizeL GetClientSize() const noexcept;
 
-		void Invalidate() const;
+		void Invalidate() const noexcept;
+
+		[[nodiscard]] bool operator==(const Window& other) const noexcept;
 
 		protected:
-		virtual void RegisterMessageHandler(UINT msg, const Handler& handler) final;
+		virtual void RegisterMessageHandler(UINT msg, const Handler& handler) noexcept final;
 		template <typename T>
-		void RegisterMessageHandler(UINT msg, HandlerResult(T::* memberFunction)(UINT, WPARAM, LPARAM))
+		void RegisterMessageHandler(UINT msg, HandlerResult(T::* memberFunction)(UINT, WPARAM, LPARAM)) noexcept
 		{
 			RegisterMessageHandler(msg, std::bind_front(memberFunction, std::bit_cast<T*>(this)));
 		}
 		template <typename T>
-		void RegisterMessageHandler(UINT msg, HandlerResult(T::* memberFunction)(UINT, WPARAM, LPARAM) const)
+		void RegisterMessageHandler(UINT msg, HandlerResult(T::* memberFunction)(UINT, WPARAM, LPARAM) const) noexcept
 		{
 			RegisterMessageHandler(msg, std::bind_front(memberFunction, std::bit_cast<const T*>(this)));
 		}
@@ -142,9 +195,6 @@ namespace PGUI::Core
 
 		HandlerMap handlerMap;
 		WindowClass::WindowClassPtr windowClass;
-		public:
-
-		bool operator==(const Window& other) const;
 	};
 
 	LRESULT _WindowProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);

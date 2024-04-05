@@ -9,27 +9,24 @@
 
 namespace PGUI
 {
-	class DirectWriteFactory
+	class DWriteFactory
 	{
 		public:
-		DirectWriteFactory() = delete;
-		DirectWriteFactory(DirectWriteFactory&) = delete;
-		void operator=(const DirectWriteFactory&) = delete;
+		DWriteFactory() = delete;
+		DWriteFactory(DWriteFactory&) = delete;
+		void operator=(const DWriteFactory&) = delete;
 
-		static [[nodiscard]] ComPtr<IDWriteFactory3> GetFactory()
+		static [[nodiscard]] ComPtr<IDWriteFactory8> GetFactory()
 		{
 			if (!directWriteFactory)
 			{
-				HRESULT hr = DWriteCreateFactory(DWRITE_FACTORY_TYPE_SHARED, __uuidof(IDWriteFactory3), (IUnknown**)directWriteFactory.GetAddressOf());
-				if (FAILED(hr))
-				{
-					throw Core::ErrorHandling::HresultException{ hr };
-				}
+				HRESULT hr = DWriteCreateFactory(DWRITE_FACTORY_TYPE_SHARED, 
+					__uuidof(IDWriteFactory8), (IUnknown**)directWriteFactory.GetAddressOf()); HR_T(hr);
 			}
 			return directWriteFactory;
 		}
 
 		private:
-		static inline ComPtr<IDWriteFactory3> directWriteFactory = nullptr;
+		static inline ComPtr<IDWriteFactory8> directWriteFactory = nullptr;
 	};
 }
