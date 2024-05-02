@@ -19,6 +19,8 @@ namespace PGUI::Core::ErrorHandling
 		[[nodiscard]] HRESULT GetErrorCode() const noexcept;
 		[[nodiscard]] const std::wstring& GetErrorMessage() const noexcept;
 
+		char const* what() const override;
+
 		private:
 		HRESULT errorCode;
 		std::wstring errorMessage;
@@ -40,7 +42,7 @@ namespace PGUI::Core::ErrorHandling
 
 namespace PGUI
 {
-	static inline void HR_T(HRESULT hr)  noexcept(false)
+	static inline void HR_T(HRESULT hr) noexcept(false)
 	{
 		if (FAILED(hr))
 		{

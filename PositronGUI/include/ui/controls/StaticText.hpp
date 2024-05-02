@@ -23,6 +23,7 @@ namespace PGUI::UI::Controls
 
 		void SetText(std::wstring_view text) noexcept;
 		[[nodiscard]] const std::wstring& GetText() const noexcept;
+		[[nodiscard]] std::wstring& GetText() noexcept;
 
 		void SetTextBrush(const Brush& textBrush) noexcept;
 		[[nodiscard]] const Brush& GetTextBrush() const noexcept;

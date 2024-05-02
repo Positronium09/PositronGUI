@@ -81,6 +81,16 @@ namespace PGUI::UI
 		return titleText;
 	}
 
+	void AppWindow::AdjustForSize(SizeI size) const noexcept
+	{
+		RECT rc;
+		SetRect(&rc, 0, 0, size.cx, size.cy);
+		AdjustWindowRect(&rc, WS_OVERLAPPEDWINDOW & ~WS_SIZEBOX, FALSE);
+
+		RectL r = rc;
+		Resize(r.Size());
+	}
+
 	Core::HandlerResult AppWindow::OnNCCreate(
 			[[maybe_unused]] UINT msg, [[maybe_unused]] WPARAM wParam, LPARAM lParam)
 	{
@@ -88,7 +98,7 @@ namespace PGUI::UI
 
 		titleText = createStruct->lpszName;
 
-		return { 1, Core::HandlerResultFlags::PassToDefWindowProc };
+		return { 1, Core::HandlerResultFlag::PassToDefWindowProc };
 	}
 
 	Core::HandlerResult AppWindow::OnSetText(
@@ -96,7 +106,7 @@ namespace PGUI::UI
 	{
 		titleText = std::bit_cast<wchar_t*>(lParam);
 
-		return { 1, Core::HandlerResultFlags::PassToDefWindowProc };
+		return { 1, Core::HandlerResultFlag::PassToDefWindowProc };
 	}
 	Core::HandlerResult AppWindow::OnGetText(
 		[[maybe_unused]] UINT msg, [[maybe_unused]] WPARAM wParam, [[maybe_unused]] LPARAM lParam) const

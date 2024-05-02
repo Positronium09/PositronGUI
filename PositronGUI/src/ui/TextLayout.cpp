@@ -13,11 +13,11 @@ namespace PGUI::UI
 		auto factory = DWriteFactory::GetFactory();
 
 		HRESULT hr = factory->CreateTextLayout(text.data(), static_cast<UINT32>(text.length()), 
-			textFormat, maxSize.cx, maxSize.cy, textLayout.GetAddressOf()); HR_L(hr);
+			textFormat, maxSize.cx, maxSize.cy, textLayout.GetAddressOf()); HR_T(hr);
 
 		if (textLayout)
 		{
-			hr = textLayout.As(GetHeldComPtrAddress()); HR_L(hr);
+			hr = textLayout.As(GetHeldComPtrAddress()); HR_T(hr);
 		}
 	}
 

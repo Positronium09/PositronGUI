@@ -21,7 +21,7 @@ namespace PGUI::Core
 		{
 			for (auto& handler : eventHandlers)
 			{
-				handler(args...);
+				std::invoke(handler, args...);
 			}
 		}
 
@@ -44,7 +44,7 @@ namespace PGUI::Core
 		{
 			for (auto& handler : eventHandlers)
 			{
-				handler();
+				std::invoke(handler);
 			}
 		}
 

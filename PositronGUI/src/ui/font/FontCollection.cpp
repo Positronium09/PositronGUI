@@ -8,13 +8,13 @@
 
 namespace PGUI::UI::Font
 {
-	FontCollection FontCollection::GetSystemFontCollection() noexcept
+	FontCollection FontCollection::GetSystemFontCollection()
 	{
 		auto factory = DWriteFactory::GetFactory();
 
 		ComPtr<IDWriteFontCollection3> fontCollection;
 
-		HRESULT hr = factory->GetSystemFontCollection(false, DWRITE_FONT_FAMILY_MODEL_TYPOGRAPHIC, fontCollection.GetAddressOf()); HR_L(hr);
+		HRESULT hr = factory->GetSystemFontCollection(false, DWRITE_FONT_FAMILY_MODEL_TYPOGRAPHIC, fontCollection.GetAddressOf()); HR_T(hr);
 
 		return FontCollection{ fontCollection };
 	}

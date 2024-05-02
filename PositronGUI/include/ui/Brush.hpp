@@ -27,7 +27,7 @@ namespace PGUI::UI
 		public:
 		SolidColorBrush() noexcept = default;
 		explicit SolidColorBrush(ComPtr<ID2D1SolidColorBrush> brush) noexcept;
-		explicit SolidColorBrush(ComPtr<ID2D1DeviceContext> renderTarget, RGBA color) noexcept;
+		explicit SolidColorBrush(ComPtr<ID2D1DeviceContext> renderTarget, RGBA color);
 		
 		[[nodiscard]] ComPtr<ID2D1Brush> GetBrush() override;
 		[[nodiscard]] ID2D1Brush* GetBrushPtr() override;
@@ -39,7 +39,7 @@ namespace PGUI::UI
 		LinearGradientBrush() noexcept = default;
 		explicit LinearGradientBrush(ComPtr<ID2D1LinearGradientBrush> brush) noexcept;
 		explicit LinearGradientBrush(ComPtr<ID2D1DeviceContext> renderTarget, LinearGradient gradient,
-			std::optional<RectF> referenceRect = std::nullopt) noexcept;
+			std::optional<RectF> referenceRect = std::nullopt);
 
 		[[nodiscard]] ComPtr<ID2D1Brush> GetBrush() override;
 		[[nodiscard]] ID2D1Brush* GetBrushPtr() override;
@@ -51,7 +51,7 @@ namespace PGUI::UI
 		RadialGradientBrush() noexcept = default;
 		explicit RadialGradientBrush(ComPtr<ID2D1RadialGradientBrush> brush) noexcept;
 		explicit RadialGradientBrush(ComPtr<ID2D1DeviceContext> renderTarget, RadialGradient gradient,
-			std::optional<RectF> referenceRect = std::nullopt) noexcept;
+			std::optional<RectF> referenceRect = std::nullopt);
 
 		[[nodiscard]] ComPtr<ID2D1Brush> GetBrush() override;
 		[[nodiscard]] ID2D1Brush* GetBrushPtr() override;
@@ -62,7 +62,7 @@ namespace PGUI::UI
 		public:
 		BitmapBrush() noexcept = default;
 		explicit BitmapBrush(ComPtr<ID2D1BitmapBrush1> brush) noexcept;
-		explicit BitmapBrush(ComPtr<ID2D1DeviceContext> renderTarget, ComPtr<ID2D1Bitmap> bitmap) noexcept;
+		explicit BitmapBrush(ComPtr<ID2D1DeviceContext> renderTarget, ComPtr<ID2D1Bitmap> bitmap);
 
 		[[nodiscard]] ComPtr<ID2D1Brush> GetBrush() override;
 		[[nodiscard]] ID2D1Brush* GetBrushPtr() override;
@@ -111,7 +111,7 @@ namespace PGUI::UI
 		Brush() noexcept = default;
 		~Brush() = default;
 
-		explicit(false) Brush(ComPtr<ID2D1DeviceContext> renderTarget, const BrushParameters& parameters) noexcept;
+		Brush(ComPtr<ID2D1DeviceContext> renderTarget, const BrushParameters& parameters) noexcept;
 		explicit(false) Brush(const BrushParameters& parameters) noexcept;
 
 		[[nodiscard]] BrushBase* Get() const noexcept;

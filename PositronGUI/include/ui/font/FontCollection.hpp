@@ -14,7 +14,7 @@ namespace PGUI::UI::Font
 	class FontCollection : public ComPtrHolder<IDWriteFontCollection3>
 	{
 		public:
-		[[nodiscard]] static FontCollection GetSystemFontCollection() noexcept;
+		[[nodiscard]] static FontCollection GetSystemFontCollection();
 		[[nodiscard]] static FontCollection LoadFontFile(std::wstring_view filePath);
 
 		FontCollection() noexcept;

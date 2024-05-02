@@ -8,6 +8,7 @@ namespace PGUI::UI
 	class Control : public UIComponent
 	{
 		public:
+		explicit Control(const Core::WindowClass::WindowClassPtr& wndClass) noexcept;
 		Control() noexcept;
 
 		private:

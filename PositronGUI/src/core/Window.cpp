@@ -144,8 +144,8 @@ namespace PGUI::Core
 		bool forceCurrentResult = false;
 		for (auto const& handler : window->handlerMap[msg])
 		{
-			using enum PGUI::Core::HandlerResultFlags;
 			auto [lResult, flags] = handler(msg, wParam, lParam);
+			using enum HandlerResultFlag::EnumValues;
 
 			if (!forceCurrentResult)
 			{

@@ -1,4 +1,5 @@
 #include "ui/UIComponent.hpp"
+#include "ui/Colors.hpp"
 
 
 namespace PGUI::UI
@@ -62,7 +63,7 @@ namespace PGUI::UI
 	{
 		LRESULT defResult = DefWindowProcW(Hwnd(), msg, wParam, lParam);
 
-		if (!hitTestClipGeometry || defResult != HTCLIENT)
+		if (!hitTestClipGeometry || defResult != HTCLIENT || !clip->GetClipGeometry())
 		{
 			return defResult;
 		}
@@ -74,7 +75,7 @@ namespace PGUI::UI
 
 		if (!contains)
 		{
-			return { HTTRANSPARENT, Core::HandlerResultFlags::ForceThisResult };
+			return { HTTRANSPARENT, Core::HandlerResultFlag::ForceThisResult };
 		}
 
 		return defResult;
@@ -90,7 +91,7 @@ namespace PGUI::UI
 	void UIComponent::BeginDraw()
 	{
 		DirectCompositionWindow::BeginDraw();
-		GetRenderingInterface()->Clear(D2D1::ColorF(0, 0));
+		GetRenderingInterface()->Clear(Colors::Transparent);
 
 		GetRenderingInterface()->PushLayer(D2D1::LayerParameters1(
 			D2D1::InfiniteRect(), clip.Get()->GetClipGeometryPtr()

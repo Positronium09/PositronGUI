@@ -2,6 +2,7 @@
 
 #include "helpers/HelperFunctions.hpp"
 
+#include <stacktrace>
 #include <memory>
 #include <string>
 
@@ -73,6 +74,13 @@ namespace PGUI
 	{
 		if (FAILED(hr))
 		{
+			std::stacktrace trace = std::stacktrace::current();
+			const auto& traceEntry = trace.at(1);
+			
+			Core::ErrorHandling::Logger::Error(
+				std::format(L"Line {} in {}", traceEntry.source_line(), 
+					StringToWString(traceEntry.source_file())));
+
 			Core::ErrorHandling::Logger::Error(GetHresultErrorMessage(hr));
 		}
 	}

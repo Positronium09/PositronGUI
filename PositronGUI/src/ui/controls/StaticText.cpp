@@ -1,19 +1,41 @@
 #include "ui/controls/StaticText.hpp"
 
+#include "ui/UIColors.hpp"
 #include "ui/Color.hpp"
+#include "ui/Colors.hpp"
 #include "ui/Gradient.hpp"
 
-#include <strsafe.h>
 #include <algorithm>
+#include <strsafe.h>
 
 #undef min
 
 
 namespace PGUI::UI::Controls
 {
+	std::pair<RGBA, RGBA> GetStaticTextColors()
+	{
+		RGBA textColor;
+		RGBA backgroundColor;
+
+		if (const auto uiColors = UIColors::GetInstance(); 
+			uiColors->IsDarkMode())
+		{
+			textColor = Colors::Aliceblue;
+			backgroundColor = RGBA{ 0x1b1b1b };
+		}
+		else
+		{
+			textColor = Colors::Black;
+			backgroundColor = RGBA{ 0xf3f3f3 };
+		}
+
+		return { textColor, backgroundColor };
+	}
+
 	StaticText::StaticText(TextFormat _textFormat) noexcept :
 		UIComponent{ PGUI::Core::WindowClass::Create(L"StaticText_UIComponent") },
-		textFormat(_textFormat), textBrush(RGBA{ 0xffffff }), backgroundBrush(RGBA{ 0x1e1e1e })
+		textFormat(_textFormat)
 	{
 		RegisterMessageHandler(WM_NCCREATE, &StaticText::OnNCCreate);
 		RegisterMessageHandler(WM_PAINT, &StaticText::OnPaint);
@@ -29,6 +51,10 @@ namespace PGUI::UI::Controls
 			textFormat->SetParagraphAlignment(Font::ParagraphAlignments::Center);
 			textFormat->SetTextAlignment(Font::TextAlignments::Center);
 		}
+
+		auto [textColor, backgroundColor] = GetStaticTextColors();
+		textBrush.SetParameters(textColor);
+		backgroundBrush.SetParameters(backgroundColor);
 	}
 
 	TextLayout StaticText::GetTextLayout() const noexcept
@@ -41,27 +67,6 @@ namespace PGUI::UI::Controls
 		textFormat = _textFormat;
 
 		InitTextLayout();
-	}
-
-	void StaticText::CreateDeviceResources()
-	{
-		auto renderer = GetRenderingInterface();
-
-		if (!textBrush)
-		{
-			textBrush.CreateBrush(renderer);
-		}
-		if (!backgroundBrush)
-		{
-			SetGradientBrushRect(backgroundBrush, GetClientRect());
-			backgroundBrush.CreateBrush(renderer);
-		}
-	}
-
-	void StaticText::DiscardDeviceResources()
-	{
-		textBrush.ReleaseBrush();
-		backgroundBrush.ReleaseBrush();
 	}
 
 	void StaticText::InitTextLayout()
@@ -89,9 +94,15 @@ namespace PGUI::UI::Controls
 		return text;
 	}
 
+	std::wstring& StaticText::GetText() noexcept
+	{
+		return text;
+	}
+
 	void StaticText::SetTextBrush(const Brush& brush) noexcept
 	{
 		textBrush.SetParameters(brush.GetParameters());
+		Invalidate();
 	}
 
 	const Brush& StaticText::GetTextBrush() const noexcept
@@ -102,6 +113,7 @@ namespace PGUI::UI::Controls
 	void StaticText::SetBackgroundBrush(const Brush& brush) noexcept
 	{
 		backgroundBrush.SetParameters(brush.GetParameters());
+		Invalidate();
 	}
 
 	const Brush& StaticText::GetBackgroundBrush() const noexcept
@@ -112,6 +124,27 @@ namespace PGUI::UI::Controls
 	Core::Event<std::wstring_view>& StaticText::TextChangedEvent() noexcept
 	{
 		return textChangedEvent;
+	}
+
+	void StaticText::CreateDeviceResources()
+	{
+		auto renderer = GetRenderingInterface();
+
+		if (!textBrush)
+		{
+			textBrush.CreateBrush(renderer);
+		}
+		if (!backgroundBrush)
+		{
+			SetGradientBrushRect(backgroundBrush, GetClientRect());
+			backgroundBrush.CreateBrush(renderer);
+		}
+	}
+
+	void StaticText::DiscardDeviceResources()
+	{
+		textBrush.ReleaseBrush();
+		backgroundBrush.ReleaseBrush();
 	}
 
 	Core::HandlerResult StaticText::OnNCCreate(
@@ -131,7 +164,6 @@ namespace PGUI::UI::Controls
 
 		auto renderer = GetRenderingInterface();
 
-		renderer->Clear(RGBA{ 0 });
 		renderer->FillRectangle(GetClientRect(), backgroundBrush->GetBrushPtr());
 		renderer->DrawTextLayout(PointF{ 0, 0 }, textLayout, textBrush->GetBrushPtr());
 
@@ -158,7 +190,7 @@ namespace PGUI::UI::Controls
 			InitTextLayout();
 		}
 
-		return { 1, Core::HandlerResultFlags::PassToDefWindowProc };
+		return { 1, Core::HandlerResultFlag::PassToDefWindowProc };
 	}
 	Core::HandlerResult StaticText::OnGetText(
 		[[maybe_unused]] UINT msg, WPARAM wParam, LPARAM lParam)

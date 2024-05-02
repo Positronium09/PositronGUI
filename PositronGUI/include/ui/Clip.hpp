@@ -3,7 +3,7 @@
 #include "core/Rect.hpp"
 #include "core/RoundedRect.hpp"
 #include "core/Ellipse.hpp"
-#include "helpers/EnumOperators.hpp"
+#include "helpers/Enum.hpp"
 #include "helpers/ComPtrHolder.hpp"
 
 #include <memory>
@@ -18,15 +18,19 @@ namespace PGUI::Core
 
 namespace PGUI::UI
 {
-	enum class ClipType
+	struct _adjust_flags
 	{
-		Unknown,
-		Empty,
-		Rect,
-		RoundedRect,
-		Ellipse,
-		Path
+		enum EnumValues
+		{
+			Unknown,
+			Empty,
+			Rect,
+			RoundedRect,
+			Ellipse,
+			Path
+		};
 	};
+	using ClipType = Enum<_adjust_flags>;
 
 	class ClipBase
 	{
@@ -51,7 +55,7 @@ namespace PGUI::UI
 		public:
 		RectangleClip() noexcept = default;
 		explicit RectangleClip(ComPtr<ID2D1RectangleGeometry> geometry) noexcept;
-		explicit RectangleClip(RectF rect) noexcept;
+		explicit RectangleClip(RectF rect);
 
 		ComPtr<ID2D1Geometry> GetClipGeometry() override;
 		ID2D1Geometry* GetClipGeometryPtr() override;
@@ -62,7 +66,7 @@ namespace PGUI::UI
 		public:
 		RoundedRectangleClip() noexcept = default;
 		explicit RoundedRectangleClip(ComPtr<ID2D1RoundedRectangleGeometry> geometry) noexcept;
-		explicit RoundedRectangleClip(RoundedRect rect) noexcept;
+		explicit RoundedRectangleClip(RoundedRect rect);
 
 		ComPtr<ID2D1Geometry> GetClipGeometry() override;
 		ID2D1Geometry* GetClipGeometryPtr() override;
@@ -73,7 +77,7 @@ namespace PGUI::UI
 		public:
 		EllipseClip() noexcept = default;
 		explicit EllipseClip(ComPtr<ID2D1EllipseGeometry> geometry) noexcept;
-		explicit EllipseClip(PGUI::Ellipse ellipse) noexcept;
+		explicit EllipseClip(PGUI::Ellipse ellipse);
 
 		ComPtr<ID2D1Geometry> GetClipGeometry() override;
 		ID2D1Geometry* GetClipGeometryPtr() override;
@@ -112,14 +116,19 @@ namespace PGUI::UI
 
 	struct RoundedRectangeClipParameters : public AdjustableToWindow
 	{
-		enum class AdjustFlags
+		struct _adjust_flags
 		{
-			AdjustNone = 0,
-			AdjustRect = 1
+			enum EnumValues
+			{
+				AdjustNone = 0,
+				AdjustRect = 1,
+				AdjustRadii = 2
+			};
 		};
+		using AdjustFlags = Enum<_adjust_flags>;
 
 		RoundedRect roundedRect;
-		AdjustFlags flags;
+		AdjustFlags flags = AdjustFlags::AdjustNone;
 
 		explicit RoundedRectangeClipParameters(
 			RoundedRect roundedRect, AdjustFlags flags = AdjustFlags::AdjustRect) noexcept;
@@ -129,15 +138,19 @@ namespace PGUI::UI
 
 	struct EllipseClipParameters : public AdjustableToWindow
 	{
-		enum class AdjustFlags
+		struct _adjust_flags
 		{
-			AdjustNone = 0,
-			AdjustCenter = 1,
-			AdjustRadii = 2
+			enum EnumValues
+			{
+				AdjustNone = 0,
+				AdjustCenter = 1,
+				AdjustRadii = 2
+			};
 		};
+		using AdjustFlags = Enum<_adjust_flags>;
 
 		Ellipse ellipse;
-		AdjustFlags flags;
+		AdjustFlags flags = AdjustFlags::AdjustNone;
 
 		explicit EllipseClipParameters(
 			Ellipse ellipse, AdjustFlags flags = AdjustFlags(AdjustFlags::AdjustCenter | AdjustFlags::AdjustRadii)) noexcept;

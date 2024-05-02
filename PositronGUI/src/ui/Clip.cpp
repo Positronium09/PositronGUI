@@ -21,11 +21,11 @@ namespace PGUI::UI
 	{
 	}
 
-	RectangleClip::RectangleClip(RectF rect) noexcept
+	RectangleClip::RectangleClip(RectF rect)
 	{
 		auto factory = D2DFactory::GetFactory();
 
-		HRESULT hr = factory->CreateRectangleGeometry(rect, GetHeldComPtrAddress()); HR_L(hr);
+		HRESULT hr = factory->CreateRectangleGeometry(rect, GetHeldComPtrAddress()); HR_T(hr);
 	}
 
 	ComPtr<ID2D1Geometry> RectangleClip::GetClipGeometry()
@@ -42,11 +42,11 @@ namespace PGUI::UI
 		ComPtrHolder{ geometry }
 	{
 	}
-	RoundedRectangleClip::RoundedRectangleClip(RoundedRect roundedRect) noexcept
+	RoundedRectangleClip::RoundedRectangleClip(RoundedRect roundedRect)
 	{
 		auto factory = D2DFactory::GetFactory();
 
-		HRESULT hr = factory->CreateRoundedRectangleGeometry(roundedRect, GetHeldComPtrAddress()); HR_L(hr);
+		HRESULT hr = factory->CreateRoundedRectangleGeometry(roundedRect, GetHeldComPtrAddress()); HR_T(hr);
 	}
 
 	ComPtr<ID2D1Geometry> RoundedRectangleClip::GetClipGeometry()
@@ -63,11 +63,11 @@ namespace PGUI::UI
 		ComPtrHolder{ geometry }
 	{
 	}
-	EllipseClip::EllipseClip(PGUI::Ellipse ellipse) noexcept
+	EllipseClip::EllipseClip(PGUI::Ellipse ellipse)
 	{
 		auto factory = D2DFactory::GetFactory();
 
-		HRESULT hr = factory->CreateEllipseGeometry(ellipse, GetHeldComPtrAddress()); HR_L(hr);
+		HRESULT hr = factory->CreateEllipseGeometry(ellipse, GetHeldComPtrAddress()); HR_T(hr);
 	}
 
 	ComPtr<ID2D1Geometry> EllipseClip::GetClipGeometry()
@@ -164,7 +164,7 @@ namespace PGUI::UI
 	{
 		RectF rect = window->GetClientRect();
 
-		if (flags & AdjustFlags::AdjustRect)
+		if ((flags & AdjustFlags::AdjustRect) != AdjustFlags::AdjustNone)
 		{
 			roundedRect.left = rect.left;
 			roundedRect.top = rect.top;
@@ -182,12 +182,12 @@ namespace PGUI::UI
 	{
 		RectF rect = window->GetClientRect();
 
-		if (flags & AdjustFlags::AdjustCenter)
+		if ((flags & AdjustFlags::AdjustCenter) != AdjustFlags::AdjustNone)
 		{
 			auto center = rect.Center();
 			ellipse.center = center;
 		}
-		if (flags & AdjustFlags::AdjustRadii)
+		if ((flags & AdjustFlags::AdjustRadii) != AdjustFlags::AdjustNone)
 		{
 			auto size = rect.Size();
 
@@ -200,7 +200,7 @@ namespace PGUI::UI
 	{
 		auto& params = clip.GetParameters();
 
-		std::visit([window]<typename T>(T & parameter)
+		std::visit([window]<typename T>(T& parameter)
 		{
 			if constexpr (IsClipParametersAdjustableForWindow<T>)
 			{
@@ -211,29 +211,3 @@ namespace PGUI::UI
 		clip.CreateClip();
 	}
 }
-
-/*
-if constexpr (std::is_same_v<T, RectF>)
-{
-	parameter = window->GetClientRect();
-}
-else if constexpr (std::is_same_v<T, RoundedRect>)
-{
-	RectF rect = window->GetClientRect();
-
-	parameter.left = rect.left;
-	parameter.top = rect.top;
-	parameter.right = rect.right;
-	parameter.bottom = rect.bottom;
-}
-else if constexpr (std::is_same_v<T, Ellipse>)
-{
-	RectF clientRect = window->GetClientRect();
-	auto size = clientRect.Size();
-	auto center = clientRect.Center();
-
-	parameter.center = center;
-	parameter.xRadius = size.cx;
-	parameter.yRadius = size.cy;
-}
-*/

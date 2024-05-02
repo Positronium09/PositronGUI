@@ -19,7 +19,17 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\helpers\TimerEvent.cpp" />
+    <ClCompile Include="src\helpers\PropVariant.cpp" />
+    <ClCompile Include="src\ui\controls\ImageButton.cpp" />
+    <ClCompile Include="src\ui\img\ImageMetadataReader.cpp" />
+    <ClCompile Include="src\ui\controls\StaticImage.cpp" />
+    <ClCompile Include="src\ui\img\Frame.cpp" />
+    <ClCompile Include="src\ui\img\Image.cpp" />
+    <ClCompile Include="src\PGUI.cpp" />
     <ClCompile Include="src\ui\Brush.cpp" />
+    <ClCompile Include="src\ui\controls\TextButton.cpp" />
+    <ClCompile Include="src\ui\controls\ButtonBase.cpp" />
     <ClCompile Include="src\ui\controls\StaticText.cpp" />
     <ClCompile Include="src\ui\TextLayout.cpp" />
     <ClCompile Include="src\ui\font\FontCollection.cpp" />
@@ -27,11 +37,11 @@
     <ClCompile Include="src\ui\font\FontSet.cpp" />
     <ClCompile Include="src\ui\font\LocalizedFontFamilyNames.cpp" />
     <ClCompile Include="src\ui\Gradient.cpp" />
-    <ClCompile Include="src\ui\ComponentHolder.cpp" />
     <ClCompile Include="src\ui\Control.cpp" />
     <ClCompile Include="src\ui\AppWindow.cpp" />
     <ClCompile Include="src\ui\Clip.cpp" />
     <ClCompile Include="src\ui\TextFormat.cpp" />
+    <ClCompile Include="src\ui\UIColors.cpp" />
     <ClCompile Include="src\ui\UIComponent.cpp" />
     <ClCompile Include="src\core\DirectCompositionWindow.cpp" />
     <ClCompile Include="src\core\Logger.cpp" />
@@ -44,8 +54,19 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\core\Ellipse.hpp" />
+    <ClInclude Include="include\helpers\Enum.hpp" />
+    <ClInclude Include="include\helpers\PropVariant.hpp" />
+    <ClInclude Include="include\helpers\TimerEvent.hpp" />
+    <ClInclude Include="include\ui\controls\ImageButton.hpp" />
+    <ClInclude Include="include\ui\controls\StaticImage.hpp" />
+    <ClInclude Include="include\ui\controls\TextButton.hpp" />
+    <ClInclude Include="include\ui\controls\ButtonBase.hpp" />
     <ClInclude Include="include\ui\controls\PGUI.ui.controls.hpp" />
     <ClInclude Include="include\ui\controls\StaticText.hpp" />
+    <ClInclude Include="include\ui\img\Frame.hpp" />
+    <ClInclude Include="include\ui\img\Image.hpp" />
+    <ClInclude Include="include\ui\img\ImageMetadataReader.hpp" />
+    <ClInclude Include="include\ui\img\PGUI.ui.img.hpp" />
     <ClInclude Include="include\ui\PositioningMode.hpp" />
     <ClInclude Include="include\helpers\ComPtrHolder.hpp" />
     <ClInclude Include="include\ui\Color.hpp" />
@@ -74,18 +95,16 @@
     <ClInclude Include="include\factories\DXGIFactory.hpp" />
     <ClInclude Include="include\factories\WICFactory.hpp" />
     <ClInclude Include="include\helpers\ComPtr.hpp" />
-    <ClInclude Include="include\helpers\EnumOperators.hpp" />
     <ClInclude Include="include\helpers\HelperFunctions.hpp" />
     <ClInclude Include="include\helpers\PGUI.helpers.hpp" />
     <ClInclude Include="include\PGUI.hpp" />
     <ClInclude Include="include\ui\AppWindow.hpp" />
     <ClInclude Include="include\ui\Clip.hpp" />
-    <ClInclude Include="include\ui\ComponentHolder.hpp" />
-    <ClInclude Include="include\ui\ComponentsHolder.hpp" />
     <ClInclude Include="include\ui\Control.hpp" />
     <ClInclude Include="include\ui\PGUI.ui.hpp" />
     <ClInclude Include="include\ui\TextFormat.hpp" />
     <ClInclude Include="include\ui\TextLayout.hpp" />
+    <ClInclude Include="include\ui\UIColors.hpp" />
     <ClInclude Include="include\ui\UIComponent.hpp" />
     <ClInclude Include="include\ui\Brush.hpp" />
   </ItemGroup>
@@ -179,7 +198,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
     <Lib>
-      <AdditionalDependencies>dwmapi.lib;d2d1.lib;dwrite.lib;dxgi.lib;dcomp.lib;d3d11.lib</AdditionalDependencies>
+      <AdditionalDependencies>dwmapi.lib;d2d1.lib;dwrite.lib;dxgi.lib;dcomp.lib;d3d11.lib;runtimeobject.lib</AdditionalDependencies>
       <AdditionalOptions> /ignore:4006 %(AdditionalOptions)</AdditionalOptions>
     </Lib>
   </ItemDefinitionGroup>
@@ -205,7 +224,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
     <Lib>
-      <AdditionalDependencies>dwmapi.lib;d2d1.lib;dwrite.lib;dxgi.lib;dcomp.lib;d3d11.lib</AdditionalDependencies>
+      <AdditionalDependencies>dwmapi.lib;d2d1.lib;dwrite.lib;dxgi.lib;dcomp.lib;d3d11.lib;runtimeobject.lib</AdditionalDependencies>
       <AdditionalOptions> /ignore:4006 %(AdditionalOptions)</AdditionalOptions>
     </Lib>
   </ItemDefinitionGroup>
@@ -227,7 +246,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
     <Lib>
-      <AdditionalDependencies>dwmapi.lib;d2d1.lib;dwrite.lib;dxgi.lib;dcomp.lib;d3d11.lib</AdditionalDependencies>
+      <AdditionalDependencies>dwmapi.lib;d2d1.lib;dwrite.lib;dxgi.lib;dcomp.lib;d3d11.lib;runtimeobject.lib</AdditionalDependencies>
       <AdditionalOptions> /ignore:4006 %(AdditionalOptions)</AdditionalOptions>
     </Lib>
   </ItemDefinitionGroup>
@@ -253,7 +272,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
     <Lib>
-      <AdditionalDependencies>dwmapi.lib;d2d1.lib;dwrite.lib;dxgi.lib;dcomp.lib;d3d11.lib</AdditionalDependencies>
+      <AdditionalDependencies>dwmapi.lib;d2d1.lib;dwrite.lib;dxgi.lib;dcomp.lib;d3d11.lib;runtimeobject.lib</AdditionalDependencies>
       <AdditionalOptions> /ignore:4006 %(AdditionalOptions)</AdditionalOptions>
     </Lib>
   </ItemDefinitionGroup>

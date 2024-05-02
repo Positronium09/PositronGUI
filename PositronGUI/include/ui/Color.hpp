@@ -3,6 +3,7 @@
 #include <cstdint>
 #include <d2d1.h>
 #include <Windows.h>
+#include <windows.ui.viewmanagement.h>
 
 
 #undef RGB
@@ -34,8 +35,8 @@ namespace PGUI::UI
 
 		constexpr [[nodiscard]] bool operator==(const RGB& other) const noexcept = default;
 
-		constexpr void Lighten(FLOAT amount) noexcept;
-		constexpr void Darken(FLOAT amount) noexcept;
+		void Lighten(FLOAT amount) noexcept;
+		void Darken(FLOAT amount) noexcept;
 
 		FLOAT r = 0.0f;
 		FLOAT g = 0.0f;
@@ -46,21 +47,22 @@ namespace PGUI::UI
 	{
 		public:
 		RGBA() noexcept = default;
-		RGBA(FLOAT r, FLOAT g, FLOAT b, FLOAT a=1.0f) noexcept;
-		RGBA(std::uint8_t r, std::uint8_t g, std::uint8_t b, std::uint8_t a=255) noexcept;
-		RGBA(std::uint32_t rgb, FLOAT a=1.0f) noexcept;
+		RGBA(FLOAT r, FLOAT g, FLOAT b, FLOAT a = 1.0f) noexcept;
+		RGBA(std::uint8_t r, std::uint8_t g, std::uint8_t b, std::uint8_t a = 255) noexcept;
+		RGBA(std::uint32_t rgb, FLOAT a = 1.0f) noexcept;
 
 		explicit(false) RGBA(const RGB& rgb) noexcept;
-
 		explicit(false) RGBA(const D2D1_COLOR_F& color) noexcept;
+		explicit(false) RGBA(const ABI::Windows::UI::Color& color) noexcept;
 
 		explicit(false) operator RGB() noexcept;
 		explicit(false) operator D2D1_COLOR_F() const noexcept;
+		explicit(false) operator ABI::Windows::UI::Color() const noexcept;
 
 		constexpr [[nodiscard]] bool operator==(const RGBA& other) const noexcept = default;
 
-		constexpr void Lighten(FLOAT amount) noexcept;
-		constexpr void Darken(FLOAT amount) noexcept;
+		void Lighten(FLOAT amount) noexcept;
+		void Darken(FLOAT amount) noexcept;
 
 		FLOAT r = 0.0f;
 		FLOAT g = 0.0f;

@@ -21,6 +21,8 @@ namespace PGUI::UI
 		void Title(std::wstring_view title) const noexcept;
 		[[nodiscard]] const std::wstring& Title() const noexcept;
 
+		void AdjustForSize(SizeI size) const noexcept;
+
 		private:
 		std::wstring titleText;
 		WINDOWPLACEMENT prevPlacement{ };

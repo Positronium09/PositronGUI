@@ -7,9 +7,10 @@
 #include "Size.hpp"
 #include "WindowClass.hpp"
 #include "helpers/HelperFunctions.hpp"
-#include "helpers/EnumOperators.hpp"
+#include "helpers/Enum.hpp"
 
 #include <bit>
+#include <ranges>
 #include <concepts>
 #include <functional>
 #include <memory>
@@ -21,21 +22,25 @@
 
 namespace PGUI::Core
 {
-	enum class HandlerResultFlags
+	struct _handler_result_flag_values
 	{
-		Nothing = 0x00,
-		NoFurtherHandling = 0x01,
-		ForceThisResult = 0x02,
-		ReturnPrevResult = 0x04,
-		PassToDefWindowProc = 0x08
+		enum EnumValues
+		{
+			Nothing = 0x00,
+			NoFurtherHandling = 0x01,
+			ForceThisResult = 0x02,
+			ReturnPrevResult = 0x04,
+			PassToDefWindowProc = 0x08
+		};
 	};
+	using HandlerResultFlag = Enum<_handler_result_flag_values>;
 
 	struct HandlerResult
 	{
 		LRESULT result;
-		HandlerResultFlags flags;
+		HandlerResultFlag flags;
 
-		HandlerResult(LRESULT _result, HandlerResultFlags _flags = HandlerResultFlags::Nothing) noexcept :
+		HandlerResult(LRESULT _result, HandlerResultFlag _flags = HandlerResultFlag::Nothing) noexcept :
 			result(_result), flags(_flags)
 		{ }
 	};
@@ -129,7 +134,7 @@ namespace PGUI::Core
 			return window;
 		}
 		template <std::derived_from<Window> T>
-		WindowPtr<T> AddChildWindow(const std::shared_ptr<T> window)
+		WindowPtr<T> AddChildWindow(const WindowPtr<T> window)
 		{
 			auto style = GetWindowLongPtrW(window->Hwnd(), GWL_STYLE);
 			SetWindowLongPtrW(window->Hwnd(), GWL_STYLE, static_cast<LONG_PTR>(style | WS_CHILD));
@@ -139,6 +144,28 @@ namespace PGUI::Core
 			childWindows.push_back(window);
 
 			return window;
+		}
+
+		void RemoveChildWindow(HWND childHwnd)
+		{
+			for (const auto& [index, child] : std::views::enumerate(childWindows))
+			{
+				if (child->Hwnd() == childHwnd)
+				{
+					auto iter = childWindows.begin();
+					std::advance(iter, index);
+					childWindows.erase(iter);
+
+					SetParent(childHwnd, NULL);
+
+					LONG_PTR style = GetWindowLongPtrW(childHwnd, GWL_STYLE);
+					style &= ~(WS_CHILD);
+					style |= WS_POPUP;
+					SetWindowLongPtrW(childHwnd, GWL_STYLE, style);
+					
+					break;
+				}
+			}
 		}
 
 		explicit Window(const WindowClass::WindowClassPtr& wndClass) noexcept;

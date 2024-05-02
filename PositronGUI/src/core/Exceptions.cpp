@@ -19,6 +19,11 @@ namespace PGUI::Core::ErrorHandling
 		return errorMessage;
 	}
 
+	char const* PGUIException::what() const
+	{
+		return WStringToString(errorMessage).c_str();
+	}
+
 	ErrorHandling::Win32Exception::Win32Exception() noexcept :
 		PGUIException{ HRESULT_FROM_WIN32(GetLastError()) }
 	{

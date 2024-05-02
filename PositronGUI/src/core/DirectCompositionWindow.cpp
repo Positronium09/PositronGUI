@@ -4,6 +4,8 @@
 #include "core/Logger.hpp"
 #include "factories/DXGIFactory.hpp"
 #include "factories/Direct2DFactory.hpp"
+ 
+#include <array>
 
 
 namespace PGUI::Core
@@ -30,12 +32,7 @@ namespace PGUI::Core
 		{
 			DiscardDeviceResources();
 		}
-		else if (FAILED(hr))
-		{
-			ErrorHandling::Logger::Error(std::format(L"D2D1DeviceContext EndDraw returned an error"));
-			ErrorHandling::Logger::Error(std::format(L"Error code: {:#x}", std::make_unsigned_t<HRESULT>(hr)));
-			ErrorHandling::Logger::Error(std::format(L"Error message\n{}", GetHresultErrorMessage(hr)));
-		}
+		HR_L(hr);
 
 		hr = swapChain->Present(1, NULL); HR_L(hr);
 		return hr;
@@ -58,17 +55,52 @@ namespace PGUI::Core
 
 	void DirectCompositionWindow::InitD3D11Device()
 	{
+		auto dxgiFactory = DXGIFactory::GetFactory();
+
+		SYSTEM_POWER_STATUS powerStatus{ };
+		GetSystemPowerStatus(&powerStatus);
+
+		DXGI_GPU_PREFERENCE gpuPreference = DXGI_GPU_PREFERENCE_HIGH_PERFORMANCE;
+		if (powerStatus.SystemStatusFlag == 1 || 
+			(powerStatus.BatteryFlag & (2 | 4) && ~(powerStatus.BatteryFlag & 8)))
+		{
+			gpuPreference = DXGI_GPU_PREFERENCE_MINIMUM_POWER;
+		}
+
+		ComPtr<IDXGIAdapter1> adapter;
+		HRESULT hr = dxgiFactory->EnumAdapterByGpuPreference(0, gpuPreference, 
+			IID_PPV_ARGS(adapter.GetAddressOf())); HR_T(hr);
+
+		auto createDeviceFlags =
+			#ifdef _DEBUG
+		(D3D11_CREATE_DEVICE_FLAG)(D3D11_CREATE_DEVICE_BGRA_SUPPORT | D3D11_CREATE_DEVICE_DEBUG);
+		#else
+			D3D11_CREATE_DEVICE_BGRA_SUPPORT;
+		#endif
+
+		std::array featureLevels =
+		{
+			D3D_FEATURE_LEVEL_11_1,
+			D3D_FEATURE_LEVEL_11_0,
+			D3D_FEATURE_LEVEL_10_1,
+			D3D_FEATURE_LEVEL_10_0,
+			D3D_FEATURE_LEVEL_9_3,
+			D3D_FEATURE_LEVEL_9_2,
+			D3D_FEATURE_LEVEL_9_1
+		};
+
 		ComPtr<ID3D11Device> device;
-		HRESULT hr = D3D11CreateDevice(nullptr,
-			D3D_DRIVER_TYPE_HARDWARE, nullptr,
-			D3D11_CREATE_DEVICE_BGRA_SUPPORT,
-			nullptr, 0, D3D11_SDK_VERSION,
+		hr = D3D11CreateDevice(adapter.Get(),
+			D3D_DRIVER_TYPE_UNKNOWN, nullptr,
+			createDeviceFlags,
+			featureLevels.data(), 
+			static_cast<UINT>(featureLevels.size()), 
+			D3D11_SDK_VERSION,
 			device.GetAddressOf(), nullptr, nullptr);  HR_T(hr);
 
 		hr = device.As(&d3d11Device); HR_T(hr);
 		hr = d3d11Device.As(&dxgiDevice); HR_T(hr);
 
-		auto dxgiFactory = DXGIFactory::GetFactory();
 
 		DXGI_SWAP_CHAIN_DESC1 description = {};
 		description.Format = DXGI_FORMAT_B8G8R8A8_UNORM;
@@ -101,8 +133,7 @@ namespace PGUI::Core
 	void DirectCompositionWindow::InitD2D1DeviceContextTarget() const
 	{
 		ComPtr<IDXGISurface2> surface;
-		HRESULT hr = swapChain->GetBuffer(0, __uuidof(surface),
-			std::bit_cast<void**>(surface.GetAddressOf())); HR_T(hr);
+		HRESULT hr = swapChain->GetBuffer(0, IID_PPV_ARGS(surface.GetAddressOf())); HR_T(hr);
 
 		D2D1_BITMAP_PROPERTIES1 properties = {};
 		properties.pixelFormat.alphaMode = D2D1_ALPHA_MODE_PREMULTIPLIED;
@@ -143,13 +174,14 @@ namespace PGUI::Core
 		InitD2D1Device();
 		InitDirectComposition();
 
-		return { 1, HandlerResultFlags::PassToDefWindowProc };
+		return { 1, HandlerResultFlag::PassToDefWindowProc };
 	}
 
 	Core::HandlerResult DirectCompositionWindow::OnSize(
 		[[maybe_unused]] UINT msg, [[maybe_unused]] WPARAM wParam, [[maybe_unused]] LPARAM lParam)
 	{
 		auto size = GetWindowSize();
+
 		d2d1Dc->SetTarget(nullptr);
 
 		if (size.cy == 0)
@@ -160,8 +192,8 @@ namespace PGUI::Core
 		HRESULT hr = swapChain->ResizeBuffers(0, size.cx, size.cy,
 			DXGI_FORMAT_UNKNOWN, NULL); HR_T(hr);
 
-		InitD2D1DeviceContextTarget();
 		DiscardDeviceResources();
+		InitD2D1DeviceContextTarget();
 
 		return 0;
 	}

@@ -3,6 +3,11 @@
 
 namespace PGUI::UI
 {
+	Control::Control(const Core::WindowClass::WindowClassPtr& wndClass) noexcept : 
+		UIComponent{ wndClass }
+	{
+		RegisterMessageHandler(WM_CREATE, &Control::OnCreate);
+	}
 	Control::Control() noexcept
 	{
 		RegisterMessageHandler(WM_CREATE, &Control::OnCreate);

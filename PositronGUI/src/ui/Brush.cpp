@@ -2,6 +2,7 @@
 
 #include "ui/UIComponent.hpp"
 #include "core/Logger.hpp"
+#include "core/Exceptions.hpp"
 
 
 namespace PGUI::UI
@@ -10,9 +11,9 @@ namespace PGUI::UI
 		ComPtrHolder{ brush }
 	{ }
 
-	SolidColorBrush::SolidColorBrush(ComPtr<ID2D1DeviceContext> renderTarget, RGBA color) noexcept
+	SolidColorBrush::SolidColorBrush(ComPtr<ID2D1DeviceContext> renderTarget, RGBA color)
 	{
-		HRESULT hr = renderTarget->CreateSolidColorBrush(color, GetHeldComPtrAddress()); HR_L(hr);
+		HRESULT hr = renderTarget->CreateSolidColorBrush(color, GetHeldComPtrAddress()); HR_T(hr);
 	}
 
 	ComPtr<ID2D1Brush> SolidColorBrush::GetBrush()
@@ -31,7 +32,7 @@ namespace PGUI::UI
 	{ }
 
 	LinearGradientBrush::LinearGradientBrush(ComPtr<ID2D1DeviceContext> renderTarget, LinearGradient gradient,
-		std::optional<RectF> referenceRect) noexcept
+		std::optional<RectF> referenceRect)
 	{
 		if (referenceRect.has_value() && gradient.GetPositioningMode() == PositioningMode::Relative)
 		{
@@ -42,7 +43,7 @@ namespace PGUI::UI
 
 		ComPtr<ID2D1GradientStopCollection> gradientStopCollection;
 		HRESULT hr = renderTarget->CreateGradientStopCollection(
-			gradientStops.data(), static_cast<UINT32>(gradientStops.size()), gradientStopCollection.GetAddressOf()); HR_L(hr);
+			gradientStops.data(), static_cast<UINT32>(gradientStops.size()), gradientStopCollection.GetAddressOf()); HR_T(hr);
 
 		if (FAILED(hr))
 		{
@@ -53,7 +54,7 @@ namespace PGUI::UI
 			D2D1::LinearGradientBrushProperties(gradient.Start(), gradient.End()),
 			gradientStopCollection.Get(),
 			GetHeldComPtrAddress()
-		); HR_L(hr);
+		); HR_T(hr);
 	}
 
 	ComPtr<ID2D1Brush> LinearGradientBrush::GetBrush()
@@ -72,7 +73,7 @@ namespace PGUI::UI
 	{ }
 
 	RadialGradientBrush::RadialGradientBrush(ComPtr<ID2D1DeviceContext> renderTarget, RadialGradient gradient,
-		std::optional<RectF> referenceRect) noexcept
+		std::optional<RectF> referenceRect)
 	{
 		if (referenceRect.has_value() && gradient.GetPositioningMode() == PositioningMode::Relative)
 		{
@@ -85,7 +86,7 @@ namespace PGUI::UI
 
 		ComPtr<ID2D1GradientStopCollection> gradientStopCollection;
 		HRESULT hr = renderTarget->CreateGradientStopCollection(
-			gradientStops.data(), static_cast<UINT32>(gradientStops.size()), gradientStopCollection.GetAddressOf()); HR_L(hr);
+			gradientStops.data(), static_cast<UINT32>(gradientStops.size()), gradientStopCollection.GetAddressOf()); HR_T(hr);
 
 		if (FAILED(hr))
 		{
@@ -96,7 +97,7 @@ namespace PGUI::UI
 			D2D1::RadialGradientBrushProperties(gradient.GetEllipse().center, gradient.Offset(), xRadius, yRadius),
 			gradientStopCollection.Get(),
 			GetHeldComPtrAddress()
-		); HR_L(hr);
+		); HR_T(hr);
 	}
 
 	ComPtr<ID2D1Brush> RadialGradientBrush::GetBrush()
@@ -114,9 +115,9 @@ namespace PGUI::UI
 		ComPtrHolder(brush)
 	{
 	}
-	BitmapBrush::BitmapBrush(ComPtr<ID2D1DeviceContext> renderTarget, ComPtr<ID2D1Bitmap> bitmap) noexcept
+	BitmapBrush::BitmapBrush(ComPtr<ID2D1DeviceContext> renderTarget, ComPtr<ID2D1Bitmap> bitmap)
 	{
-		HRESULT hr = renderTarget->CreateBitmapBrush(bitmap.Get(), GetHeldComPtrAddress()); HR_L(hr);
+		HRESULT hr = renderTarget->CreateBitmapBrush(bitmap.Get(), GetHeldComPtrAddress()); HR_T(hr);
 	}
 
 	ComPtr<ID2D1Brush> BitmapBrush::GetBrush()

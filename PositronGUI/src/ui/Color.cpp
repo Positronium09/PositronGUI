@@ -142,14 +142,14 @@ namespace PGUI::UI
 		return D2D1::ColorF(r, g, b);
 	}
 
-	constexpr void RGB::Lighten(FLOAT amount) noexcept
+	void RGB::Lighten(FLOAT amount) noexcept
 	{
 		r = std::clamp(r + amount, 0.0f, 1.0f);
 		g = std::clamp(g + amount, 0.0f, 1.0f);
 		b = std::clamp(b + amount, 0.0f, 1.0f);
 	}
 
-	constexpr void RGB::Darken(FLOAT amount) noexcept
+	void RGB::Darken(FLOAT amount) noexcept
 	{
 		r = std::clamp(r - amount, 0.0f, 1.0f);
 		g = std::clamp(g - amount, 0.0f, 1.0f);
@@ -182,6 +182,11 @@ namespace PGUI::UI
 	{
 	}
 
+	RGBA::RGBA(const ABI::Windows::UI::Color& color) noexcept : 
+		r(color.R / 255.0f), g(color.G / 255.0f), b(color.B / 255.0f), a(color.A / 255.0f)
+	{
+	}
+
 	RGBA::operator RGB() noexcept
 	{
 		return RGB{ *this };
@@ -191,14 +196,26 @@ namespace PGUI::UI
 		return D2D1::ColorF(r, g, b, a);
 	}
 
-	constexpr void RGBA::Lighten(FLOAT amount) noexcept
+	RGBA::operator ABI::Windows::UI::Color() const noexcept
+	{
+		ABI::Windows::UI::Color color{ };
+		
+		color.R = static_cast<BYTE>(r / 255.0f);
+		color.G = static_cast<BYTE>(g / 255.0f);
+		color.B = static_cast<BYTE>(b / 255.0f);
+		color.A = static_cast<BYTE>(a / 255.0f);
+
+		return color;
+	}
+
+	void RGBA::Lighten(FLOAT amount) noexcept
 	{
 		r = std::clamp(r + amount, 0.0f, 1.0f);
 		g = std::clamp(g + amount, 0.0f, 1.0f);
 		b = std::clamp(b + amount, 0.0f, 1.0f);
 	}
 
-	constexpr void RGBA::Darken(FLOAT amount) noexcept
+	void RGBA::Darken(FLOAT amount) noexcept
 	{
 		r = std::clamp(r - amount, 0.0f, 1.0f);
 		g = std::clamp(g - amount, 0.0f, 1.0f);
