@@ -2,6 +2,7 @@
 
 #include <cstdint>
 #include <d2d1.h>
+#include <wincodec.h>
 #include <Windows.h>
 #include <windows.ui.viewmanagement.h>
 
@@ -67,7 +68,7 @@ namespace PGUI::UI
 		FLOAT r = 0.0f;
 		FLOAT g = 0.0f;
 		FLOAT b = 0.0f;
-		FLOAT a = 0.0f;
+		FLOAT a = 0.0f; 
 	};
 
 	class HSL

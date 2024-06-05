@@ -13,7 +13,7 @@ namespace PGUI::UI
 
 	SolidColorBrush::SolidColorBrush(ComPtr<ID2D1DeviceContext> renderTarget, RGBA color)
 	{
-		HRESULT hr = renderTarget->CreateSolidColorBrush(color, GetHeldComPtrAddress()); HR_T(hr);
+		HRESULT hr = renderTarget->CreateSolidColorBrush(color, GetHeldPtrAddress()); HR_T(hr);
 	}
 
 	ComPtr<ID2D1Brush> SolidColorBrush::GetBrush()
@@ -53,7 +53,7 @@ namespace PGUI::UI
 		renderTarget->CreateLinearGradientBrush(
 			D2D1::LinearGradientBrushProperties(gradient.Start(), gradient.End()),
 			gradientStopCollection.Get(),
-			GetHeldComPtrAddress()
+			GetHeldPtrAddress()
 		); HR_T(hr);
 	}
 
@@ -96,7 +96,7 @@ namespace PGUI::UI
 		renderTarget->CreateRadialGradientBrush(
 			D2D1::RadialGradientBrushProperties(gradient.GetEllipse().center, gradient.Offset(), xRadius, yRadius),
 			gradientStopCollection.Get(),
-			GetHeldComPtrAddress()
+			GetHeldPtrAddress()
 		); HR_T(hr);
 	}
 
@@ -117,7 +117,7 @@ namespace PGUI::UI
 	}
 	BitmapBrush::BitmapBrush(ComPtr<ID2D1DeviceContext> renderTarget, ComPtr<ID2D1Bitmap> bitmap)
 	{
-		HRESULT hr = renderTarget->CreateBitmapBrush(bitmap.Get(), GetHeldComPtrAddress()); HR_T(hr);
+		HRESULT hr = renderTarget->CreateBitmapBrush(bitmap.Get(), GetHeldPtrAddress()); HR_T(hr);
 	}
 
 	ComPtr<ID2D1Brush> BitmapBrush::GetBrush()

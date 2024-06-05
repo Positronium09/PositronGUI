@@ -34,12 +34,12 @@ namespace PGUI::UI
 
 	void UIComponent::EnableInput() const noexcept
 	{
-		EnableWindow(Hwnd(), TRUE);
+		Enable(true);
 	}
 
 	void UIComponent::DisableInput() const noexcept
 	{
-		EnableWindow(Hwnd(), FALSE);
+		Enable(false);
 	}
 
 	bool UIComponent::IsInputEnabled() const noexcept
@@ -47,8 +47,7 @@ namespace PGUI::UI
 		return IsWindowEnabled(Hwnd());
 	}
 
-	Core::HandlerResult UIComponent::OnCreate(
-		[[maybe_unused]] UINT msg, [[maybe_unused]] WPARAM wParam, [[maybe_unused]] LPARAM lParam) const
+	Core::HandlerResult UIComponent::OnCreate(UINT, WPARAM, LPARAM) const noexcept
 	{
 		/*
 		* Disable input by default
@@ -59,7 +58,7 @@ namespace PGUI::UI
 		return 0;
 	}
 
-	Core::HandlerResult UIComponent::OnNcHitTest(UINT msg, WPARAM wParam, LPARAM lParam) const
+	Core::HandlerResult UIComponent::OnNcHitTest(UINT msg, WPARAM wParam, LPARAM lParam) const noexcept
 	{
 		LRESULT defResult = DefWindowProcW(Hwnd(), msg, wParam, lParam);
 
@@ -81,8 +80,7 @@ namespace PGUI::UI
 		return defResult;
 	}
 
-	Core::HandlerResult UIComponent::OnSize(
-		[[maybe_unused]] UINT msg, [[maybe_unused]] WPARAM wParam, [[maybe_unused]] LPARAM lParam)
+	Core::HandlerResult UIComponent::OnSize(UINT, WPARAM, LPARAM) noexcept
 	{
 		AdjustClipForWindow(clip, this);
 		return 0;

@@ -3,7 +3,7 @@
 #include "core/Rect.hpp"
 #include "core/RoundedRect.hpp"
 #include "core/Ellipse.hpp"
-#include "helpers/Enum.hpp"
+#include "helpers/EnumFlag.hpp"
 #include "helpers/ComPtrHolder.hpp"
 
 #include <memory>
@@ -30,7 +30,7 @@ namespace PGUI::UI
 			Path
 		};
 	};
-	using ClipType = Enum<_adjust_flags>;
+	using ClipType = EnumFlag<_adjust_flags>;
 
 	class ClipBase
 	{
@@ -125,7 +125,7 @@ namespace PGUI::UI
 				AdjustRadii = 2
 			};
 		};
-		using AdjustFlags = Enum<_adjust_flags>;
+		using AdjustFlags = EnumFlag<_adjust_flags>;
 
 		RoundedRect roundedRect;
 		AdjustFlags flags = AdjustFlags::AdjustNone;
@@ -147,7 +147,7 @@ namespace PGUI::UI
 				AdjustRadii = 2
 			};
 		};
-		using AdjustFlags = Enum<_adjust_flags>;
+		using AdjustFlags = EnumFlag<_adjust_flags>;
 
 		Ellipse ellipse;
 		AdjustFlags flags = AdjustFlags::AdjustNone;

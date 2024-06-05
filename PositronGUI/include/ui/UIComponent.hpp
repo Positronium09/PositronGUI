@@ -28,8 +28,8 @@ namespace PGUI::UI
 		Clip clip;
 		bool hitTestClipGeometry = true;
 
-		Core::HandlerResult OnCreate(UINT msg, WPARAM wParam, LPARAM lParam) const;
-		Core::HandlerResult OnNcHitTest(UINT msg, WPARAM wParam, LPARAM lParam) const;
-		Core::HandlerResult OnSize(UINT msg, WPARAM wParam, LPARAM lParam);
+		Core::HandlerResult OnCreate(UINT msg, WPARAM wParam, LPARAM lParam) const noexcept;
+		Core::HandlerResult OnNcHitTest(UINT msg, WPARAM wParam, LPARAM lParam) const noexcept;
+		Core::HandlerResult OnSize(UINT msg, WPARAM wParam, LPARAM lParam) noexcept;
 	};
 }

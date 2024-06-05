@@ -21,6 +21,34 @@ namespace PGUI
 	[[nodiscard]] std::wstring GetWin32ErrorMessage() noexcept;
 	[[nodiscard]] std::wstring GetWin32ErrorMessage(DWORD errorCode) noexcept;
 
+	template <std::integral T>
+	[[nodiscard]] constexpr int sign(T x) noexcept
+	{
+		if (x == 0)
+		{
+			return 0;
+		}
+		return x > 0 ? 1 : -1;
+	}
+	template <std::floating_point T>
+	[[nodiscard]] constexpr int sign(T x) noexcept
+	{
+		if (x == 0)
+		{
+			return 0;
+		}
+		return std::signbit(x) ? -1 : 1;
+	}
+	//template <std::float T>
+	//[[nodiscard]] constexpr int sign(T x) noexcept
+	//{
+	//	if (x == 0)
+	//	{
+	//		return 0;
+	//	}
+	//	return x > 0 ? 1 : -1;
+	//}
+
 	template<std::floating_point T>
 	[[nodiscard]] constexpr T MapToRange(T value,
 		T outRangeMin, T outRangeMax, T inRangeMin = 0, T inRangeMax = 1) noexcept

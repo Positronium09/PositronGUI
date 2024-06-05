@@ -28,6 +28,10 @@ namespace PGUI
 	{
 		return var;
 	}
+	PropVariant::operator PropVariantValue() const noexcept
+	{
+		return GetValue();
+	}
 	PropVariantType PropVariant::Type() const noexcept
 	{
 		return var.vt;
@@ -38,7 +42,7 @@ namespace PGUI
 		{
 			using enum PropVariantType::EnumValues;
 
-			case Empty: 
+			case Empty:
 			case Null:
 				return nullptr;
 
@@ -131,6 +135,8 @@ namespace PGUI
 			case Array:
 				return var.parray;
 
+#pragma region Byref
+
 			case Byref | I1:
 				return var.pcVal;
 
@@ -184,68 +190,127 @@ namespace PGUI
 			case Byref | Array:
 				return var.pparray;
 
+#pragma endregion
+
+#pragma region Vector
 			case Vector | Variant:
-				return var.capropvar;
+				return std::vector<PROPVARIANT>{ 
+					var.capropvar.pElems, 
+					var.capropvar.pElems + var.capropvar.cElems 
+				};
 
 			case Vector | I1:
-				return var.cac;
+				return std::vector<CHAR>{
+					var.cac.pElems,
+						var.cac.pElems + var.cac.cElems
+				};
 
 			case Vector | Ui1:
-				return var.caub;
+				return std::vector<UCHAR>{
+					var.caub.pElems,
+						var.caub.pElems + var.caub.cElems
+				};
 
 			case Vector | I2:
-				return var.cai;
+				return std::vector<SHORT>{
+					var.cai.pElems,
+						var.cai.pElems + var.cai.cElems
+				};
 
 			case Vector | Ui2:
-				return var.caui;
+				return std::vector<USHORT>{
+					var.caui.pElems,
+						var.caui.pElems + var.caui.cElems
+				};
 
 			case Vector | Bool:
-				return var.cabool;
+			{
+				std::vector<bool> vec(var.cabool.cElems);
+				for (ULONG i = 0; i < var.cabool.cElems; i++)
+				{
+					vec.push_back(var.cabool.pElems[i]);
+				}
+				return vec;
+			}
 
+			case Vector | Int:
 			case Vector | I4:
-				return var.cal;
+			case Vector | Error:
+				return std::vector<LONG>{
+					var.cal.pElems,
+						var.cal.pElems + var.cal.cElems
+				};
 
+			case Vector | Uint:
 			case Vector | Ui4:
-				return var.caul;
+				return std::vector<ULONG>{
+					var.caul.pElems,
+						var.caul.pElems + var.caul.cElems
+				};
 
 			case Vector | R4:
-				return var.caflt;
-
-			case Vector | R8:
-				return var.cadbl;
-
-			case Vector | Error:
-				return var.cascode;
-
-			case Vector | I8:
-				return var.cah;
-
-			case Vector | Ui8:
-				return var.cauh;
-
-			case Vector | Cy:
-				return var.cacy;
+				return std::vector<FLOAT>{
+					var.caflt.pElems,
+						var.caflt.pElems + var.caflt.cElems
+				};
 
 			case Vector | Date:
-				return var.cadate;
+			case Vector | R8:
+				return std::vector<DOUBLE>{
+					var.cadbl.pElems,
+						var.cadbl.pElems + var.cadbl.cElems
+				};
+
+			case Vector | I8:
+				return std::vector<LARGE_INTEGER>{
+					var.cah.pElems,
+						var.cah.pElems + var.cah.cElems
+				};
+
+			case Vector | Ui8:
+				return std::vector<ULARGE_INTEGER>{
+					var.cauh.pElems,
+						var.cauh.pElems + var.cauh.cElems
+				};
+
+			case Vector | Cy:
+				return std::vector<CY>{
+					var.cacy.pElems,
+						var.cacy.pElems + var.cacy.cElems
+				};
 
 			case Vector | Filetime:
-				return var.cafiletime;
+				return std::vector<FILETIME>{
+					var.cafiletime.pElems,
+						var.cafiletime.pElems + var.cafiletime.cElems
+				};
 
 			case Vector | Clsid:
-				return var.cauuid;
+				return std::vector<CLSID>{
+					var.cauuid.pElems,
+						var.cauuid.pElems + var.cauuid.cElems
+				};
 
 			case Vector | Cf:
-				return var.caclipdata;
-
-			case Vector | Bstr:
-				return var.cabstr;
+				return std::vector<CLIPDATA>{
+					var.caclipdata.pElems,
+						var.caclipdata.pElems + var.caclipdata.cElems
+				};
 
 			case Vector | Lpstr:
-				return var.calpstr;
+				return std::vector<LPSTR>{
+					var.calpstr.pElems,
+						var.calpstr.pElems + var.calpstr.cElems
+				};
 
+			case Vector | Bstr:
 			case Vector | Lpwstr:
-				return var.calpwstr;
+				return std::vector<LPWSTR>{
+					var.calpwstr.pElems,
+						var.calpwstr.pElems + var.calpwstr.cElems
+				};
+
+#pragma endregion
 
 			default:
 				return nullptr;

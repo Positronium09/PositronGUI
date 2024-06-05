@@ -79,6 +79,29 @@ namespace PGUI
 		}
 	};
 
+	template<_sz_arithmetic T>
+	[[nodiscard]] Size<T> operator*(T factor, const Size<T>& v) noexcept
+	{
+		return Size<T>(v.cx * factor, v.cy * factor);
+	}
+
+	template<_sz_arithmetic T>
+	[[nodiscard]] Size<T> operator/(T factor, const Size<T>& v) noexcept
+	{
+		return Size<T>(v.cx / factor, v.cy / factor);
+	}
+
+	template<_sz_arithmetic T>
+	[[nodiscard]] Size<T> operator*(const Size<T>& v, T factor) noexcept
+	{
+		return Size<T>(v.cx * factor, v.cy * factor);
+	}
+
+	template<_sz_arithmetic T>
+	[[nodiscard]] Size<T> operator/(const Size<T>& v, T factor) noexcept
+	{
+		return Size<T>(v.cx / factor, v.cy / factor);
+	}
 
 	using SizeF = Size<float>;
 	using SizeI = Size<int>;

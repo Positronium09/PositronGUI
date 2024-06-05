@@ -1,10 +1,12 @@
 #pragma once
 
 #include "helpers/HelperFunctions.hpp"
+#include "Exceptions.hpp"
 
-#include <stacktrace>
+#include <format>
 #include <memory>
 #include <string>
+#include <stacktrace>
 
 #undef ERROR
 
@@ -75,13 +77,22 @@ namespace PGUI
 		if (FAILED(hr))
 		{
 			std::stacktrace trace = std::stacktrace::current();
-			const auto& traceEntry = trace.at(1);
-			
-			Core::ErrorHandling::Logger::Error(
-				std::format(L"Line {} in {}", traceEntry.source_line(), 
-					StringToWString(traceEntry.source_file())));
+
+			for (size_t i = 1; i < trace.size(); i++)
+			{
+				const auto& traceEntry = trace.at(i);
+
+				Core::ErrorHandling::Logger::Error(std::format(
+					L"Line {} in {}\n", traceEntry.source_line(), StringToWString(traceEntry.source_file())
+				));
+			}
 
 			Core::ErrorHandling::Logger::Error(GetHresultErrorMessage(hr));
 		}
+	}
+
+	static inline void HR_L(const Core::ErrorHandling::HresultException& hrException) noexcept
+	{
+		HR_L(hrException.GetErrorCode());
 	}
 }

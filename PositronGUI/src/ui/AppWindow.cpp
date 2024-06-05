@@ -81,47 +81,33 @@ namespace PGUI::UI
 		return titleText;
 	}
 
-	void AppWindow::AdjustForSize(SizeI size) const noexcept
-	{
-		RECT rc;
-		SetRect(&rc, 0, 0, size.cx, size.cy);
-		AdjustWindowRect(&rc, WS_OVERLAPPEDWINDOW & ~WS_SIZEBOX, FALSE);
-
-		RectL r = rc;
-		Resize(r.Size());
-	}
-
-	Core::HandlerResult AppWindow::OnNCCreate(
-			[[maybe_unused]] UINT msg, [[maybe_unused]] WPARAM wParam, LPARAM lParam)
+	Core::HandlerResult AppWindow::OnNCCreate(UINT, WPARAM, LPARAM lParam) noexcept
 	{
 		auto createStruct = std::bit_cast<LPCREATESTRUCTW>(lParam);
 
 		titleText = createStruct->lpszName;
+		createStruct->dwExStyle |= WS_EX_NOREDIRECTIONBITMAP;
 
 		return { 1, Core::HandlerResultFlag::PassToDefWindowProc };
 	}
 
-	Core::HandlerResult AppWindow::OnSetText(
-		[[maybe_unused]] UINT msg, [[maybe_unused]] WPARAM wParam, [[maybe_unused]] LPARAM lParam)
+	Core::HandlerResult AppWindow::OnSetText(UINT, WPARAM, LPARAM lParam) noexcept
 	{
 		titleText = std::bit_cast<wchar_t*>(lParam);
 
 		return { 1, Core::HandlerResultFlag::PassToDefWindowProc };
 	}
-	Core::HandlerResult AppWindow::OnGetText(
-		[[maybe_unused]] UINT msg, [[maybe_unused]] WPARAM wParam, [[maybe_unused]] LPARAM lParam) const
+	Core::HandlerResult AppWindow::OnGetText(UINT, WPARAM wParam, LPARAM lParam) const noexcept
 	{
 		auto size = std::min(titleText.size() + 1, wParam);
 		wcsncpy_s(std::bit_cast<wchar_t*>(lParam), wParam, titleText.data(), size);
 		return size;
 	}
-	Core::HandlerResult AppWindow::OnGetTextLength(
-		[[maybe_unused]] UINT msg, [[maybe_unused]] WPARAM wParam, [[maybe_unused]] LPARAM lParam) const
+	Core::HandlerResult AppWindow::OnGetTextLength(UINT, WPARAM, LPARAM) const noexcept
 	{
 		return titleText.length();
 	}
-	Core::HandlerResult AppWindow::OnGetMinMaxInfo(
-		[[maybe_unused]] UINT msg, [[maybe_unused]] WPARAM wParam, [[maybe_unused]] LPARAM lParam) const
+	Core::HandlerResult AppWindow::OnGetMinMaxInfo(UINT, WPARAM, LPARAM lParam) const noexcept
 	{
 		auto minMaxInfo = std::bit_cast<LPMINMAXINFO>(lParam);
 

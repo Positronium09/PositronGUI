@@ -7,10 +7,12 @@
 #include "Size.hpp"
 #include "WindowClass.hpp"
 #include "helpers/HelperFunctions.hpp"
-#include "helpers/Enum.hpp"
+#include "helpers/EnumFlag.hpp"
 
 #include <bit>
+#include <set>
 #include <ranges>
+#include <chrono>
 #include <concepts>
 #include <functional>
 #include <memory>
@@ -33,7 +35,7 @@ namespace PGUI::Core
 			PassToDefWindowProc = 0x08
 		};
 	};
-	using HandlerResultFlag = Enum<_handler_result_flag_values>;
+	using HandlerResultFlag = EnumFlag<_handler_result_flag_values>;
 
 	struct HandlerResult
 	{
@@ -75,6 +77,9 @@ namespace PGUI::Core
 
 	using ChildWindowList = std::vector<WindowPtr<Window>>;
 
+	using TimerId = UINT_PTR;
+	using TimerCallback = std::function<void(TimerId)>;
+	using TimerMap = std::unordered_map<TimerId, TimerCallback>;
 
 	[[nodiscard]] Window* GetWindowFromHwnd(HWND hWnd) noexcept;
 
@@ -146,27 +151,7 @@ namespace PGUI::Core
 			return window;
 		}
 
-		void RemoveChildWindow(HWND childHwnd)
-		{
-			for (const auto& [index, child] : std::views::enumerate(childWindows))
-			{
-				if (child->Hwnd() == childHwnd)
-				{
-					auto iter = childWindows.begin();
-					std::advance(iter, index);
-					childWindows.erase(iter);
-
-					SetParent(childHwnd, NULL);
-
-					LONG_PTR style = GetWindowLongPtrW(childHwnd, GWL_STYLE);
-					style &= ~(WS_CHILD);
-					style |= WS_POPUP;
-					SetWindowLongPtrW(childHwnd, GWL_STYLE, style);
-					
-					break;
-				}
-			}
-		}
+		void RemoveChildWindow(HWND childHwnd);
 
 		explicit Window(const WindowClass::WindowClassPtr& wndClass) noexcept;
 		virtual ~Window() noexcept;
@@ -180,10 +165,20 @@ namespace PGUI::Core
 		[[nodiscard]] HWND Hwnd() const noexcept { return hWnd; }
 		[[nodiscard]] HWND ParentHwnd() const noexcept { return parenthWnd; }
 
-		void Show(int show=SW_SHOW) noexcept;
+		void Show(int show=SW_SHOW) const noexcept;
 
 		void Move(PointL newPos) const noexcept;
 		void Resize(SizeL newSize) const noexcept;
+
+		TimerId AddTimer(TimerId id, std::chrono::milliseconds delay, 
+			const TimerCallback& callback);
+		void RemoveTimer(TimerId id);
+
+		void Enable(bool enable) const noexcept;
+		void AdjustForSize(SizeI size) const noexcept;
+
+		[[nodiscard]] const TimerMap& GetTimerMap() const noexcept;
+		[[nodiscard]] TimerMap& GetTimerMap() noexcept;
 
 		[[nodiscard]] PointL ScreenToClient(PointL point) const noexcept;
 		[[nodiscard]] RectL ScreenToClient(RectL rect) const noexcept;
@@ -191,6 +186,7 @@ namespace PGUI::Core
 		[[nodiscard]] PointL ClientToScreen(PointL point) const noexcept;
 		[[nodiscard]] RectL ClientToScreen(RectL rect) const noexcept;
 
+		[[nodiscard]] WindowClass::WindowClassPtr GetWindowClass() const noexcept;
 		[[nodiscard]] const ChildWindowList& GetChildWindowList() const noexcept;
 
 		[[nodiscard]] RectL GetWindowRect() const noexcept;
@@ -221,6 +217,7 @@ namespace PGUI::Core
 		ChildWindowList childWindows;
 
 		HandlerMap handlerMap;
+		TimerMap timerMap;
 		WindowClass::WindowClassPtr windowClass;
 	};
 

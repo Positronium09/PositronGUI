@@ -14,17 +14,17 @@ namespace PGUI
 	template <typename T> using underlying_t = std::underlying_type_t<T>;
 
 	template <is_enum_defined EnumDefType>
-	class Enum : public EnumDefType
+	class EnumFlag : public EnumDefType
 	{
 		private:
 		using EnumType = EnumDefType::EnumValues;
 		using UnderlyingType = underlying_t<EnumType>;
 
 		public:
-		constexpr explicit(false) Enum(UnderlyingType _val) noexcept : val(static_cast<EnumType>(_val))
+		constexpr explicit(false) EnumFlag(UnderlyingType _val) noexcept : val(static_cast<EnumType>(_val))
 		{
 		}
-		constexpr ~Enum() noexcept = default;
+		constexpr ~EnumFlag() noexcept = default;
 
 		constexpr explicit(false) operator UnderlyingType() const noexcept
 		{
@@ -45,17 +45,17 @@ namespace PGUI
 			return ~static_cast<UnderlyingType>(val);
 		}
 
-		constexpr UnderlyingType& operator&=(const Enum& other) noexcept
+		constexpr UnderlyingType& operator&=(const EnumFlag& other) noexcept
 		{
 			val = static_cast<EnumType>(static_cast<UnderlyingType>(val) & static_cast<UnderlyingType>(other.val));
 			return *this;
 		}
-		constexpr UnderlyingType& operator|=(const Enum& other) noexcept
+		constexpr UnderlyingType& operator|=(const EnumFlag& other) noexcept
 		{
 			val = static_cast<EnumType>(static_cast<UnderlyingType>(val) | static_cast<UnderlyingType>(other.val));
 			return *this;
 		}
-		constexpr UnderlyingType& operator^=(const Enum& other) noexcept
+		constexpr UnderlyingType& operator^=(const EnumFlag& other) noexcept
 		{
 			val = static_cast<EnumType>(static_cast<UnderlyingType>(val) ^ static_cast<UnderlyingType>(other.val));
 			return *this;

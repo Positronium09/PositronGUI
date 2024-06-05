@@ -15,6 +15,28 @@ namespace PGUI::Core
 		InvalidateRect(hWnd, nullptr, false);
 	}
 
+	void Window::RemoveChildWindow(HWND childHwnd)
+	{
+		for (const auto& [index, child] : std::views::enumerate(childWindows))
+		{
+			if (child->Hwnd() == childHwnd)
+			{
+				auto iter = childWindows.begin();
+				std::advance(iter, index);
+				childWindows.erase(iter);
+
+				SetParent(childHwnd, NULL);
+
+				LONG_PTR style = GetWindowLongPtrW(childHwnd, GWL_STYLE);
+				style &= ~(WS_CHILD);
+				style |= WS_POPUP;
+				SetWindowLongPtrW(childHwnd, GWL_STYLE, style);
+
+				break;
+			}
+		}
+	}
+
 	Window::Window(const WindowClass::WindowClassPtr& wndClass) noexcept :
 		windowClass{ wndClass }
 	{
@@ -22,12 +44,21 @@ namespace PGUI::Core
 
 	Window::~Window() noexcept
 	{
+		for (const auto& [id, _] : timerMap)
+		{
+			KillTimer(Hwnd(), id);
+		}
 		DestroyWindow(hWnd);
 	}
 
-	void Window::Show(int show) noexcept
+	void Window::Show(int show) const noexcept
 	{
 		ShowWindow(hWnd, show);
+	}
+
+	WindowClass::WindowClassPtr Window::GetWindowClass() const noexcept
+	{
+		return windowClass;
 	}
 
 	const ChildWindowList& Window::GetChildWindowList() const noexcept
@@ -57,6 +88,65 @@ namespace PGUI::Core
 	void Window::Resize(SizeL newSize) const noexcept
 	{
 		SetWindowPos(Hwnd(), nullptr, NULL, NULL, newSize.cx, newSize.cy, SWP_NOMOVE | SWP_NOZORDER);
+	}
+
+	TimerId Window::AddTimer(TimerId id, std::chrono::milliseconds delay, 
+		const TimerCallback& callback)
+	{
+		 if (TimerId setTimerId = 
+			 SetTimer(Hwnd(), id, static_cast<UINT>(delay.count()), nullptr); 
+			 setTimerId == 0)
+		 {
+			 Core::ErrorHandling::Logger::Error(GetWin32ErrorMessage());
+			 return setTimerId;
+		 }
+
+		 timerMap[id] = callback;
+
+		 return id;
+	}
+
+	void Window::RemoveTimer(TimerId id)
+	{
+		if (auto succeeded = KillTimer(Hwnd(), id);
+			succeeded == 0)
+		{
+			if (DWORD error = GetLastError();
+				error != ERROR_SUCCESS)
+			{
+				Core::ErrorHandling::Logger::Error(GetWin32ErrorMessage(error));
+				return;
+			}
+		}
+
+		timerMap.erase(id);
+	}
+
+	void Window::Enable(bool enable) const noexcept
+	{
+		EnableWindow(Hwnd(), static_cast<BOOL>(enable));
+	}
+
+	void Window::AdjustForSize(SizeI size) const noexcept
+	{
+		RECT rc;
+		SetRect(&rc, 0, 0, size.cx, size.cy);
+		AdjustWindowRect(&rc, 
+			static_cast<DWORD>(GetWindowLongPtrW(hWnd, GWL_STYLE)), 
+			FALSE);
+
+		RectL r = rc;
+		Resize(r.Size());
+	}
+
+	const TimerMap& Window::GetTimerMap() const noexcept
+	{
+		return timerMap;
+	}
+
+	TimerMap& Window::GetTimerMap() noexcept
+	{
+		return timerMap;
 	}
 
 	PointL Window::ScreenToClient(PointL point) const noexcept
@@ -134,7 +224,17 @@ namespace PGUI::Core
 			return result;
 		}
 
-		if (!window->handlerMap.contains(msg))
+		if (msg == WM_TIMER)
+		{
+			if (auto id = wParam;
+				window->timerMap.contains(id))
+			{
+				window->timerMap.at(id)(id);
+				return 0;
+			}
+		}
+
+		else if (!window->handlerMap.contains(msg))
 		{
 			result = DefWindowProcW(hWnd, msg, wParam, lParam);
 			return result;
@@ -147,20 +247,21 @@ namespace PGUI::Core
 			auto [lResult, flags] = handler(msg, wParam, lParam);
 			using enum HandlerResultFlag::EnumValues;
 
-			if (!forceCurrentResult)
+			if (!(flags & ReturnPrevResult))
 			{
-				if (!(flags & ReturnPrevResult))
-				{
-					result = lResult;
-				}
-				if (flags & ForceThisResult)
-				{
-					forceCurrentResult = true;
-				}
+				result = lResult;
 			}
 			if (flags & NoFurtherHandling)
 			{
 				break;
+			}
+			if (forceCurrentResult)
+			{
+				continue;
+			}
+			if (flags & ForceThisResult)
+			{
+				forceCurrentResult = true;
 			}
 			if (flags & PassToDefWindowProc)
 			{

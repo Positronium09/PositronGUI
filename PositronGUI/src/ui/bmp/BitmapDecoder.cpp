@@ -1,14 +1,14 @@
-#include "ui/img/Image.hpp"
+#include "ui/bmp/BitmapDecoder.hpp"
 
-#include "ui/img/Frame.hpp"
-#include "ui/img/ImageMetadataReader.hpp"
+#include "ui/bmp/Frame.hpp"
+#include "ui/bmp/MetadataReader.hpp"
 #include "core/Logger.hpp"
 #include "factories/WICFactory.hpp"
 
 
-namespace PGUI::UI::Img
+namespace PGUI::UI::Bmp
 {
-	Image::Image(std::wstring_view filePath, bool readOnly, std::optional<GUID> vendorGUID) noexcept
+	BitmapDecoder::BitmapDecoder(std::wstring_view filePath, bool readOnly, std::optional<GUID> vendorGUID) noexcept
 	{
 		auto wicFactory = PGUI::WICFactory::GetFactory();
 
@@ -21,10 +21,10 @@ namespace PGUI::UI::Img
 		DWORD access = GENERIC_READ | (!readOnly ? GENERIC_WRITE : 0);
 
 		HRESULT hr = wicFactory->CreateDecoderFromFilename(
-			filePath.data(), vendor, access, WICDecodeMetadataCacheOnDemand, GetHeldComPtrAddress()); HR_L(hr);
+			filePath.data(), vendor, access, WICDecodeMetadataCacheOnDemand, GetHeldPtrAddress()); HR_L(hr);
 	}
 
-	Image::Image(ULONG_PTR fileHandle, std::optional<GUID> vendorGUID) noexcept
+	BitmapDecoder::BitmapDecoder(ULONG_PTR fileHandle, std::optional<GUID> vendorGUID) noexcept
 	{
 		auto wicFactory = PGUI::WICFactory::GetFactory();
 
@@ -35,7 +35,7 @@ namespace PGUI::UI::Img
 		}
 
 		HRESULT hr = wicFactory->CreateDecoderFromFileHandle(
-			fileHandle, vendor, WICDecodeMetadataCacheOnDemand, GetHeldComPtrAddress()); HR_L(hr);
+			fileHandle, vendor, WICDecodeMetadataCacheOnDemand, GetHeldPtrAddress()); HR_L(hr);
 	}
 
 	/*
@@ -54,17 +54,17 @@ namespace PGUI::UI::Img
 	}
 	*/
 
-	Image::Image() noexcept : 
+	BitmapDecoder::BitmapDecoder() noexcept : 
 		ComPtrHolder{ nullptr }
 	{
 	}
 
-	Frame Image::GetFrame(UINT frameIndex) const noexcept
+	Frame BitmapDecoder::GetFrame(UINT frameIndex) const noexcept
 	{
 		return Frame{ *this, frameIndex };
 	}
 
-	std::vector<Frame> Image::GetFrames() const noexcept
+	std::vector<Frame> BitmapDecoder::GetFrames() const noexcept
 	{
 		auto frameCount = GetFrameCount();
 		std::vector<Frame> frames(frameCount);
@@ -77,7 +77,7 @@ namespace PGUI::UI::Img
 		return frames;
 	}
 
-	UINT Image::GetFrameCount() const noexcept
+	UINT BitmapDecoder::GetFrameCount() const noexcept
 	{
 		UINT count = 0;
 
@@ -86,12 +86,12 @@ namespace PGUI::UI::Img
 		return count;
 	}
 
-	ImageMetadataReader Image::GetMetadata() const noexcept
+	MetadataReader BitmapDecoder::GetMetadata() const noexcept
 	{
-		return ImageMetadataReader{ *this };
+		return MetadataReader{ *this };
 	}
 
-	ComPtr<IWICBitmapSource> Image::GetThumbnail() const noexcept
+	ComPtr<IWICBitmapSource> BitmapDecoder::GetThumbnail() const noexcept
 	{
 		ComPtr<IWICBitmapSource> thumbnail;
 

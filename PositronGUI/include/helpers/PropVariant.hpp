@@ -1,9 +1,10 @@
 #pragma once
 
 #include <variant>
+#include <vector>
 #include <Windows.h>
 
-#include "helpers/Enum.hpp"
+#include "helpers/EnumFlag.hpp"
 
 namespace PGUI
 {
@@ -52,7 +53,7 @@ namespace PGUI
 			TypeMask = 0xfff,
 		};
 	};
-	using PropVariantType = Enum<_prop_variant_type_values>;
+	using PropVariantType = EnumFlag<_prop_variant_type_values>;
 
 	using PropVariantValue = 
 		std::variant<
@@ -69,24 +70,25 @@ namespace PGUI
 		IStream*, IStorage*, 
 		LPVERSIONEDSTREAM,
 		DECIMAL, LPSAFEARRAY,
-		CAPROPVARIANT,
 		UCHAR*,
 		SHORT*, USHORT*, INT*, UINT*,
 		LARGE_INTEGER*, ULARGE_INTEGER*,
 		FLOAT*, DOUBLE*,
 		bool*, SCODE*,
-		CY*, FILETIME*,
-		BSTR*,
+		CY*, FILETIME*, BSTR*,
 		IUnknown**, IDispatch**,
 		DECIMAL*, LPSAFEARRAY*,
 		PROPVARIANT*,
-		CAC, CAUB, CAI, CAUI,
-		CAL, CAUL, CAH, CAUH,
-		CAFLT, CADBL,
-		CABOOL, CASCODE,
-		CACY, CADATE, CAFILETIME,
-		CACLSID, CACLIPDATA,
-		CABSTR, CABSTRBLOB, CALPSTR, CALPWSTR>;
+		std::vector<CHAR>, std::vector<UCHAR>,
+		std::vector<SHORT>, std::vector<USHORT>,
+		std::vector<LONG>, std::vector<ULONG>,
+		std::vector<FLOAT>, std::vector<DOUBLE>,
+		std::vector<CY>, std::vector<CLSID>,
+		std::vector<bool>,
+		std::vector<PROPVARIANT>,
+		std::vector<LARGE_INTEGER>, std::vector<ULARGE_INTEGER>,
+		std::vector<LPSTR>, std::vector<LPWSTR>,
+		std::vector<FILETIME>, std::vector<CLIPDATA>>;
 
 	class PropVariant final
 	{
@@ -97,6 +99,7 @@ namespace PGUI
 
 		PROPVARIANT* operator&() noexcept;
 		explicit(false) operator PROPVARIANT() const noexcept;
+		explicit(false) operator PropVariantValue() const noexcept;
 
 		[[nodiscard]] PropVariantType Type() const noexcept;
 

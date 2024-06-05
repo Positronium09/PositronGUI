@@ -59,6 +59,8 @@ namespace PGUI::UI
 		[[nodiscard]] std::vector<DWRITE_CLUSTER_METRICS> GetClusterMetrics() const noexcept;
 		[[nodiscard]] std::vector<DWRITE_LINE_METRICS1> GetLineMetrics() const noexcept;
 
+		DWRITE_TEXT_METRICS1 GetMetrics() const noexcept;
+
 		template <typename T>
 		[[nodiscard]] ComPtr<T> GetDrawingEffect(UINT32 position, OptionalTextRangeRet textRange = std::nullopt)
 		{

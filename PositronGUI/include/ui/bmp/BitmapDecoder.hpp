@@ -8,26 +8,24 @@
 #include <wincodec.h>
 
 
-namespace PGUI::UI::Img
+namespace PGUI::UI::Bmp
 {
 	class Frame;
-	class ImageMetadataReader;
-
-	class Image : public ComPtrHolder<IWICBitmapDecoder>
+	class MetadataReader;
+	
+	class BitmapDecoder : public ComPtrHolder<IWICBitmapDecoder>
 	{
 		public:
-		Image(std::wstring_view filePath, bool readOnly = true, 
+		BitmapDecoder(std::wstring_view filePath, bool readOnly = true, 
 			std::optional<GUID> vendorGUID = std::nullopt) noexcept;
-		Image(ULONG_PTR fileHandle,
+		BitmapDecoder(ULONG_PTR fileHandle,
 			std::optional<GUID> vendorGUID = std::nullopt) noexcept;
-		//Image(ComPtr<IStream> stream, 
-		//	std::optional<GUID> vendorGUID = std::nullopt) noexcept;
-		Image() noexcept;
+		BitmapDecoder() noexcept;
 
 		[[nodiscard]] Frame GetFrame(UINT frameIndex = 0) const noexcept;
 		[[nodiscard]] std::vector<Frame> GetFrames() const noexcept;
 		[[nodiscard]] UINT GetFrameCount() const noexcept;
-		[[nodiscard]] ImageMetadataReader GetMetadata() const noexcept;
+		[[nodiscard]] MetadataReader GetMetadata() const noexcept;
 
 		[[nodiscard]] ComPtr<IWICBitmapSource> GetThumbnail() const noexcept;
 	};

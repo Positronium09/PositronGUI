@@ -48,12 +48,12 @@ namespace PGUI::UI::Controls
 		Core::Event<std::wstring_view> textChangedEvent;
 
 
-		Core::HandlerResult OnNCCreate(UINT msg, WPARAM wParam, LPARAM lParam);
-		Core::HandlerResult OnPaint(UINT msg, WPARAM wParam, LPARAM lParam);
-		Core::HandlerResult OnSize(UINT msg, WPARAM wParam, LPARAM lParam);
+		Core::HandlerResult OnNCCreate(UINT msg, WPARAM wParam, LPARAM lParam) noexcept;
+		Core::HandlerResult OnPaint(UINT msg, WPARAM wParam, LPARAM lParam) noexcept;
+		Core::HandlerResult OnSize(UINT msg, WPARAM wParam, LPARAM lParam) noexcept;
 		
-		Core::HandlerResult OnSetText(UINT msg, WPARAM wParam, LPARAM lParam);
-		Core::HandlerResult OnGetText(UINT msg, WPARAM wParam, LPARAM lParam);
-		Core::HandlerResult OnGetTextLength(UINT msg, WPARAM wParam, LPARAM lParam) const;
+		Core::HandlerResult OnSetText(UINT msg, WPARAM wParam, LPARAM lParam) noexcept;
+		Core::HandlerResult OnGetText(UINT msg, WPARAM wParam, LPARAM lParam) noexcept;
+		Core::HandlerResult OnGetTextLength(UINT msg, WPARAM wParam, LPARAM lParam) const noexcept;
 	};
 }

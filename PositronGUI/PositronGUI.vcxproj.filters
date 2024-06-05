@@ -90,16 +90,16 @@
     <ClCompile Include="src\ui\controls\ButtonBase.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\ui\img\Image.cpp">
+    <ClCompile Include="src\ui\bmp\BitmapDecoder.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\ui\img\Frame.cpp">
+    <ClCompile Include="src\ui\bmp\Frame.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\ui\controls\StaticImage.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\ui\img\ImageMetadataReader.cpp">
+    <ClCompile Include="src\ui\bmp\MetadataReader.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\helpers\PropVariant.cpp">
@@ -109,6 +109,21 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\helpers\TimerEvent.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ui\bmp\Palette.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ui\Dialog.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ui\dialogs\MessageBoxDialog.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ui\bmp\BitmapSource.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ui\bmp\Bitmap.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -248,31 +263,49 @@
     <ClInclude Include="include\ui\controls\ButtonBase.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\ui\img\Image.hpp">
+    <ClInclude Include="include\ui\bmp\BitmapDecoder.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\ui\img\Frame.hpp">
+    <ClInclude Include="include\ui\bmp\Frame.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\ui\img\PGUI.ui.img.hpp">
+    <ClInclude Include="include\ui\bmp\PGUI.ui.img.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\ui\controls\StaticImage.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\ui\img\ImageMetadataReader.hpp">
+    <ClInclude Include="include\ui\bmp\MetadataReader.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\helpers\PropVariant.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\helpers\Enum.hpp">
+    <ClInclude Include="include\helpers\EnumFlag.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\ui\controls\ImageButton.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\helpers\TimerEvent.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\ui\bmp\Palette.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\ui\Dialog.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\ui\dialogs\MessageBoxDialog.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\ui\dialogs\PGUI.ui.dialogs.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\ui\bmp\Bitmap.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\ui\bmp\BitmapSource.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

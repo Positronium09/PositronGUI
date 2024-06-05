@@ -13,6 +13,10 @@ namespace PGUI
 		float yRadius = 0.0f;
 
 		constexpr Ellipse() noexcept = default;
+		constexpr Ellipse(PointF _center, float radius) noexcept :
+			center(_center), xRadius(radius), yRadius(radius)
+		{
+		}
 		constexpr Ellipse(PointF _center, float _xRadius, float _yRadius) noexcept : 
 			center(_center), xRadius(_xRadius), yRadius(_yRadius)
 		{

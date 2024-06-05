@@ -13,10 +13,10 @@ namespace PGUI::UI
 		RegisterMessageHandler(WM_CREATE, &Control::OnCreate);
 	}
 
-	Core::HandlerResult Control::OnCreate(
-		[[maybe_unused]] UINT msg, [[maybe_unused]] WPARAM wParam, [[maybe_unused]] LPARAM lParam) const
+	Core::HandlerResult Control::OnCreate(UINT, WPARAM, LPARAM) const noexcept
 	{
-		// Controls have input enabled by default
+		// Controls have input 
+		// d by default
 		EnableInput();
 		return 0;
 	}

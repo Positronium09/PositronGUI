@@ -12,6 +12,6 @@ namespace PGUI::UI
 		Control() noexcept;
 
 		private:
-		Core::HandlerResult OnCreate(UINT msg, WPARAM wParam, LPARAM lParam) const;
+		Core::HandlerResult OnCreate(UINT msg, WPARAM wParam, LPARAM lParam) const noexcept;
 	};
 }

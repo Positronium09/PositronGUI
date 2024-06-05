@@ -19,18 +19,23 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\ui\bmp\Bitmap.cpp" />
+    <ClCompile Include="src\ui\bmp\BitmapSource.cpp" />
+    <ClCompile Include="src\ui\dialogs\MessageBoxDialog.cpp" />
+    <ClCompile Include="src\ui\Dialog.cpp" />
     <ClCompile Include="src\helpers\TimerEvent.cpp" />
     <ClCompile Include="src\helpers\PropVariant.cpp" />
     <ClCompile Include="src\ui\controls\ImageButton.cpp" />
-    <ClCompile Include="src\ui\img\ImageMetadataReader.cpp" />
+    <ClCompile Include="src\ui\bmp\MetadataReader.cpp" />
     <ClCompile Include="src\ui\controls\StaticImage.cpp" />
-    <ClCompile Include="src\ui\img\Frame.cpp" />
-    <ClCompile Include="src\ui\img\Image.cpp" />
+    <ClCompile Include="src\ui\bmp\Frame.cpp" />
+    <ClCompile Include="src\ui\bmp\BitmapDecoder.cpp" />
     <ClCompile Include="src\PGUI.cpp" />
     <ClCompile Include="src\ui\Brush.cpp" />
     <ClCompile Include="src\ui\controls\TextButton.cpp" />
     <ClCompile Include="src\ui\controls\ButtonBase.cpp" />
     <ClCompile Include="src\ui\controls\StaticText.cpp" />
+    <ClCompile Include="src\ui\bmp\Palette.cpp" />
     <ClCompile Include="src\ui\TextLayout.cpp" />
     <ClCompile Include="src\ui\font\FontCollection.cpp" />
     <ClCompile Include="src\ui\font\FontFamily.cpp" />
@@ -53,8 +58,9 @@
     <ClCompile Include="src\helpers\HelperFunctions.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="include\ui\Dialog.hpp" />
     <ClInclude Include="include\core\Ellipse.hpp" />
-    <ClInclude Include="include\helpers\Enum.hpp" />
+    <ClInclude Include="include\helpers\EnumFlag.hpp" />
     <ClInclude Include="include\helpers\PropVariant.hpp" />
     <ClInclude Include="include\helpers\TimerEvent.hpp" />
     <ClInclude Include="include\ui\controls\ImageButton.hpp" />
@@ -63,10 +69,15 @@
     <ClInclude Include="include\ui\controls\ButtonBase.hpp" />
     <ClInclude Include="include\ui\controls\PGUI.ui.controls.hpp" />
     <ClInclude Include="include\ui\controls\StaticText.hpp" />
-    <ClInclude Include="include\ui\img\Frame.hpp" />
-    <ClInclude Include="include\ui\img\Image.hpp" />
-    <ClInclude Include="include\ui\img\ImageMetadataReader.hpp" />
-    <ClInclude Include="include\ui\img\PGUI.ui.img.hpp" />
+    <ClInclude Include="include\ui\dialogs\PGUI.ui.dialogs.hpp" />
+    <ClInclude Include="include\ui\bmp\Bitmap.hpp" />
+    <ClInclude Include="include\ui\bmp\BitmapSource.hpp" />
+    <ClInclude Include="include\ui\bmp\Frame.hpp" />
+    <ClInclude Include="include\ui\bmp\BitmapDecoder.hpp" />
+    <ClInclude Include="include\ui\bmp\MetadataReader.hpp" />
+    <ClInclude Include="include\ui\bmp\Palette.hpp" />
+    <ClInclude Include="include\ui\bmp\PGUI.ui.img.hpp" />
+    <ClInclude Include="include\ui\dialogs\MessageBoxDialog.hpp" />
     <ClInclude Include="include\ui\PositioningMode.hpp" />
     <ClInclude Include="include\helpers\ComPtrHolder.hpp" />
     <ClInclude Include="include\ui\Color.hpp" />

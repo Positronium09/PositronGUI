@@ -3,24 +3,24 @@
 
 namespace PGUI::UI::Controls
 {
-	ImageButton::ImageButton(Img::Image img) noexcept : 
+	ImageButton::ImageButton(Bmp::BitmapDecoder img) noexcept : 
 		img{ img }, frames{ img.GetFrames() }
 	{
 	}
 	ImageButton::ImageButton(std::wstring_view filePath) noexcept : 
-		ImageButton{ Img::Image{ filePath } }
+		ImageButton{ Bmp::BitmapDecoder{ filePath } }
 	{
 	}
 
-	Img::Image ImageButton::GetImage() const noexcept
+	Bmp::BitmapDecoder ImageButton::GetImage() const noexcept
 	{
 		return img;
 	}
-	const std::vector<Img::Frame>& ImageButton::GetFrames() const noexcept
+	const std::vector<Bmp::Frame>& ImageButton::GetFrames() const noexcept
 	{
 		return frames;
 	}
-	std::vector<Img::Frame>& ImageButton::GetFrames() noexcept
+	std::vector<Bmp::Frame>& ImageButton::GetFrames() noexcept
 	{
 		return frames;
 	}

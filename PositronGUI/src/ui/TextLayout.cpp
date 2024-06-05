@@ -14,7 +14,7 @@ namespace PGUI::UI
 
 		HRESULT hr = factory->CreateTextLayout(text.data(), static_cast<UINT32>(text.length()), 
 			textFormat, maxSize.cx, maxSize.cy, textLayout.GetAddressOf()); HR_T(hr);
-
+		
 		if (textLayout)
 		{
 			hr = textLayout.As(GetHeldComPtrAddress()); HR_T(hr);
@@ -83,6 +83,14 @@ namespace PGUI::UI
 		tl->GetLineMetrics(lineMetrics.data(), requiredSize, &requiredSize); HR_L(hr);
 
 		return lineMetrics;
+	}
+
+	DWRITE_TEXT_METRICS1 TextLayout::GetMetrics() const noexcept
+	{
+		DWRITE_TEXT_METRICS1 textMetrics{ };
+		HRESULT hr = GetHeldComPtr()->GetMetrics(&textMetrics); HR_L(hr);
+
+		return textMetrics;
 	}
 
 	Font::FontCollection TextLayout::GetFontCollection(UINT32 position, OptionalTextRangeRet textRange) const noexcept

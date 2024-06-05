@@ -7,6 +7,7 @@
 
 namespace PGUI
 {
+	void Initialize();
 	void InitializeWindowsFoundation();
 	void UninitializeWindowsFoundation();
 }

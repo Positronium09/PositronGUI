@@ -39,45 +39,46 @@ namespace PGUI::UI::Controls
 		return state;
 	}
 	
-	Core::HandlerResult ButtonBase::OnMouseMove(
-		[[maybe_unused]] UINT msg, [[maybe_unused]] WPARAM wParam, [[maybe_unused]] LPARAM lParam) noexcept
+	Core::HandlerResult ButtonBase::OnMouseMove(UINT, WPARAM, LPARAM) noexcept
 	{
-		if (state == ButtonState::Normal)
+		if (state == ButtonState::Clicked)
 		{
-			SetState(ButtonState::Hover);
-
-			TRACKMOUSEEVENT tme{ };
-			tme.cbSize = sizeof(TRACKMOUSEEVENT);
-			tme.hwndTrack = Hwnd();
-			tme.dwHoverTime = 0;
-			tme.dwFlags = TME_LEAVE;
-
-			TrackMouseEvent(&tme);
+			return 0;
 		}
 
+		SetState(ButtonState::Hover);
+
+		TRACKMOUSEEVENT tme{ };
+		tme.cbSize = sizeof(TRACKMOUSEEVENT);
+		tme.hwndTrack = Hwnd();
+		tme.dwHoverTime = 0;
+		tme.dwFlags = TME_LEAVE;
+
+		TrackMouseEvent(&tme);
+		
 		return 0;
 	}
 
-	Core::HandlerResult Controls::ButtonBase::OnMouseLeave(
-		[[maybe_unused]] UINT msg, [[maybe_unused]] WPARAM wParam, [[maybe_unused]] LPARAM lParam) noexcept
+	Core::HandlerResult Controls::ButtonBase::OnMouseLeave(UINT, WPARAM, LPARAM) noexcept
 	{
 		SetState(ButtonState::Normal);
 
 		return 0;
 	}
 
-	Core::HandlerResult Controls::ButtonBase::OnLButtonDown(
-		[[maybe_unused]] UINT msg, [[maybe_unused]] WPARAM wParam, [[maybe_unused]] LPARAM lParam) noexcept
+	Core::HandlerResult Controls::ButtonBase::OnLButtonDown(UINT, WPARAM, LPARAM) noexcept
 	{
 		SetState(ButtonState::Clicked);
 
 		return 0;
 	}
 
-	Core::HandlerResult ButtonBase::OnLButtonUp(
-		[[maybe_unused]] UINT msg, [[maybe_unused]] WPARAM wParam, [[maybe_unused]] LPARAM lParam) noexcept
+	Core::HandlerResult ButtonBase::OnLButtonUp(UINT, WPARAM, LPARAM) noexcept
 	{
-		clickedEvent.Emit();
+		if (state == ButtonState::Clicked)
+		{
+			clickedEvent.Emit();
+		}
 
 		SetState(ButtonState::Hover);
 

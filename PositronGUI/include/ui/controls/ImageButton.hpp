@@ -1,8 +1,8 @@
 #pragma once
 
 #include "ui/UIComponent.hpp"
-#include "ui/img/Image.hpp"
-#include "ui/img/Frame.hpp"
+#include "ui/bmp/BitmapDecoder.hpp"
+#include "ui/bmp/Frame.hpp"
 
 
 namespace PGUI::UI::Controls
@@ -10,16 +10,16 @@ namespace PGUI::UI::Controls
 	class ImageButton : public UIComponent
 	{
 		public:
-		explicit ImageButton(Img::Image img) noexcept;
+		explicit ImageButton(Bmp::BitmapDecoder img) noexcept;
 		explicit ImageButton(std::wstring_view filePath) noexcept;
 
-		[[nodiscard]] Img::Image GetImage() const noexcept;
-		[[nodiscard]] const std::vector<Img::Frame>& GetFrames() const noexcept;
-		[[nodiscard]] std::vector<Img::Frame>& GetFrames() noexcept;
+		[[nodiscard]] Bmp::BitmapDecoder GetImage() const noexcept;
+		[[nodiscard]] const std::vector<Bmp::Frame>& GetFrames() const noexcept;
+		[[nodiscard]] std::vector<Bmp::Frame>& GetFrames() noexcept;
 
 		private:
-		Img::Image img;
-		std::vector<Img::Frame> frames;
+		Bmp::BitmapDecoder img;
+		std::vector<Bmp::Frame> frames;
 
 		Core::HandlerResult OnPaint(UINT msg, WPARAM wParam, LPARAM lParam) noexcept;
 	};

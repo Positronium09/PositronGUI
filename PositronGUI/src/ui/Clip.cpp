@@ -25,7 +25,7 @@ namespace PGUI::UI
 	{
 		auto factory = D2DFactory::GetFactory();
 
-		HRESULT hr = factory->CreateRectangleGeometry(rect, GetHeldComPtrAddress()); HR_T(hr);
+		HRESULT hr = factory->CreateRectangleGeometry(rect, GetHeldPtrAddress()); HR_T(hr);
 	}
 
 	ComPtr<ID2D1Geometry> RectangleClip::GetClipGeometry()
@@ -46,7 +46,7 @@ namespace PGUI::UI
 	{
 		auto factory = D2DFactory::GetFactory();
 
-		HRESULT hr = factory->CreateRoundedRectangleGeometry(roundedRect, GetHeldComPtrAddress()); HR_T(hr);
+		HRESULT hr = factory->CreateRoundedRectangleGeometry(roundedRect, GetHeldPtrAddress()); HR_T(hr);
 	}
 
 	ComPtr<ID2D1Geometry> RoundedRectangleClip::GetClipGeometry()

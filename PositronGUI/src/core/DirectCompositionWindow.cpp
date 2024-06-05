@@ -167,8 +167,7 @@ namespace PGUI::Core
 		hr = dcompDevice->Commit(); HR_T(hr);
 	}
 
-	Core::HandlerResult DirectCompositionWindow::OnNCCreate(
-		[[maybe_unused]] UINT msg, [[maybe_unused]] WPARAM wParam, [[maybe_unused]] LPARAM lParam)
+	Core::HandlerResult DirectCompositionWindow::OnNCCreate(UINT, WPARAM, LPARAM)
 	{
 		InitD3D11Device();
 		InitD2D1Device();
@@ -177,8 +176,7 @@ namespace PGUI::Core
 		return { 1, HandlerResultFlag::PassToDefWindowProc };
 	}
 
-	Core::HandlerResult DirectCompositionWindow::OnSize(
-		[[maybe_unused]] UINT msg, [[maybe_unused]] WPARAM wParam, [[maybe_unused]] LPARAM lParam)
+	Core::HandlerResult DirectCompositionWindow::OnSize(UINT, WPARAM, LPARAM)
 	{
 		auto size = GetWindowSize();
 

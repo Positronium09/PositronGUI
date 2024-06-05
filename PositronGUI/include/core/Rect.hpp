@@ -67,8 +67,8 @@ namespace PGUI
 
 		[[nodiscard]] constexpr bool IsPointInside(Point<T> p) const noexcept
 		{
-			return 
-				left <= p.x && p.x <= right && 
+			return
+				left <= p.x && p.x <= right &&
 				top <= p.y && p.y <= bottom;
 		}
 
@@ -98,8 +98,8 @@ namespace PGUI
 
 			left = p.x - size.cx;
 			right = p.x + size.cx;
-			top = p.y + size.cy;
-			bottom = p.y - size.cy;
+			top = p.y - size.cy;
+			bottom = p.y + size.cy;
 		}
 		[[nodiscard]] constexpr Rect<T> CenteredAround(Point<T> p) const noexcept
 		{
@@ -107,7 +107,7 @@ namespace PGUI
 
 			return Rect<T>{
 				p.x - size.cx, p.y + size.cy,
-				p.x + size.cx, p.y - size.cy
+					p.x + size.cx, p.y - size.cy
 			};
 		}
 
@@ -116,7 +116,7 @@ namespace PGUI
 		{
 			return Rect<U>{
 				static_cast<U>(left), static_cast<U>(top),
-				static_cast<U>(right), static_cast<U>(bottom) };
+					static_cast<U>(right), static_cast<U>(bottom) };
 		}
 
 		explicit(false) operator RECT() const noexcept

@@ -35,7 +35,7 @@ namespace PGUI::Core::ErrorHandling
 	{
 		for (auto& entry : std::stacktrace::current())
 		{
-			logger->Log(LogLevel::TRACE, StringToWString(std::to_string(entry)) + L"\n");
+			logger->Log(LogLevel::TRACE, StringToWString(std::to_string(entry)));
 		}
 	}
 

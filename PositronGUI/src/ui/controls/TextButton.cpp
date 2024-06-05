@@ -89,8 +89,8 @@ namespace PGUI::UI::Controls
 		{
 			textFormat = TextFormat{ L"Segoe UI", 16, GetUserLocaleName() };
 
-			textFormat->SetParagraphAlignment(Font::ParagraphAlignments::Center);
-			textFormat->SetTextAlignment(Font::TextAlignments::Center);
+			textFormat.SetParagraphAlignment(Font::ParagraphAlignments::Center);
+			textFormat.SetTextAlignment(Font::TextAlignments::Center);
 		}
 
 		StateChangedEvent().Subscribe(PGUI::BindMemberFunc(&TextButton::OnStateChanged, this));
@@ -199,8 +199,7 @@ namespace PGUI::UI::Controls
 		backgroundBrush.ReleaseBrush();
 	}
 
-	Core::HandlerResult TextButton::OnNCCreate(
-		[[maybe_unused]] UINT msg, [[maybe_unused]] WPARAM wParam, LPARAM lParam) noexcept
+	Core::HandlerResult TextButton::OnNCCreate(UINT, WPARAM, LPARAM lParam) noexcept
 	{
 		auto createStruct = std::bit_cast<LPCREATESTRUCTW>(lParam);
 
@@ -209,8 +208,7 @@ namespace PGUI::UI::Controls
 		return 1;
 	}
 
-	Core::HandlerResult TextButton::OnPaint(
-		[[maybe_unused]] UINT msg, [[maybe_unused]] WPARAM wParam, [[maybe_unused]] LPARAM lParam) noexcept
+	Core::HandlerResult TextButton::OnPaint(UINT, WPARAM, LPARAM) noexcept
 	{
 		BeginDraw();
 
@@ -224,16 +222,14 @@ namespace PGUI::UI::Controls
 		return 0;
 	}
 
-	Core::HandlerResult TextButton::OnSize(
-		[[maybe_unused]] UINT msg, [[maybe_unused]] WPARAM wParam, [[maybe_unused]] LPARAM lParam) noexcept
+	Core::HandlerResult TextButton::OnSize(UINT, WPARAM, LPARAM) noexcept
 	{
 		InitTextLayout();
 
 		return 0;
 	}
 
-	Core::HandlerResult TextButton::OnSetText(
-		[[maybe_unused]] UINT msg, [[maybe_unused]] WPARAM wParam, LPARAM lParam) noexcept
+	Core::HandlerResult TextButton::OnSetText(UINT, WPARAM, LPARAM lParam) noexcept
 	{
 		if (auto newText = std::bit_cast<wchar_t*>(lParam);
 			text.data() != newText)
@@ -245,8 +241,7 @@ namespace PGUI::UI::Controls
 
 		return { 1, Core::HandlerResultFlag::PassToDefWindowProc };
 	}
-	Core::HandlerResult TextButton::OnGetText(
-		[[maybe_unused]] UINT msg, WPARAM wParam, LPARAM lParam) noexcept
+	Core::HandlerResult TextButton::OnGetText(UINT, WPARAM wParam, LPARAM lParam) noexcept
 	{
 		auto minSize = std::min(text.size() + 1, wParam);
 
@@ -254,8 +249,7 @@ namespace PGUI::UI::Controls
 
 		return minSize;
 	}
-	Core::HandlerResult TextButton::OnGetTextLength(
-		[[maybe_unused]] UINT msg, [[maybe_unused]] WPARAM wParam, [[maybe_unused]] LPARAM lParam) const noexcept
+	Core::HandlerResult TextButton::OnGetTextLength(UINT, WPARAM, LPARAM) const noexcept
 	{
 		return text.size();
 	}

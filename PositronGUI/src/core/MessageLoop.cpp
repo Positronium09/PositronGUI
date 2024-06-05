@@ -30,6 +30,7 @@ namespace PGUI::Core
 		return static_cast<int>(msg.wParam);
 	}
 
+	//TODO Implemet
 	int PeekMessageLoop::Run()
 	{
 		throw ErrorHandling::HresultException{ E_NOTIMPL };
