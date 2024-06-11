@@ -8,21 +8,35 @@
 #include "helpers/EnumFlag.hpp"
 
 #include <chrono>
+#include <variant>
 
 
 namespace PGUI::UI::Controls
 {
+	using BmpToRender = std::variant<Bmp::BitmapSource, Bmp::BitmapDecoder>;
 	// TODO Add aspect ratio options
 	class StaticImage : public UIComponent
 	{
-		class IRenderer
+		class IImgRenderer
 		{
 			public:
-			virtual ~IRenderer() = default;
-
-			virtual void Render(StaticImage* staticImage) noexcept = 0;
+			virtual ~IImgRenderer() = default;
+			virtual void Render(StaticImage* img) = 0;
+			virtual BmpToRender GetImage() const noexcept = 0;
 		};
-		class GifRenderer : public IRenderer
+
+		class BitmapSourceRenderer : public IImgRenderer
+		{
+			public:
+			explicit BitmapSourceRenderer(Bmp::BitmapSource bmpSrc) noexcept;
+			void Render(StaticImage* img) override;
+			BmpToRender GetImage() const noexcept override;
+
+			private:
+			ComPtr<ID2D1Bitmap> bmp;
+			Bmp::BitmapSource bmpSrc;
+		};
+		class GifRenderer : public IImgRenderer
 		{
 			struct _frame_disposal_values
 			{
@@ -44,25 +58,27 @@ namespace PGUI::UI::Controls
 			};
 
 			public:
-			explicit GifRenderer(StaticImage* staticImage);
+			explicit GifRenderer(StaticImage* staticImage, Bmp::BitmapDecoder decoder) noexcept;
 			void Render(StaticImage* staticImage) noexcept override;
+			BmpToRender GetImage() const noexcept override;
 			void OnSize(const StaticImage* staticImage);
 
 			private:
+			Bmp::BitmapDecoder decoder;
 			ComPtr<ID2D1Bitmap> savedBitmap;
 			ComPtr<ID2D1BitmapRenderTarget> composeRenderTarget;
 
-			SizeU gifSize;
-			SizeU gifPixelSize;
-			RGBA backgroundColor = Colors::Transparent;
-
 			std::vector<FrameData> frameData;
+
+			SizeU gifSize{ };
+			SizeU gifPixelSize{ };
+			RGBA backgroundColor = Colors::Transparent;
 
 			const PGUI::Core::TimerId frameTimer = 1;
 
-			UINT loopCount;
-			UINT totalLoopCount;
-			bool loop;
+			UINT loopCount = 0;
+			UINT totalLoopCount = 0;
+			bool loop = true;
 
 			std::size_t currentFrameIndex = 0;
 			std::size_t nextFrameIndex = 1;
@@ -72,40 +88,30 @@ namespace PGUI::UI::Controls
 
 			[[nodiscard]] RectF CalculateDrawRect(const StaticImage* staticImage) const;
 
-			void GetFrameData(const StaticImage* staticImage);
-
 			void ComposeFrame(StaticImage* staticImage);
-			void DisposeFrame(const StaticImage* staticImage);
-			void OverlayFrame(const StaticImage* staticImage);
-			void ClearCurrentFrameArea(const StaticImage* staticImage);
-			void SaveComposedFrame(const StaticImage* staticImage);
-			void RestoreSavedFrame(const StaticImage* staticImage) const;
+			void DisposeFrame();
+			void OverlayFrame();
+			void ClearCurrentFrameArea();
+			void SaveComposedFrame();
+			void RestoreSavedFrame() const;
 
-			void GetGlobalMetadata(const StaticImage* staticImage);
-			void GetBackgroundColor(const StaticImage* staticImage);
-		};
-		class StaticRenderer : public IRenderer
-		{
-			public:
-			explicit StaticRenderer(const StaticImage* staticImage) noexcept;
-			void Render(StaticImage* staticImage) noexcept override;
-
-			private:
-			ComPtr<ID2D1Bitmap> frame;
+			void GetGlobalMetadata();
+			void GetBackgroundColor();
+			void GetFrameData();
 		};
 
 		public:
-		explicit StaticImage(Bmp::BitmapSource img) noexcept;
-		explicit StaticImage(std::wstring_view filePath) noexcept;
+		explicit StaticImage(std::wstring_view fileName);
+		explicit StaticImage(BmpToRender bmp);
 
-		[[nodiscard]] Bmp::BitmapSource GetImage() const noexcept;
-		[[nodiscard]] std::vector<Bmp::Frame> GetFrames() const noexcept;
+		BmpToRender GetImage() const noexcept;
+		void SetImage(BmpToRender bmp) noexcept;
 
 		private:
-		std::unique_ptr<IRenderer> imageRenderer;
-		Bmp::BitmapSource img;
+		void CreateRenderer(BmpToRender bmp) noexcept;
+		std::unique_ptr<IImgRenderer> renderer;
 
-		Core::HandlerResult OnCreate(UINT msg, WPARAM wParam, LPARAM lParam) noexcept;
+		Core::HandlerResult OnCreate(BmpToRender bmp, UINT msg, WPARAM wParam, LPARAM lParam) noexcept;
 		Core::HandlerResult OnPaint(UINT msg, WPARAM wParam, LPARAM lParam) noexcept;
 		Core::HandlerResult OnSize(UINT msg, WPARAM wParam, LPARAM lParam) const noexcept;
 	};
