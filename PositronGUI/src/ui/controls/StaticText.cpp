@@ -46,10 +46,7 @@ namespace PGUI::UI::Controls
 
 		if (!textFormat)
 		{
-			textFormat = TextFormat{ L"Segoe UI", 16, GetUserLocaleName() };
-
-			textFormat.SetParagraphAlignment(Font::ParagraphAlignments::Center);
-			textFormat.SetTextAlignment(Font::TextAlignments::Center);
+			textFormat = TextFormat::GetDefTextFormat();
 		}
 
 		auto [textColor, backgroundColor] = GetStaticTextColors();
@@ -132,6 +129,7 @@ namespace PGUI::UI::Controls
 
 		if (!textBrush)
 		{
+			SetGradientBrushRect(textBrush, textLayout.GetBoundingRect());
 			textBrush.CreateBrush(renderer);
 		}
 		if (!backgroundBrush)

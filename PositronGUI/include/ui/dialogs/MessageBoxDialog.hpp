@@ -1,5 +1,6 @@
 #pragma once
 
+#include "ui/bmp/Bitmap.hpp"
 #include "ui/Dialog.hpp"
 #include "ui/controls/TextButton.hpp"
 #include "ui/Colors.hpp"
@@ -65,11 +66,13 @@ namespace PGUI::UI::Dialogs
 		std::vector<Core::WindowPtr<Controls::TextButton>> buttons;
 
 		MessageBoxButtonSet buttonSet;
-		MessageBoxIcon icon;
 		MessageBoxChoice choice = MessageBoxChoice::Ok;
 
 		TextFormat textFormat;
 		TextLayout textLayout;
+
+		Bmp::Bitmap icon;
+		ComPtr<ID2D1Bitmap> iconBmp;
 
 		Brush textBrush{ Colors::Aliceblue };
 		Brush buttonHighlightBrush{ Colors::Black };

@@ -227,7 +227,6 @@ namespace PGUI::UI::Controls
 		}
 	}
 
-
 	void StaticImage::GifRenderer::GetGlobalMetadata()
 	{
 		GetBackgroundColor();
@@ -387,7 +386,8 @@ namespace PGUI::UI::Controls
 	{
 	}
 
-	StaticImage::StaticImage(BmpToRender bmp)
+	StaticImage::StaticImage(BmpToRender bmp) : 
+		UIComponent{ Core::WindowClass::Create(L"StaticImage_UIComponent") }
 	{
 		RegisterMessageHandler(WM_CREATE, std::bind_front(&StaticImage::OnCreate, this, bmp));
 		RegisterMessageHandler(WM_SIZE, &StaticImage::OnSize);

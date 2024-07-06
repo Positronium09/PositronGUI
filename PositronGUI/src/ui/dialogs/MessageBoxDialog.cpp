@@ -11,12 +11,58 @@ namespace PGUI::UI::Dialogs
 	MessageBoxDialog::MessageBoxDialog(std::wstring_view _text, 
 		MessageBoxButtonSet _buttonSet, MessageBoxIcon _icon) noexcept : 
 		ModalDialog{ Core::WindowClass::Create(L"MessageBoxDialog_Dialog") },
-		text(_text), buttonSet(_buttonSet), icon(_icon)
+		text(_text), buttonSet(_buttonSet)
 	{
 		RegisterMessageHandler(WM_CREATE, &MessageBoxDialog::OnCreate);
 		RegisterMessageHandler(WM_PAINT, &MessageBoxDialog::OnPaint);
 
 		InitTextFormat();
+
+		switch (_icon)
+		{
+			using enum MessageBoxIcon;
+
+			#pragma warning (push)
+			#pragma warning (disable : 4302)
+
+			case Error: // Stop, Hand
+			{
+				auto hIcon = static_cast<HICON>(
+					LoadImageW(nullptr, MAKEINTRESOURCEW(IDI_ERROR), IMAGE_ICON, 0, 0, LR_DEFAULTSIZE | LR_SHARED)
+					);
+				icon = Bmp::Bitmap{ hIcon };
+				break;
+			}
+			case Question:
+			{
+				auto hIcon = static_cast<HICON>(
+					LoadImageW(nullptr, MAKEINTRESOURCEW(IDI_QUESTION), IMAGE_ICON, 0, 0, LR_DEFAULTSIZE | LR_SHARED)
+					);
+				icon = Bmp::Bitmap{ hIcon };
+				break;
+			}
+			case Warning: // Exclamation
+			{
+				auto hIcon = static_cast<HICON>(
+					LoadImageW(nullptr, MAKEINTRESOURCEW(IDI_WARNING), IMAGE_ICON, 0, 0, LR_DEFAULTSIZE | LR_SHARED)
+					);
+				icon = Bmp::Bitmap{ hIcon };
+				break;
+			}
+			case Information: // Asterisk
+			{ 
+				auto hIcon = static_cast<HICON>(
+					LoadImageW(nullptr, 
+						MAKEINTRESOURCEW(IDI_INFORMATION), IMAGE_ICON, 0, 0, LR_DEFAULTSIZE | LR_SHARED)
+					);
+				icon = Bmp::Bitmap{ hIcon };
+				break;
+			}
+			default:
+				break;
+		}
+
+		#pragma warning (pop)
 	}
 
 	void MessageBoxDialog::CreateDeviceResources()
@@ -130,7 +176,7 @@ namespace PGUI::UI::Dialogs
 
 	void MessageBoxDialog::SetToRequiredSize() const noexcept
 	{
-		AdjustForSize(CalculateSize());
+		AdjustForClientSize(CalculateSize());
 		CenterAroundParent();
 	}
 
@@ -197,6 +243,8 @@ namespace PGUI::UI::Dialogs
 			case AbortRetryIgnore:
 				totalButtonSize.cx += 3 * (buttonSize.cx + 20);
 				break;
+			default:
+				break;
 		}
 
 		if (size.cx > monitorSize_5_8.cx)
@@ -214,6 +262,11 @@ namespace PGUI::UI::Dialogs
 		}
 		size.cy += totalButtonSize.cy;
 
+		if (iconBmp)
+		{
+			size.cx += icon.GetSize().cx + margin.left * 2;
+		}
+
 		return size;
 	}
 
@@ -224,9 +277,15 @@ namespace PGUI::UI::Dialogs
 			EnableDarkTitleBar(Hwnd());
 		}
 
+		if (icon.ComPtrHolder<IWICBitmap>::IsInitialized())
+		{
+			iconBmp = icon.ConvertToD2D1Bitmap(GetRenderingInterface());
+		}
+
 		SetToRequiredSize();
 		CreateButtons();
 		InitTextLayout();
+
 
 		return 0;
 	}
@@ -243,7 +302,24 @@ namespace PGUI::UI::Dialogs
 
 		renderer->FillRectangle(RectF{ 0, size.cy - buttonSize.cy - 40, size.cx, size.cy }, 
 			buttonHighlightBrush->GetBrushPtr());
-		renderer->DrawTextLayout(PointF{ 0, 0 }, textLayout, textBrush->GetBrushPtr());
+
+		SizeI iconSize{ };
+		if (iconBmp)
+		{
+			float middleY = (size.cy - buttonSize.cy - 40) / 2.f;
+
+			iconSize = icon.GetSize();
+			renderer->DrawBitmap(iconBmp.Get(), RectF{
+				static_cast<float>(margin.left), 
+				middleY - static_cast<float>(iconSize.cy) / 2.f,
+				static_cast<float>(margin.left + iconSize.cx), 
+				middleY + 
+				static_cast<float>(iconSize.cy) / 2.f
+				});
+		}
+
+		renderer->DrawTextLayout(PointF{ 0, 0 },
+		textLayout, textBrush->GetBrushPtr());
 
 		EndDraw();
 
@@ -255,7 +331,7 @@ namespace PGUI::UI::Dialogs
 		MessageBoxButtonSet buttonSet, MessageBoxIcon icon)
 	{
 		auto msgBox = Dialog::Create<MessageBoxDialog>(
-			DialogCreateParams{ parentHwnd },
+			DialogCreateParams{ parentHwnd, DS_MODALFRAME },
 			Core::WindowCreateParams{ caption, PointI{ }, SizeI{ 200, 200 }, NULL },
 			text, buttonSet, icon
 		);

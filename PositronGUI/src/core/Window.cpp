@@ -40,6 +40,7 @@ namespace PGUI::Core
 	Window::Window(const WindowClass::WindowClassPtr& wndClass) noexcept :
 		windowClass{ wndClass }
 	{
+		RegisterMessageHandler(WM_DPICHANGED, &Window::OnDPIChanged);
 	}
 
 	Window::~Window() noexcept
@@ -82,12 +83,63 @@ namespace PGUI::Core
 
 	void Window::Move(PointL newPos) const noexcept
 	{
-		SetWindowPos(Hwnd(), nullptr, newPos.x, newPos.y, NULL, NULL, SWP_NOSIZE | SWP_NOZORDER);
+		SetWindowPos(Hwnd(), nullptr, newPos.x, newPos.y, NULL, NULL, 
+			SWP_NOSIZE | SWP_NOZORDER | SWP_NOACTIVATE);
 	}
 
 	void Window::Resize(SizeL newSize) const noexcept
 	{
-		SetWindowPos(Hwnd(), nullptr, NULL, NULL, newSize.cx, newSize.cy, SWP_NOMOVE | SWP_NOZORDER);
+		SetWindowPos(Hwnd(), nullptr, NULL, NULL, newSize.cx, newSize.cy, 
+			SWP_NOMOVE | SWP_NOZORDER | SWP_NOACTIVATE);
+	}
+
+	void Window::MoveAndResize(RectL newRect) const noexcept
+	{
+		const auto size = newRect.Size();
+
+		SetWindowPos(Hwnd(),
+			nullptr,
+			newRect.left,
+			newRect.top,
+			size.cx,
+			size.cy,
+			SWP_NOZORDER | SWP_NOACTIVATE);
+	}
+
+	void Window::MoveAndResize(PointL newPos, SizeL newSize) const noexcept
+	{
+		SetWindowPos(Hwnd(),
+			nullptr,
+			newPos.x,
+			newPos.y,
+			newSize.cx,
+			newSize.cy,
+			SWP_NOZORDER | SWP_NOACTIVATE);
+	}
+
+	UINT Window::GetDpi() const noexcept
+	{
+		return GetDpiForWindow(Hwnd());
+	}
+
+	std::span<PointL> Window::MapPoints(HWND hWndTo, std::span<PointL> points) const noexcept
+	{
+		return PGUI::MapPoints(Hwnd(), hWndTo, points);
+	}
+
+	PointL Window::MapPoint(HWND hWndTo, PointL point) const noexcept
+	{
+		return PGUI::MapPoint(Hwnd(), hWndTo, point);
+	}
+
+	std::span<RectL> Window::MapRects(HWND hWndTo, std::span<RectL> rects) const noexcept
+	{
+		return PGUI::MapRects(Hwnd(), hWndTo, rects);
+	}
+
+	RectL Window::MapRect(HWND hWndTo, RectL rect) const noexcept
+	{
+		return PGUI::MapRect(Hwnd(), hWndTo, rect);
 	}
 
 	TimerId Window::AddTimer(TimerId id, std::chrono::milliseconds delay, 
@@ -127,16 +179,33 @@ namespace PGUI::Core
 		EnableWindow(Hwnd(), static_cast<BOOL>(enable));
 	}
 
-	void Window::AdjustForSize(SizeI size) const noexcept
+	void Window::AdjustForClientSize(SizeI size) const noexcept
 	{
 		RECT rc;
 		SetRect(&rc, 0, 0, size.cx, size.cy);
-		AdjustWindowRect(&rc, 
+		
+		AdjustWindowRectExForDpi(&rc,
 			static_cast<DWORD>(GetWindowLongPtrW(hWnd, GWL_STYLE)), 
-			FALSE);
+			FALSE,
+			static_cast<DWORD>(GetWindowLongPtrW(hWnd, GWL_EXSTYLE)), 
+			GetDpi());
 
 		RectL r = rc;
 		Resize(r.Size());
+	}
+
+	void Window::AdjustForRect(RectI rect) const noexcept
+	{
+		RECT rc = rect;
+		auto dpi = GetDpi();
+
+		AdjustWindowRectExForDpi(&rc,
+			static_cast<DWORD>(GetWindowLongPtrW(hWnd, GWL_STYLE)),
+			FALSE,
+			static_cast<DWORD>(GetWindowLongPtrW(hWnd, GWL_EXSTYLE)),
+			dpi);
+
+		MoveAndResize(rc);
 	}
 
 	const TimerMap& Window::GetTimerMap() const noexcept
@@ -197,6 +266,50 @@ namespace PGUI::Core
 	{
 		handlerMap[msg].push_back(handler);
 	}
+	
+	HandlerResult Window::OnDPIChange(float dpiScale, RectI suggestedRect)
+	{
+		MoveAndResize(suggestedRect);
+
+		ErrorHandling::Logger::Log(std::format(L"{}", dpiScale));
+		AdjustChildWindowsForDPI(dpiScale);
+
+		return 0;
+	}
+
+	void Window::AdjustChildWindowsForDPI(float dpiScale)
+	{
+		for (const auto& child : childWindows)
+		{
+			auto rc = child->GetWindowRect();
+
+			rc = PGUI::MapRect(nullptr, Hwnd(), rc);
+
+			#pragma warning (push)
+			#pragma warning (disable : 4244)
+
+			rc.left *= dpiScale;
+			rc.top *= dpiScale;
+			rc.right *= dpiScale;
+			rc.bottom *= dpiScale;
+
+			#pragma warning (pop)
+
+			child->OnDPIChange(dpiScale, rc);
+		}
+	}
+
+	Core::HandlerResult Window::OnDPIChanged(UINT, WPARAM wParam, LPARAM lParam)
+	{
+		const auto result = OnDPIChange(
+			static_cast<float>(LOWORD(wParam)) /
+			static_cast<float>(prevDpi),
+			*std::bit_cast<LPRECT>(lParam));
+
+		prevDpi = LOWORD(wParam);
+
+		return result;
+	}
 
 	bool Window::operator==(const Window& other) const noexcept
 	{
@@ -214,6 +327,7 @@ namespace PGUI::Core
 
 			window->hWnd = hWnd;
 			window->parenthWnd = createStruct->hwndParent;
+			window->prevDpi = window->GetDpi();
 		}
 
 		auto window = GetWindowFromHwnd(hWnd);

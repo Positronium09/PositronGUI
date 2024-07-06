@@ -29,9 +29,9 @@ namespace PGUI::Core
 		wc.hbrBackground = backgroundBrush;
 		wc.lpszMenuName = nullptr;
 		wc.lpszClassName = _className.data();
-		wc.hIcon = icon ? icon : static_cast<HICON>(LoadImageW(nullptr, IDI_APPLICATION, IMAGE_ICON, NULL, NULL, LR_SHARED | LR_DEFAULTSIZE));
+		wc.hIcon = icon;
 		wc.hCursor = cursor ? cursor : static_cast<HCURSOR>(LoadImageW(nullptr, IDC_ARROW, IMAGE_CURSOR, NULL, NULL, LR_SHARED | LR_DEFAULTSIZE));
-		wc.hIconSm = smIcon ? smIcon : static_cast<HICON>(LoadImageW(nullptr, IDI_APPLICATION, IMAGE_ICON, NULL, NULL, LR_SHARED | LR_DEFAULTSIZE));
+		wc.hIconSm = smIcon;
 
 		classAtom = RegisterClassExW(&wc);
 

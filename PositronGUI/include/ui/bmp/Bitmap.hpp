@@ -14,6 +14,9 @@ namespace PGUI::UI::Bmp
 		public:
 		Bitmap() noexcept = default;
 		explicit Bitmap(ComPtr<IWICBitmap> bmp) noexcept;
+		explicit Bitmap(HBITMAP bmp, 
+			WICBitmapAlphaChannelOption alphaChannelOption = WICBitmapUsePremultipliedAlpha) noexcept;
+		explicit Bitmap(HICON icon) noexcept;
 
 		void SetPalette(Palette palette) const;
 		void SetResolution(BitmapResolution resolution) const;

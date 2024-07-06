@@ -16,12 +16,12 @@ namespace PGUI::UI::Controls
 		public:
 		struct TextButtonColors
 		{
-			RGBA normalTextColor;
-			RGBA normalBackgroundColor;
-			RGBA hoverTextColor;
-			RGBA hoverBackgroundColor;
-			RGBA clickedTextColor;
-			RGBA clickedBackgroundColor;
+			BrushParameters normalText;
+			BrushParameters normalBackground;
+			BrushParameters hoverText;
+			BrushParameters hoverBackground;
+			BrushParameters clickedText;
+			BrushParameters clickedBackground;
 
 			TextButtonColors() = default;
 		};

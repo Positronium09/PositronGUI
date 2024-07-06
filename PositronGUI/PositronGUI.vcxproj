@@ -21,6 +21,9 @@
   <ItemGroup>
     <ClCompile Include="src\ui\bmp\Bitmap.cpp" />
     <ClCompile Include="src\ui\bmp\BitmapSource.cpp" />
+    <ClCompile Include="src\ui\controls\Header.cpp" />
+    <ClCompile Include="src\ui\controls\ListBox.cpp" />
+    <ClCompile Include="src\ui\controls\ScrollBar.cpp" />
     <ClCompile Include="src\ui\dialogs\MessageBoxDialog.cpp" />
     <ClCompile Include="src\ui\Dialog.cpp" />
     <ClCompile Include="src\helpers\TimerEvent.cpp" />
@@ -58,6 +61,8 @@
     <ClCompile Include="src\helpers\HelperFunctions.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="include\ui\controls\Header.hpp" />
+    <ClInclude Include="include\ui\controls\ScrollBar.hpp" />
     <ClInclude Include="include\ui\Dialog.hpp" />
     <ClInclude Include="include\core\Ellipse.hpp" />
     <ClInclude Include="include\helpers\EnumFlag.hpp" />
@@ -78,6 +83,7 @@
     <ClInclude Include="include\ui\bmp\Palette.hpp" />
     <ClInclude Include="include\ui\bmp\PGUI.ui.img.hpp" />
     <ClInclude Include="include\ui\dialogs\MessageBoxDialog.hpp" />
+    <ClInclude Include="include\ui\controls\ListBox.hpp" />
     <ClInclude Include="include\ui\PositioningMode.hpp" />
     <ClInclude Include="include\helpers\ComPtrHolder.hpp" />
     <ClInclude Include="include\ui\Color.hpp" />

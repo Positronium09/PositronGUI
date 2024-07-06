@@ -1,8 +1,11 @@
 #pragma once
 
+#include "core/Point.hpp"
+#include "core/Rect.hpp"
 #include <functional>
 #include <concepts>
 #include <string>
+#include <span>
 #include <Windows.h>
 
 
@@ -39,15 +42,6 @@ namespace PGUI
 		}
 		return std::signbit(x) ? -1 : 1;
 	}
-	//template <std::float T>
-	//[[nodiscard]] constexpr int sign(T x) noexcept
-	//{
-	//	if (x == 0)
-	//	{
-	//		return 0;
-	//	}
-	//	return x > 0 ? 1 : -1;
-	//}
 
 	template<std::floating_point T>
 	[[nodiscard]] constexpr T MapToRange(T value,
@@ -67,4 +61,12 @@ namespace PGUI
 	{
 		return std::bind_front(memberFunc, ptr);
 	}
+
+	[[nodiscard]] int AdjustForDpi(int value, int dpi) noexcept;
+
+	[[nodiscard]] std::span<PointL> MapPoints(HWND from, HWND to, std::span<PointL> points) noexcept;
+	[[nodiscard]] PointL MapPoint(HWND from, HWND to, PointL point) noexcept;
+
+	[[nodiscard]] std::span<RectL> MapRects(HWND from, HWND to, std::span<RectL> rects) noexcept;
+	[[nodiscard]] RectL MapRect(HWND from, HWND to, RectL rect) noexcept;
 }

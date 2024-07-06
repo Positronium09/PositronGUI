@@ -89,7 +89,7 @@ namespace PGUI::Core
 
 		public:
 		template <std::derived_from<Window> T, typename ...Args>
-		static WindowPtr<T> Create(const WindowCreateParams& createParams, Args... args)
+		[[nodiscard]] static WindowPtr<T> Create(const WindowCreateParams& createParams, Args... args)
 		{
 			auto window = std::make_shared<T>(args...);
 
@@ -97,7 +97,8 @@ namespace PGUI::Core
 				window->windowClass->ClassName().data(), createParams.windowName.data(),
 				createParams.style,
 				createParams.position.x, createParams.position.y, 
-				createParams.size.cx, createParams.size.cy,
+				createParams.size.cx, 
+				createParams.size.cy,
 				NULL, NULL, GetHInstance(),
 				static_cast<LPVOID>(window.get()));
 
@@ -109,6 +110,16 @@ namespace PGUI::Core
 				ErrorHandling::Logger::Error(GetWin32ErrorMessage(errorCode));
 				throw ErrorHandling::Win32Exception{ };
 			}
+			
+			const auto dpi = GetDpiForWindow(window->Hwnd());
+			auto rect = window->GetWindowRect();
+
+			rect.left = AdjustForDpi(rect.left, dpi);
+			rect.top = AdjustForDpi(rect.top, dpi);
+			rect.right = AdjustForDpi(rect.right, dpi);
+			rect.bottom = AdjustForDpi(rect.bottom, dpi);
+
+			window->MoveAndResize(rect);
 
 			return window;
 		}
@@ -136,6 +147,19 @@ namespace PGUI::Core
 		
 			childWindows.push_back(window);
 
+
+			const auto dpi = GetDpiForWindow(window->Hwnd());
+
+			auto rect = window->GetWindowRect();
+			rect = PGUI::MapRect(nullptr, Hwnd(), rect);
+
+			rect.left = AdjustForDpi(rect.left, dpi);
+			rect.top = AdjustForDpi(rect.top, dpi);
+			rect.right = AdjustForDpi(rect.right, dpi);
+			rect.bottom = AdjustForDpi(rect.bottom, dpi);
+
+			window->MoveAndResize(rect);
+
 			return window;
 		}
 		template <std::derived_from<Window> T>
@@ -147,6 +171,18 @@ namespace PGUI::Core
 			SetParent(window->Hwnd(), Hwnd());
 
 			childWindows.push_back(window);
+
+			const auto dpi = GetDpiForWindow(window->Hwnd());
+
+			auto rect = window->GetWindowRect();
+			rect = PGUI::MapRect(nullptr, Hwnd(), rect);
+
+			rect.left = AdjustForDpi(rect.left, dpi);
+			rect.top = AdjustForDpi(rect.top, dpi);
+			rect.right = AdjustForDpi(rect.right, dpi);
+			rect.bottom = AdjustForDpi(rect.bottom, dpi);
+
+			window->MoveAndResize(rect);
 
 			return window;
 		}
@@ -169,13 +205,24 @@ namespace PGUI::Core
 
 		void Move(PointL newPos) const noexcept;
 		void Resize(SizeL newSize) const noexcept;
+		void MoveAndResize(RectL newRect) const noexcept;
+		void MoveAndResize(PointL newPos, SizeL newSize) const noexcept;
+
+		[[nodiscard]] UINT GetDpi() const noexcept;
+
+		[[nodiscard]] std::span<PointL> MapPoints(HWND hWndTo, std::span<PointL> points) const noexcept;
+		[[nodiscard]] PointL MapPoint(HWND hWndTo, PointL point) const noexcept;
+
+		[[nodiscard]] std::span<RectL> MapRects(HWND hWndTo, std::span<RectL> rects) const noexcept;
+		[[nodiscard]] RectL MapRect(HWND hWndTo, RectL rect) const noexcept;
 
 		TimerId AddTimer(TimerId id, std::chrono::milliseconds delay, 
 			const TimerCallback& callback);
 		void RemoveTimer(TimerId id);
 
 		void Enable(bool enable) const noexcept;
-		void AdjustForSize(SizeI size) const noexcept;
+		void AdjustForClientSize(SizeI size) const noexcept;
+		void AdjustForRect(RectI rect) const noexcept;
 
 		[[nodiscard]] const TimerMap& GetTimerMap() const noexcept;
 		[[nodiscard]] TimerMap& GetTimerMap() noexcept;
@@ -211,14 +258,21 @@ namespace PGUI::Core
 			RegisterMessageHandler(msg, std::bind_front(memberFunction, std::bit_cast<const T*>(this)));
 		}
 
+		virtual HandlerResult OnDPIChange(float dpiScale, RectI suggestedRect);
+		virtual void AdjustChildWindowsForDPI(float dpiScale);
+
 		private:
 		HWND hWnd = nullptr;
 		HWND parenthWnd = nullptr;
 		ChildWindowList childWindows;
 
+		UINT prevDpi = USER_DEFAULT_SCREEN_DPI;
+
 		HandlerMap handlerMap;
 		TimerMap timerMap;
 		WindowClass::WindowClassPtr windowClass;
+		
+		HandlerResult OnDPIChanged(UINT msg, WPARAM wParam, LPARAM lParam);
 	};
 
 	LRESULT _WindowProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);

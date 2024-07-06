@@ -7,7 +7,16 @@
 
 namespace PGUI::UI
 {
-	TextFormat::TextFormat(std::wstring_view fontFamilyName, 
+	TextFormat TextFormat::GetDefTextFormat(FLOAT fontSize)
+	{
+		auto textFormat = TextFormat{ L"Segoe UI", fontSize, GetUserLocaleName() };
+
+		textFormat.SetParagraphAlignment(Font::ParagraphAlignments::Center);
+		textFormat.SetTextAlignment(Font::TextAlignments::Center);
+
+		return textFormat;
+	}
+	TextFormat::TextFormat(std::wstring_view fontFamilyName,
 		FLOAT fontSize, std::wstring_view localeName,
 		std::optional<Font::FontCollection> _fontCollection,
 		Font::FontWeight fontWeight, Font::FontStyle fontStyle, Font::FontStretch fontStretch) noexcept

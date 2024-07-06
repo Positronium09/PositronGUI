@@ -17,26 +17,26 @@ namespace PGUI::UI::Controls
 		if (const auto uiColors = UIColors::GetInstance();
 			uiColors->IsDarkMode())
 		{
-			colors.normalTextColor = Colors::Aliceblue;
-			colors.normalBackgroundColor = RGBA{ 0x1b1b1b };
+			colors.normalText = Colors::Aliceblue;
+			colors.normalBackground = RGBA{ 0x1b1b1b };
 
-			colors.hoverTextColor = Colors::Aliceblue;
-			colors.hoverBackgroundColor = RGBA{ 0x202020 };
+			colors.hoverText = Colors::Aliceblue;
+			colors.hoverBackground = RGBA{ 0x202020 };
 
-			colors.clickedTextColor = Colors::Aliceblue;
-			colors.clickedBackgroundColor = RGBA{ 0x191919 };
+			colors.clickedText = Colors::Aliceblue;
+			colors.clickedBackground = RGBA{ 0x191919 };
 
 		}
 		else
 		{
-			colors.normalTextColor = Colors::Black;
-			colors.normalBackgroundColor = RGBA{ 0xf3f3f3 };
+			colors.normalText = Colors::Black;
+			colors.normalBackground = RGBA{ 0xf3f3f3 };
 
-			colors.hoverTextColor = Colors::Black;
-			colors.hoverBackgroundColor = RGBA{ 0xffffff };
+			colors.hoverText = Colors::Black;
+			colors.hoverBackground = RGBA{ 0xffffff };
 
-			colors.clickedTextColor = Colors::Black;
-			colors.clickedBackgroundColor = RGBA{ 0xe5e5e5 };
+			colors.clickedText = Colors::Black;
+			colors.clickedBackground = RGBA{ 0xe5e5e5 };
 		}
 
 		return colors;
@@ -48,26 +48,26 @@ namespace PGUI::UI::Controls
 		if (const auto uiColors = UIColors::GetInstance();
 			uiColors->IsDarkMode())
 		{
-			colors.normalTextColor = Colors::Aliceblue;
-			colors.normalBackgroundColor = RGBA{ 0x1b1b1b };
+			colors.normalText = Colors::Aliceblue;
+			colors.normalBackground = RGBA{ 0x1b1b1b };
 
-			colors.hoverTextColor = RGBA{ 0x1b1b1b };
-			colors.hoverBackgroundColor = uiColors->GetAccentColor();
+			colors.hoverText = RGBA{ 0x1b1b1b };
+			colors.hoverBackground = uiColors->GetAccentColor();
 
-			colors.clickedTextColor = RGBA{ 0x1b1b1b };
-			colors.clickedBackgroundColor = uiColors->GetAccentDark1Color();
+			colors.clickedText = RGBA{ 0x1b1b1b };
+			colors.clickedBackground = uiColors->GetAccentDark1Color();
 
 		}
 		else
 		{
-			colors.normalTextColor = Colors::Black;
-			colors.normalBackgroundColor = RGBA{ 0xf3f3f3 };
+			colors.normalText = Colors::Black;
+			colors.normalBackground = RGBA{ 0xf3f3f3 };
 
-			colors.hoverTextColor = Colors::Black;
-			colors.hoverBackgroundColor = uiColors->GetAccentLight2Color();
+			colors.hoverText = Colors::Black;
+			colors.hoverBackground = uiColors->GetAccentLight2Color();
 
-			colors.clickedTextColor = Colors::Black;
-			colors.clickedBackgroundColor = uiColors->GetAccentColor();
+			colors.clickedText = Colors::Black;
+			colors.clickedBackground = uiColors->GetAccentColor();
 		}
 
 		return colors;
@@ -87,10 +87,7 @@ namespace PGUI::UI::Controls
 
 		if (!textFormat)
 		{
-			textFormat = TextFormat{ L"Segoe UI", 16, GetUserLocaleName() };
-
-			textFormat.SetParagraphAlignment(Font::ParagraphAlignments::Center);
-			textFormat.SetTextAlignment(Font::TextAlignments::Center);
+			textFormat = TextFormat::GetDefTextFormat();
 		}
 
 		StateChangedEvent().Subscribe(PGUI::BindMemberFunc(&TextButton::OnStateChanged, this));
@@ -156,20 +153,20 @@ namespace PGUI::UI::Controls
 
 			case Normal:
 			{
-				textBrush.SetParameters(colors.normalTextColor);
-				backgroundBrush.SetParameters(colors.normalBackgroundColor);
+				textBrush.SetParameters(colors.normalText);
+				backgroundBrush.SetParameters(colors.normalBackground);
 				break;
 			}
 			case Hover:
 			{
-				textBrush.SetParameters(colors.hoverTextColor);
-				backgroundBrush.SetParameters(colors.hoverBackgroundColor);
+				textBrush.SetParameters(colors.hoverText);
+				backgroundBrush.SetParameters(colors.hoverBackground);
 				break;
 			}
 			case Clicked:
 			{
-				textBrush.SetParameters(colors.clickedTextColor);
-				backgroundBrush.SetParameters(colors.clickedBackgroundColor);
+				textBrush.SetParameters(colors.clickedText);
+				backgroundBrush.SetParameters(colors.clickedBackground);
 				break;
 			}
 		}
@@ -184,6 +181,7 @@ namespace PGUI::UI::Controls
 
 		if (!textBrush)
 		{
+			SetGradientBrushRect(textBrush, textLayout.GetBoundingRect());
 			textBrush.CreateBrush(renderer);
 		}
 		if (!backgroundBrush)

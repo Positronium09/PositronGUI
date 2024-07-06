@@ -15,6 +15,8 @@ namespace PGUI::UI
 	class TextFormat : public ComPtrHolder<IDWriteTextFormat3>
 	{
 		public:
+		static [[nodiscard]] TextFormat GetDefTextFormat(FLOAT fontSize = 16);
+
 		TextFormat() noexcept = default;
 		TextFormat(std::wstring_view fontFamilyName, 
 			FLOAT fontSize, std::wstring_view localeName,

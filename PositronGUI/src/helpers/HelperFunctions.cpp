@@ -3,8 +3,9 @@
 #include "ui/Brush.hpp"
 #include "ui/Gradient.hpp"
 
-#include <string.h>
+#include <bit>
 #include <system_error>
+#include <string.h>
 #include <dwmapi.h>
 
 
@@ -75,5 +76,45 @@ namespace PGUI
 	std::wstring GetWin32ErrorMessage(DWORD errorCode) noexcept
 	{
 		return StringToWString(std::system_category().message(HRESULT_FROM_WIN32(errorCode)));
+	}
+
+	int AdjustForDpi(int value, int dpi) noexcept
+	{
+		return MulDiv(value, dpi, USER_DEFAULT_SCREEN_DPI);
+	}
+
+
+	std::span<PointL> MapPoints(HWND from, HWND to, std::span<PointL> points) noexcept
+	{
+		MapWindowPoints(from, to,
+			std::bit_cast<LPPOINT>(points.data()),
+			static_cast<UINT>(points.size()));
+
+		return points;
+	}
+
+	PointL MapPoint(HWND from, HWND to, PointL point) noexcept
+	{
+		MapWindowPoints(from, to,
+			std::bit_cast<LPPOINT>(&point), 1U);
+
+		return point;
+	}
+
+	std::span<RectL> MapRects(HWND from, HWND to, std::span<RectL> rects) noexcept
+	{
+		MapWindowPoints(from, to,
+			std::bit_cast<LPPOINT>(rects.data()),
+			static_cast<UINT>(rects.size()) * 2);
+
+		return rects;
+	}
+
+	RectL MapRect(HWND from, HWND to, RectL rect) noexcept
+	{
+		MapWindowPoints(from, to,
+			std::bit_cast<LPPOINT>(&rect), 2U);
+
+		return rect;
 	}
 }

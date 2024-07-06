@@ -38,6 +38,10 @@ namespace PGUI
 			left((T)rc.left), top((T)rc.top), right((T)rc.right), bottom((T)rc.bottom)
 		{
 		}
+		constexpr Rect(Point<T> position, Size<T> size) noexcept : 
+			left(position.x), top(position.y), right(position.x + size.cx), bottom(position.y + size.cy)
+		{
+		}
 		~Rect() noexcept = default;
 
 		constexpr [[nodiscard]] bool operator==(const Rect<T>& other) const noexcept = default;

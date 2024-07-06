@@ -15,6 +15,7 @@ namespace PGUI::UI::Controls
 {
 	using BmpToRender = std::variant<Bmp::BitmapSource, Bmp::BitmapDecoder>;
 	// TODO Add aspect ratio options
+	// TODO Extract Renderers from this class
 	class StaticImage : public UIComponent
 	{
 		class IImgRenderer
