@@ -1,6 +1,8 @@
 #include "core/Window.hpp"
 
 #include <bit>
+#include <algorithm>
+#include <ranges>
 
 
 namespace PGUI::Core
@@ -45,10 +47,11 @@ namespace PGUI::Core
 
 	Window::~Window() noexcept
 	{
-		for (const auto& [id, _] : timerMap)
+		std::ranges::for_each(timerMap | std::views::keys,
+			[this](const auto& id)
 		{
 			KillTimer(Hwnd(), id);
-		}
+		});
 		DestroyWindow(hWnd);
 	}
 
@@ -285,15 +288,17 @@ namespace PGUI::Core
 
 			rc = PGUI::MapRect(nullptr, Hwnd(), rc);
 
-			#pragma warning (push)
-			#pragma warning (disable : 4244)
+			rc.left = static_cast<long>(
+				static_cast<float>(rc.left) * dpiScale);
 
-			rc.left *= dpiScale;
-			rc.top *= dpiScale;
-			rc.right *= dpiScale;
-			rc.bottom *= dpiScale;
-
-			#pragma warning (pop)
+			rc.top = static_cast<long>(
+				static_cast<float>(rc.top) * dpiScale);
+			
+			rc.right = static_cast<long>(
+				static_cast<float>(rc.right) * dpiScale);
+			
+			rc.bottom = static_cast<long>(
+				static_cast<float>(rc.bottom) * dpiScale);
 
 			child->OnDPIChange(dpiScale, rc);
 		}

@@ -58,7 +58,7 @@ namespace PGUI::UI
 			auto window = std::make_shared<T>(args...);
 
 			CreateWindowExW(exStyle,
-				window->GetWindowClass()->ClassName().data(), createParams.windowName.data(),
+				window->GetWindowClass()->GetClassName().data(), createParams.windowName.data(),
 				style,
 				position.x, position.y,
 				size.cx, size.cy,

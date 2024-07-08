@@ -31,7 +31,7 @@ namespace PGUI::UI::Controls
 		void SetBackgroundBrush(const Brush& backgroundBrush) noexcept;
 		[[nodiscard]] const Brush& GetBackgroundBrush() const noexcept;
 
-		Core::Event<std::wstring_view>& TextChangedEvent() noexcept;
+		[[nodiscard]] Core::Event<std::wstring_view>& TextChangedEvent() noexcept;
 
 		protected:
 		void CreateDeviceResources() override;

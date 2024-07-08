@@ -19,7 +19,7 @@ namespace PGUI::Core::ErrorHandling
 		[[nodiscard]] HRESULT GetErrorCode() const noexcept;
 		[[nodiscard]] const std::wstring& GetErrorMessage() const noexcept;
 
-		char const* what() const override;
+		[[nodiscard]] char const* what() const override;
 
 		private:
 		HRESULT errorCode;

@@ -72,11 +72,11 @@ namespace PGUI::UI
 		minSize = size;
 	}
 
-	void AppWindow::Title(std::wstring_view title) const noexcept
+	void AppWindow::SetTitle(std::wstring_view title) const noexcept
 	{
 		SendMessage(Hwnd(), WM_SETTEXT, NULL, std::bit_cast<LPARAM>(title.data()));
 	}
-	const std::wstring& AppWindow::Title() const noexcept
+	const std::wstring& AppWindow::GetTitle() const noexcept
 	{
 		return titleText;
 	}

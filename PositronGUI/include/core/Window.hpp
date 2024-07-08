@@ -94,7 +94,7 @@ namespace PGUI::Core
 			auto window = std::make_shared<T>(args...);
 
 			CreateWindowExW(createParams.exStyle, 
-				window->windowClass->ClassName().data(), createParams.windowName.data(),
+				window->windowClass->GetClassName().data(), createParams.windowName.data(),
 				createParams.style,
 				createParams.position.x, createParams.position.y, 
 				createParams.size.cx, 
@@ -129,7 +129,7 @@ namespace PGUI::Core
 			auto window = std::make_shared<T>(args...);
 
 			CreateWindowExW(createParams.exStyle,
-				window->windowClass->ClassName().data(), createParams.windowName.data(),
+				window->windowClass->GetClassName().data(), createParams.windowName.data(),
 				createParams.style | WS_CHILD,
 				createParams.position.x, createParams.position.y,
 				createParams.size.cx, createParams.size.cy,

@@ -19,6 +19,6 @@ namespace PGUI::UI::Bmp
 		[[nodiscard]] PropVariant GetMetadata(std::wstring_view name) const noexcept;
 		[[nodiscard]] std::wstring Location() const noexcept;
 
-		PropVariant operator[](std::wstring_view name) const noexcept;
+		[[nodiscard]] PropVariant operator[](std::wstring_view name) const noexcept;
 	};
 }

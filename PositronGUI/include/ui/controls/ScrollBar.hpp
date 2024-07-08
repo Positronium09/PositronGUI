@@ -56,7 +56,7 @@ namespace PGUI::UI::Controls
 
 		void WheelScroll(std::int64_t wheelDelta) noexcept;
 
-		[[nodiscard]] Core::Event<void>& GetScrolledEvent() noexcept { return scrolledEvent; }
+		[[nodiscard]] Core::Event<void>& ScrolledEvent() noexcept { return scrolledEvent; }
 
 		void SetThumbBrush(Brush&  brush);
 		void SetBackgroundBrush(Brush& brush);

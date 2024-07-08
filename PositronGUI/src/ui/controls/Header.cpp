@@ -5,6 +5,7 @@
 
 #include <numeric>
 #include <ranges>
+#include <algorithm>
 
 
 namespace PGUI::UI::Controls
@@ -176,7 +177,6 @@ namespace PGUI::UI::Controls
 		Control{ Core::WindowClass::Create(L"Header_UIControl") }
 	{
 		RegisterMessageHandler(WM_PAINT, &Header::OnPaint);
-		RegisterMessageHandler(WM_SIZE, &Header::OnSize);
 		RegisterMessageHandler(WM_MOUSEMOVE, &Header::OnMouseMove);
 		RegisterMessageHandler(WM_LBUTTONDOWN, &Header::OnMouseLButtonDown);
 		RegisterMessageHandler(WM_LBUTTONUP, &Header::OnMouseLButtonUp);
@@ -221,10 +221,10 @@ namespace PGUI::UI::Controls
 			backgroundBrush.CreateBrush(renderer);
 		}
 
-		for (const auto& headerItem : headerItems)
+		std::ranges::for_each(headerItems, [renderer](const auto& headerItem)
 		{
 			headerItem->CreateDeviceResources(renderer);
-		}
+		});
 	}
 	void Header::DiscardDeviceResources()
 	{
@@ -233,10 +233,10 @@ namespace PGUI::UI::Controls
 		seperatorBrush.ReleaseBrush();
 		backgroundBrush.ReleaseBrush();
 
-		for (const auto& headerItem : headerItems)
+		std::ranges::for_each(headerItems, [renderer](const auto& headerItem)
 		{
 			headerItem->DiscardDeviceResources(renderer);
-		}
+		});
 	}
 
 	std::optional<std::size_t> Header::GetHoveredHeaderItemIndex(long xPos) const noexcept
@@ -282,14 +282,14 @@ namespace PGUI::UI::Controls
 	{
 		return std::accumulate(
 			headerItems.cbegin(), std::next(headerItems.cbegin(), index), 0,
-			[](std::int32_t x, const auto& header) { return x + header->GetWidth(); }
+			[](long x, const auto& header) { return x + header->GetWidth(); }
 		);
 	}
 	long Header::GetTotalHeaderWidth() const noexcept
 	{
 		return std::accumulate(
 			headerItems.cbegin(), headerItems.cend(), 0,
-			[](std::int32_t x, const auto& header) { return x + header->GetWidth(); }
+			[](long x, const auto& header) { return x + header->GetWidth(); }
 		);
 	}
 
@@ -328,10 +328,6 @@ namespace PGUI::UI::Controls
 
 		EndDraw();
 
-		return 0;
-	}
-	Core::HandlerResult Header::OnSize(UINT, WPARAM, LPARAM)
-	{
 		return 0;
 	}
 	
@@ -399,17 +395,19 @@ namespace PGUI::UI::Controls
 	}
 	Core::HandlerResult Header::OnMouseLButtonDown(UINT, WPARAM, LPARAM)
 	{
-		if (!dragging)
+		if (dragging)
 		{
-			if (mouseOnDivider)
-			{
-				dragging = true;
-				SetCapture(Hwnd());
-			}
-			else if (hoveringIndex.has_value())
-			{
-				headerItems.at(*hoveringIndex)->SetState(HeaderItemState::Pressed);
-			}
+			return 0;
+		}
+
+		if (mouseOnDivider)
+		{
+			dragging = true;
+			SetCapture(Hwnd());
+		}
+		else if (hoveringIndex.has_value())
+		{
+			headerItems.at(*hoveringIndex)->SetState(HeaderItemState::Pressed);
 		}
 
 		return 0;
@@ -424,6 +422,7 @@ namespace PGUI::UI::Controls
 		else if (hoveringIndex.has_value())
 		{
 			headerItems.at(*hoveringIndex)->SetState(HeaderItemState::Hover);
+			headerItemClickedEvent.Emit(*hoveringIndex);
 		}
 
 		return 0;

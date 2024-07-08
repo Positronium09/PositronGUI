@@ -53,7 +53,7 @@ namespace PGUI::Core
 				className, style, backgroundBrush, 
 				icon, cursor, smIcon);
 
-			atom = windowClass->Atom();
+			atom = windowClass->GetAtom();
 			registeredClasses[atom] = windowClass;
 		}
 
@@ -65,12 +65,12 @@ namespace PGUI::Core
 		UnregisterClassW(className.c_str(), GetHInstance());
 	}
 
-	std::wstring_view WindowClass::ClassName() const noexcept
+	std::wstring_view WindowClass::GetClassName() const noexcept
 	{
 		return className;
 	}
 
-	ATOM WindowClass::Atom() const noexcept
+	ATOM WindowClass::GetAtom() const noexcept
 	{
 		return classAtom;
 	}

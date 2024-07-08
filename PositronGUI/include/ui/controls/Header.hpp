@@ -40,7 +40,7 @@ namespace PGUI::UI::Controls
 		[[nodiscard]] Core::Event<void>& GetStateChangedEvent() noexcept { return stateChangedEvent; }
 		[[nodiscard]] Core::Event<void>& GetWidthChangedEvent() noexcept { return widthChangedEvent; }
 
-		void SetWidth(long _width) noexcept { width = _width; }
+		void SetWidth(long _width) noexcept { width = _width; widthChangedEvent.Emit(); }
 		[[nodiscard]] long GetWidth() const noexcept { return width; }
 		[[nodiscard]] long GetMinWidth() const noexcept { return minWidth; }
 
@@ -127,25 +127,25 @@ namespace PGUI::UI::Controls
 		}
 		
 		template <std::derived_from<HeaderItem> T>
-		T* GetItem(std::size_t index) const
+		[[nodiscard]] T* GetItem(std::size_t index) const
 		{
 			auto& ptr = headerItems.at(index);
 
 			return dynamic_cast<T*>(ptr.get());
 		}
-		HeaderItem* GetItem(std::size_t index) const
+		[[nodiscard]] HeaderItem* GetItem(std::size_t index) const
 		{
 			return headerItems.at(index).get();
 		}
 
 		template <std::derived_from<HeaderItem> T>
-		T* GetHoveredItem() const
+		[[nodiscard]] T* GetHoveredItem() const
 		{
 			auto& ptr = headerItems.at(*hoveringIndex);
 
 			return dynamic_cast<T*>(ptr.get());
 		}
-		HeaderItem* GetHoveredItem() const
+		[[nodiscard]] HeaderItem* GetHoveredItem() const
 		{
 			return headerItems.at(*hoveringIndex).get();
 		}
@@ -154,6 +154,8 @@ namespace PGUI::UI::Controls
 
 		void SetSeperatorBrush(const Brush& seperatorBrush) noexcept;
 		void SetBackgroundBrush(const Brush& backgroundBrush) noexcept;
+
+		[[nodiscard]] Core::Event<std::size_t>& HeaderItemClickedEvent() { return headerItemClickedEvent; }
 
 		private:
 		void CreateDeviceResources() override;
@@ -164,6 +166,8 @@ namespace PGUI::UI::Controls
 
 		[[nodiscard]] long CalculateHeaderItemWidthUpToIndex(std::size_t index) const noexcept;
 		[[nodiscard]] long GetTotalHeaderWidth() const noexcept;
+
+		Core::Event<std::size_t> headerItemClickedEvent;
 
 		const long sizingMargin = 5;
 		HeaderItemList headerItems;
@@ -177,7 +181,6 @@ namespace PGUI::UI::Controls
 		std::optional<std::size_t> hoveringIndex = std::nullopt;
 
 		Core::HandlerResult OnPaint(UINT msg, WPARAM wParam, LPARAM lParam);
-		Core::HandlerResult OnSize(UINT msg, WPARAM wParam, LPARAM lParam);
 		Core::HandlerResult OnMouseMove(UINT msg, WPARAM wParam, LPARAM lParam);
 		Core::HandlerResult OnMouseLButtonDown(UINT msg, WPARAM wParam, LPARAM lParam);
 		Core::HandlerResult OnMouseLButtonUp(UINT msg, WPARAM wParam, LPARAM lParam);

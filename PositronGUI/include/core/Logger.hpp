@@ -48,10 +48,10 @@ namespace PGUI::Core::ErrorHandling
 		static void Fatal(std::wstring_view string) noexcept;
 
 		static void SetLogger(ILogger* logger) noexcept;
-		[[nodiscard]] static ILogger* GetLogger() noexcept;
+		static [[nodiscard]] ILogger* GetLogger() noexcept;
 
 		static void SetLogLevel(LogLevel logLevel) noexcept;
-		[[nodiscard]] static LogLevel GetLogLevel() noexcept;
+		static [[nodiscard]] LogLevel GetLogLevel() noexcept;
 
 		private:
 		static inline ILogger* logger;

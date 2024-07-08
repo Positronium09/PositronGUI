@@ -17,7 +17,7 @@ namespace PGUI
 		D2DFactory(D2DFactory&) = delete;
 		void operator=(const D2DFactory&) = delete;
 
-		static ComPtr<ID2D1Factory8> GetFactory()
+		static [[nodiscard]] ComPtr<ID2D1Factory8> GetFactory()
 		{
 			if (!direct2DFactory)
 			{

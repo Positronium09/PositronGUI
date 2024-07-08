@@ -132,7 +132,7 @@
     <ClCompile Include="src\ui\controls\ScrollBar.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\ui\controls\ListBox.cpp">
+    <ClCompile Include="src\ui\controls\ListView.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -323,7 +323,7 @@
     <ClInclude Include="include\ui\controls\ScrollBar.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\ui\controls\ListBox.hpp">
+    <ClInclude Include="include\ui\controls\ListView.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

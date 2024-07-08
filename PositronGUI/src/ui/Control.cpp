@@ -15,8 +15,7 @@ namespace PGUI::UI
 
 	Core::HandlerResult Control::OnCreate(UINT, WPARAM, LPARAM) const noexcept
 	{
-		// Controls have input 
-		// d by default
+		// Controls have input enabled by default
 		EnableInput();
 		return 0;
 	}

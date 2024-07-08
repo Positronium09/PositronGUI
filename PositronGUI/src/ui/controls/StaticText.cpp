@@ -13,7 +13,7 @@
 
 namespace PGUI::UI::Controls
 {
-	std::pair<RGBA, RGBA> GetStaticTextColors()
+	static std::pair<RGBA, RGBA> GetStaticTextColors()
 	{
 		RGBA textColor;
 		RGBA backgroundColor;

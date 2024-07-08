@@ -27,27 +27,27 @@ namespace PGUI
 		[[nodiscard]] explicit operator bool () const noexcept { return IsInitialized(); }
 
 		protected:
-		ComPtr<T> GetHeldComPtr() const noexcept
+		[[nodiscard]] ComPtr<T> GetHeldComPtr() const noexcept
 		{
 			return heldPtr;
 		}
-		auto GetHeldComPtrAddress() noexcept
+		[[nodiscard]] auto GetHeldComPtrAddress() noexcept
 		{
 			return &heldPtr;
 		}
-		auto GetHeldComPtrAddress() const noexcept
+		[[nodiscard]] auto GetHeldComPtrAddress() const noexcept
 		{
 			return &heldPtr;
 		}
-		T* GetHeldPtr() const noexcept
+		[[nodiscard]] T* GetHeldPtr() const noexcept
 		{
 			return heldPtr.Get();
 		}
-		T* const* GetHeldPtrAddress() const noexcept
+		[[nodiscard]] T* const* GetHeldPtrAddress() const noexcept
 		{
 			return heldPtr.GetAddressOf();
 		}
-		T** GetHeldPtrAddress() noexcept
+		[[nodiscard]] T** GetHeldPtrAddress() noexcept
 		{
 			return heldPtr.GetAddressOf();
 		}

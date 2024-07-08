@@ -103,7 +103,7 @@ namespace PGUI
 
 		[[nodiscard]] PropVariantType Type() const noexcept;
 
-		PropVariantValue GetValue() const noexcept;
+		[[nodiscard]] PropVariantValue GetValue() const noexcept;
 
 		PROPVARIANT var;
 	};

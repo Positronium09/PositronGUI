@@ -123,7 +123,8 @@ namespace PGUI::UI
 		DWORD value = 1;
 		DWORD size = sizeof(value);
 
-		if (LSTATUS status = RegGetValueW(HKEY_CURRENT_USER, LR"(Software\Microsoft\Windows\CurrentVersion\Themes\Personalize)",
+		if (LSTATUS status = RegGetValueW(HKEY_CURRENT_USER, 
+			LR"(Software\Microsoft\Windows\CurrentVersion\Themes\Personalize)",
 			L"AppsUseLightTheme", RRF_RT_DWORD, nullptr, &value, &size);
 			status != ERROR_SUCCESS)
 		{

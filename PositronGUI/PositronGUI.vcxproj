@@ -22,7 +22,7 @@
     <ClCompile Include="src\ui\bmp\Bitmap.cpp" />
     <ClCompile Include="src\ui\bmp\BitmapSource.cpp" />
     <ClCompile Include="src\ui\controls\Header.cpp" />
-    <ClCompile Include="src\ui\controls\ListBox.cpp" />
+    <ClCompile Include="src\ui\controls\ListView.cpp" />
     <ClCompile Include="src\ui\controls\ScrollBar.cpp" />
     <ClCompile Include="src\ui\dialogs\MessageBoxDialog.cpp" />
     <ClCompile Include="src\ui\Dialog.cpp" />
@@ -83,7 +83,7 @@
     <ClInclude Include="include\ui\bmp\Palette.hpp" />
     <ClInclude Include="include\ui\bmp\PGUI.ui.img.hpp" />
     <ClInclude Include="include\ui\dialogs\MessageBoxDialog.hpp" />
-    <ClInclude Include="include\ui\controls\ListBox.hpp" />
+    <ClInclude Include="include\ui\controls\ListView.hpp" />
     <ClInclude Include="include\ui\PositioningMode.hpp" />
     <ClInclude Include="include\helpers\ComPtrHolder.hpp" />
     <ClInclude Include="include\ui\Color.hpp" />

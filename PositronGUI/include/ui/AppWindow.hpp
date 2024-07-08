@@ -17,8 +17,8 @@ namespace PGUI::UI
 		[[nodiscard]] SizeI GetMinimumSize() const noexcept;
 		void SetMinimumSize(SizeI size) noexcept;
 
-		void Title(std::wstring_view title) const noexcept;
-		[[nodiscard]] const std::wstring& Title() const noexcept;
+		void SetTitle(std::wstring_view title) const noexcept;
+		[[nodiscard]] const std::wstring& GetTitle() const noexcept;
 
 		private:
 		std::wstring titleText;

@@ -16,20 +16,20 @@ namespace PGUI::UI
 		UIColors(UIColors&) = delete;
 		void operator=(const UIColors&) = delete;
 
-		static UIColors* GetInstance() noexcept;
+		static [[nodiscard]] UIColors* GetInstance() noexcept;
 
-		RGBA GetForegroundColor() const noexcept;
-		RGBA GetBackgroundColor() const noexcept;
-		RGBA GetAccentColor() const noexcept;
-		RGBA GetAccentDark1Color() const noexcept;
-		RGBA GetAccentDark2Color() const noexcept;
-		RGBA GetAccentDark3Color() const noexcept;
-		RGBA GetAccentLight1Color() const noexcept;
-		RGBA GetAccentLight2Color() const noexcept;
-		RGBA GetAccentLight3Color() const noexcept;
+		[[nodiscard]] RGBA GetForegroundColor() const noexcept;
+		[[nodiscard]] RGBA GetBackgroundColor() const noexcept;
+		[[nodiscard]] RGBA GetAccentColor() const noexcept;
+		[[nodiscard]] RGBA GetAccentDark1Color() const noexcept;
+		[[nodiscard]] RGBA GetAccentDark2Color() const noexcept;
+		[[nodiscard]] RGBA GetAccentDark3Color() const noexcept;
+		[[nodiscard]] RGBA GetAccentLight1Color() const noexcept;
+		[[nodiscard]] RGBA GetAccentLight2Color() const noexcept;
+		[[nodiscard]] RGBA GetAccentLight3Color() const noexcept;
 
-		bool IsDarkMode() const noexcept;
-		bool IsLightMode() const noexcept;
+		[[nodiscard]] bool IsDarkMode() const noexcept;
+		[[nodiscard]] bool IsLightMode() const noexcept;
 
 		protected:
 		UIColors() = default;

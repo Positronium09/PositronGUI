@@ -24,8 +24,8 @@ namespace PGUI::Core
 
 		~WindowClass() noexcept;
 
-		[[nodiscard]] std::wstring_view ClassName() const noexcept;
-		[[nodiscard]] ATOM Atom() const noexcept;
+		[[nodiscard]] std::wstring_view GetClassName() const noexcept;
+		[[nodiscard]] ATOM GetAtom() const noexcept;
 
 		protected:
 		WindowClass(std::wstring_view _className,

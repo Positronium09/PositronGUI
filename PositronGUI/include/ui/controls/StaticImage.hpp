@@ -105,7 +105,7 @@ namespace PGUI::UI::Controls
 		explicit StaticImage(std::wstring_view fileName);
 		explicit StaticImage(BmpToRender bmp);
 
-		BmpToRender GetImage() const noexcept;
+		[[nodiscard]] BmpToRender GetImage() const noexcept;
 		void SetImage(BmpToRender bmp) noexcept;
 
 		private:

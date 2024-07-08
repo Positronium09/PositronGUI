@@ -21,11 +21,11 @@ namespace PGUI::UI::Bmp
 		BitmapSource() noexcept = default;
 		explicit BitmapSource(ComPtr<IWICBitmapSource> bmp) noexcept;
 
-		SizeU GetSize() const noexcept;
-		BitmapResolution GetResolution() const noexcept;
-		WICPixelFormatGUID GetPixelFormat() const noexcept;
+		[[nodiscard]] SizeU GetSize() const noexcept;
+		[[nodiscard]] BitmapResolution GetResolution() const noexcept;
+		[[nodiscard]] WICPixelFormatGUID GetPixelFormat() const noexcept;
 		void CopyPixels(RectI copyRect, UINT stride, std::span<BYTE> buffer) const;
-		Palette CopyPalette() const;
+		[[nodiscard]] Palette CopyPalette() const;
 		void CopyPalette(Palette palette) const noexcept;
 
 		[[nodiscard]] ComPtr<ID2D1Bitmap> ConvertToD2D1Bitmap(ComPtr<ID2D1RenderTarget> renderTarget) const noexcept;
