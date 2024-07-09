@@ -130,7 +130,8 @@ namespace PGUI::UI::Controls
 			return;
 		}
 
-		if (selectionMode == SelectionMode::Single)
+		if (selectionMode == SelectionMode::Single &&
+			!selectedItemIndexes.empty())
 		{
 			std::ranges::for_each(
 				std::ranges::next(selectedItemIndexes.begin()),
@@ -343,17 +344,19 @@ namespace PGUI::UI::Controls
 				if (auto selectedIndex = GetSelectedItemIndex();
 					selectedIndex.has_value())
 				{
-					auto [begin, end] = std::ranges::remove(selectedItemIndexes, *selectedIndex);
-					std::ranges::for_each(begin, end, [this](const auto& index)
-					{
-						listViewItems.at(index)->SetState(ListViewItemState::Normal);
-					});
-					selectedItemIndexes.erase(begin, end);
+					const auto found = std::ranges::find(selectedItemIndexes, *selectedIndex);
+					selectedItemIndexes.erase(found);
 
-					listViewItems.at(*selectedIndex)->SetState(ListViewItemState::Normal);
-					
-					selectedItemIndexes.push_back(*hoveringIndex);
-					SetStateWithSelected(*hoveringIndex, ListViewItemState::Hover);
+					if (*selectedIndex == *hoveringIndex)
+					{
+						listViewItems.at(*selectedIndex)->SetState(ListViewItemState::Hover);
+					}
+					else
+					{
+						listViewItems.at(*selectedIndex)->SetState(ListViewItemState::Normal);
+						SetStateWithSelected(*hoveringIndex, ListViewItemState::Hover);
+						selectedItemIndexes.push_back(*hoveringIndex);
+					}
 
 					lastPressedIndex = *hoveringIndex;
 					selectionChangedEvent.Emit();
@@ -374,13 +377,9 @@ namespace PGUI::UI::Controls
 			{
 				if (std::ranges::contains(selectedItemIndexes, *hoveringIndex))
 				{
-					auto [begin, end] = std::ranges::remove(selectedItemIndexes, *hoveringIndex);
-					std::ranges::for_each(begin, end, [this](const auto& index)
-					{
-						listViewItems.at(index)->SetState(ListViewItemState::Normal);
-					});
-					selectedItemIndexes.erase(begin, end);
-					SetStateWithSelected(*hoveringIndex, ListViewItemState::Hover);
+					const auto found = std::ranges::find(selectedItemIndexes, *hoveringIndex);
+					selectedItemIndexes.erase(found);
+					listViewItems.at(*hoveringIndex)->SetState(ListViewItemState::Hover);
 
 					lastPressedIndex = *hoveringIndex;
 					selectionChangedEvent.Emit();
@@ -410,8 +409,11 @@ namespace PGUI::UI::Controls
 					{
 						listViewItems.at(index)->SetState(ListViewItemState::Normal);
 					});
-					selectedItemIndexes.erase(selectedItemIndexes.end());
 
+					if (!selectedItemIndexes.empty())
+					{
+						selectedItemIndexes.clear();
+					}
 
 					selectedItemIndexes.push_back(*hoveringIndex);
 					SetStateWithSelected(*hoveringIndex, ListViewItemState::Hover);
@@ -433,48 +435,49 @@ namespace PGUI::UI::Controls
 
 					if (lastPressedIndex > hoveringIndex)
 					{
-						addRange = std::views::iota(*hoveringIndex, *lastPressedIndex);
+						addRange = std::views::iota(*hoveringIndex, *lastPressedIndex + 1);
 					}
 					else
 					{
-						addRange = std::views::iota(*hoveringIndex, *lastPressedIndex);
+						addRange = std::views::iota(*lastPressedIndex, *hoveringIndex + 1);
 					}
 
-					std::ranges::for_each(selectedItemIndexes, [this](const auto& index)
+					std::ranges::for_each(selectedItemIndexes, 
+						[this, &addRange](const auto& index)
 					{
-						listViewItems.at(index)->SetState(ListViewItemState::Normal);
+						if (!std::ranges::contains(addRange, index))
+						{
+							listViewItems.at(index)->SetState(ListViewItemState::Normal);
+						}
 					});
-					selectedItemIndexes.erase(selectedItemIndexes.end());
-
+					selectedItemIndexes.clear();
 					selectedItemIndexes.append_range(addRange);
+
 					std::ranges::for_each(selectedItemIndexes, [this](const auto& index)
 					{
-						SetStateWithSelected(index, ListViewItemState::Normal);
+						if (index != *hoveringIndex)
+						{
+							SetStateWithSelected(index, ListViewItemState::Normal);
+						}
 					});
 
 					SetStateWithSelected(*hoveringIndex, ListViewItemState::Hover);
 				}
 				else if (ctrlPressed)
 				{
-					if (*lastPressedIndex == *hoveringIndex)
+					if (std::ranges::contains(selectedItemIndexes, *hoveringIndex))
 					{
-						auto [begin, end] = std::ranges::remove(selectedItemIndexes, *hoveringIndex);
-						std::ranges::for_each(begin, end, [this](const auto& index)
-						{
-							listViewItems.at(index)->SetState(ListViewItemState::Normal);
-						});
-						selectedItemIndexes.erase(begin, end);
-						
+						const auto found = std::ranges::find(selectedItemIndexes, *hoveringIndex);
+						selectedItemIndexes.erase(found);
+
 						listViewItems.at(*hoveringIndex)->SetState(ListViewItemState::Hover);
-
-						selectionChangedEvent.Emit();
-
-						lastPressedIndex = *hoveringIndex;
-						return 0;
 					}
+					else
+					{
+						selectedItemIndexes.push_back(*hoveringIndex);
 
-					selectedItemIndexes.push_back(*hoveringIndex);
-					SetStateWithSelected(*hoveringIndex, ListViewItemState::Hover);
+						SetStateWithSelected(*hoveringIndex, ListViewItemState::Hover);
+					}
 				}
 
 				lastPressedIndex = *hoveringIndex;
