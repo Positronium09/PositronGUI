@@ -16,8 +16,6 @@ namespace PGUI::UI::Dialogs
 		RegisterMessageHandler(WM_CREATE, &MessageBoxDialog::OnCreate);
 		RegisterMessageHandler(WM_PAINT, &MessageBoxDialog::OnPaint);
 
-		InitTextFormat();
-
 		switch (_icon)
 		{
 			using enum MessageBoxIcon;
@@ -73,17 +71,11 @@ namespace PGUI::UI::Dialogs
 		{
 			buttonHighlightBrush.CreateBrush(renderer);
 		}
-
-		if (!textBrush)
-		{
-			textBrush.CreateBrush(renderer);
-		}
 	}
 
 	void MessageBoxDialog::DiscardDeviceResources()
 	{
 		buttonHighlightBrush.ReleaseBrush();
-		textBrush.ReleaseBrush();
 	}
 
 	MessageBoxChoice MessageBoxDialog::Display() noexcept
@@ -186,29 +178,13 @@ namespace PGUI::UI::Dialogs
 		SetRunning(false);
 	}
 
-	void MessageBoxDialog::InitTextFormat()
-	{
-		textFormat = TextFormat{ L"Segoe UI", 16, GetUserLocaleName() };
-
-		textFormat.SetParagraphAlignment(Font::ParagraphAlignments::Center);
-		textFormat.SetTextAlignment(Font::TextAlignments::Center);
-		textFormat.SetWordWrapping(Font::WordWrappings::WholeWord);
-	}
-
-	void MessageBoxDialog::InitTextLayout()
-	{
-		auto size = CalculateSize();
-		size.cy -= 40 + buttonSize.cy;
-
-		textLayout = TextLayout{ text, textFormat, size };
-	}
-
 	SizeI MessageBoxDialog::CalculateSize() const noexcept
 	{
-		auto metrics = TextLayout{ text, textFormat, { 1, 1 } }.GetMetrics();
+		auto metrics = staticText->GetTextLayout().GetMetrics();
+		
 		SizeI size{ 
 			static_cast<int>(std::ceilf(metrics.width)), 
-			static_cast<int>(std::ceilf(metrics.height)) + 80 };
+			static_cast<int>(std::ceilf(metrics.height)) };
 
 		SizeI monitorSize_5_8{  };
 
@@ -272,7 +248,7 @@ namespace PGUI::UI::Dialogs
 
 	Core::HandlerResult MessageBoxDialog::OnCreate(UINT, WPARAM, LPARAM)
 	{
-		if (UIColors::GetInstance()->IsDarkMode())
+		if (UIColors::IsDarkMode())
 		{
 			EnableDarkTitleBar(Hwnd());
 		}
@@ -282,14 +258,41 @@ namespace PGUI::UI::Dialogs
 			iconBmp = icon.ConvertToD2D1Bitmap(GetRenderingInterface());
 		}
 
+		TextFormat tf = TextFormat::GetDefTextFormat();
+		tf.SetParagraphAlignment(Font::ParagraphAlignments::Center);
+		tf.SetTextAlignment(Font::TextAlignments::Leading);
+		staticText = AddChildWindow<Controls::StaticText>(
+			Core::WindowCreateParams{ text, PointL{ 0, 0 }, SizeL{ 10, 10 }, NULL },
+			tf
+		);
+		staticText->Show();
+
+		staticText->SetBackgroundBrush(Brush{ RGBA{ 0, 0 } });
 		SetToRequiredSize();
 		CreateButtons();
-		InitTextLayout();
 
+		auto size = GetClientSize();
+
+		size.cy -= 4 * margin.bottom + buttonSize.cy;
+
+		PointL position{
+			margin.left,
+			margin.top
+		};
+
+		if (iconBmp)
+		{
+			auto iconSize = icon.GetSize();
+
+			position.x = 2 * margin.left + iconSize.cx;
+		}
+
+		size.cx -= position.x + margin.right;
+
+		staticText->MoveAndResize(position, size);
 
 		return 0;
 	}
-
 
 	Core::HandlerResult MessageBoxDialog::OnPaint(UINT, WPARAM, LPARAM)
 	{
@@ -317,9 +320,6 @@ namespace PGUI::UI::Dialogs
 				static_cast<float>(iconSize.cy) / 2.f
 				});
 		}
-
-		renderer->DrawTextLayout(PointF{ 0, 0 },
-		textLayout, textBrush->GetBrushPtr());
 
 		EndDraw();
 

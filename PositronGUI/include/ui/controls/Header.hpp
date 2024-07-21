@@ -55,6 +55,8 @@ namespace PGUI::UI::Controls
 
 		void SetMinWidth(long newMinWidth) noexcept { minWidth = newMinWidth; }
 
+		virtual void OnHeaderSizeChanged() = 0;
+
 		private:
 		Core::Event<void> stateChangedEvent;
 		Core::Event<void> widthChangedEvent;
@@ -90,6 +92,14 @@ namespace PGUI::UI::Controls
 		[[nodiscard]] const HeaderTextItemColors& GetColors() const noexcept { return colors; }
 		[[nodiscard]] HeaderTextItemColors& GetColors() noexcept { return colors; }
 
+		protected:
+		void Create() override;
+		void Render(ComPtr<ID2D1DeviceContext7> dc, RectF renderRect) override;
+		void CreateDeviceResources(ComPtr<ID2D1DeviceContext7> dc) override;
+		void DiscardDeviceResources(ComPtr<ID2D1DeviceContext7>) override;
+
+		void OnHeaderSizeChanged() override;
+
 		private:
 		std::wstring text;
 		
@@ -105,10 +115,6 @@ namespace PGUI::UI::Controls
 
 		void OnStateChanged() noexcept;
 
-		void Create() override;
-		void Render(ComPtr<ID2D1DeviceContext7> dc, RectF renderRect) override;
-		void CreateDeviceResources(ComPtr<ID2D1DeviceContext7> dc) override;
-		void DiscardDeviceResources(ComPtr<ID2D1DeviceContext7>) override;
 	};
 
 	class Header : public Control
@@ -186,5 +192,6 @@ namespace PGUI::UI::Controls
 		Core::HandlerResult OnMouseLButtonUp(UINT msg, WPARAM wParam, LPARAM lParam);
 		Core::HandlerResult OnMouseLeave(UINT msg, WPARAM wParam, LPARAM lParam);
 		Core::HandlerResult OnSetCursor(UINT msg, WPARAM wParam, LPARAM lParam) const;
+		Core::HandlerResult OnSize(UINT msg, WPARAM wParam, LPARAM lParam) const;
 	};
 }

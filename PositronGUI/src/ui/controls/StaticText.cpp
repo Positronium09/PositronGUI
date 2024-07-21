@@ -18,8 +18,7 @@ namespace PGUI::UI::Controls
 		RGBA textColor;
 		RGBA backgroundColor;
 
-		if (const auto uiColors = UIColors::GetInstance(); 
-			uiColors->IsDarkMode())
+		if (UIColors::IsDarkMode())
 		{
 			textColor = Colors::Aliceblue;
 			backgroundColor = RGBA{ 0x1b1b1b };
@@ -73,6 +72,7 @@ namespace PGUI::UI::Controls
 		auto size = GetClientSize();
 
 		textLayout = TextLayout{ text, textFormat, size };
+		textBrush.ReleaseBrush();
 	}
 
 	void StaticText::SetText(std::wstring_view newText) noexcept

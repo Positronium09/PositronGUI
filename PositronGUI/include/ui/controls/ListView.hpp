@@ -2,7 +2,10 @@
 
 #include "core/Event.hpp"
 #include "ui/Control.hpp"
+#include "ui/controls/ScrollBar.hpp"
 #include "ui/Brush.hpp"
+#include "ui/TextFormat.hpp"
+#include "ui/TextLayout.hpp"
 
 #include <vector>
 
@@ -64,6 +67,8 @@ namespace PGUI::UI::Controls
 
 		void SetMinHeight(long newMinheight) noexcept { minHeight = newMinheight; }
 
+		virtual void OnListViewSizeChanged() = 0;
+
 		private:
 		Core::Event<void> stateChangedEvent;
 		Core::Event<void> heightChangedEvent;
@@ -77,20 +82,49 @@ namespace PGUI::UI::Controls
 	class ListViewTextItem : public ListViewItem
 	{
 		public:
-		ListViewTextItem() noexcept;
+		struct ListViewTextItemColors
+		{
+			BrushParameters normal;
+			BrushParameters hover;
+			BrushParameters pressed;
+			BrushParameters selectedIndicator;
+			BrushParameters text;
 
-		private:
-		Brush normal;
-		Brush hover;
-		Brush pressed;
-		Brush selected;
-		Brush selectedHover;
-		Brush selectedPressed;
+			ListViewTextItemColors() = default;
+		};
 
+		ListViewTextItem(std::wstring_view text, long height = 75, TextFormat textFormat = TextFormat{ }) noexcept;
+
+		[[nodiscard]] TextLayout GetTextLayout() const noexcept { return textLayout; }
+		void SetTextFormat(TextFormat textFormat) noexcept;
+
+		void InitTextLayout();
+
+		void SetText(std::wstring_view _text) noexcept { text = _text; }
+		[[nodiscard]] const std::wstring& GetText() const noexcept { return text; }
+		[[nodiscard]] std::wstring& GetText() noexcept { return text; }
+
+		void SetColors(const ListViewTextItemColors& colors) noexcept;
+		[[nodiscard]] ListViewTextItemColors GetColors() const noexcept;
+
+		protected:
 		void Create() override;
 		void Render(ComPtr<ID2D1DeviceContext7> dc, RectF renderRect) override;
 		void CreateDeviceResources(ComPtr<ID2D1DeviceContext7> dc) override;
 		void DiscardDeviceResources(ComPtr<ID2D1DeviceContext7> dc) override;
+
+		void OnListViewSizeChanged() override;
+
+		private:
+		std::wstring text;
+		TextFormat textFormat;
+		TextLayout textLayout;
+
+		Brush normalBrush;
+		Brush hoverBrush;
+		Brush pressedBrush;
+		Brush selectedIndicatorBrush;
+		Brush textBrush;
 	};
 
 	class ListView : public Control
@@ -100,6 +134,44 @@ namespace PGUI::UI::Controls
 		public:
 		ListView() noexcept;
 
+		template <std::derived_from<ListViewItem> T, typename ...Args>
+		void AddItem(Args... args)
+		{
+			listViewItems.push_back(std::make_unique<T>(args...));
+			listViewItems.at(listViewItems.size() - 1)->listView = this;
+			listViewItems.at(listViewItems.size() - 1)->Create();
+			itemsChangedEvent.Emit();
+		}
+
+		void RemoveItem(std::size_t index) noexcept;
+
+		template <std::derived_from<ListViewItem> T>
+		[[nodiscard]] T* GetItem(std::size_t index) const
+		{
+			auto& ptr = listViewItems.at(index);
+
+			return dynamic_cast<T*>(ptr.get());
+		}
+		[[nodiscard]] ListViewItem* GetItem(std::size_t index) const
+		{
+			return listViewItems.at(index).get();
+		}
+
+		template <std::derived_from<ListViewItem> T>
+		[[nodiscard]] T* GetHoveredItem() const
+		{
+			auto& ptr = listViewItems.at(*hoveringIndex);
+
+			return dynamic_cast<T*>(ptr.get());
+		}
+		[[nodiscard]] ListViewItem* GetHoveredItem() const
+		{
+			return listViewItems.at(*hoveringIndex).get();
+		}
+
+		[[nodiscard]] std::vector<ListViewItem*> GetSelectedItems() const noexcept;
+
+		[[nodiscard]] const ListViewItemList& GetListViewItems() const noexcept { return listViewItems; }
 		[[nodiscard]] std::span<const std::size_t> GetSelectedItemIndexes() const noexcept { return selectedItemIndexes; }
 		[[nodiscard]] std::optional<std::size_t> GetSelectedItemIndex() const noexcept
 		{
@@ -121,6 +193,7 @@ namespace PGUI::UI::Controls
 		[[nodiscard]] SelectionMode GetSelectionMode() const noexcept { return selectionMode; }
 
 		Core::Event<void> SelectionChangedEvent() const noexcept { return selectionChangedEvent; }
+		Core::Event<void> ItemsChangedEvent() const noexcept { return itemsChangedEvent; }
 
 		private:
 		void CreateDeviceResources() override;
@@ -128,12 +201,18 @@ namespace PGUI::UI::Controls
 
 		[[nodiscard]] std::optional<std::size_t> GetHoveredListViewItemIndex(long yPos) const noexcept;
 
-		[[nodiscard]] long CalculateHeaderItemHeightUpToIndex(std::size_t index) const noexcept;
-		[[nodiscard]] long GetTotalHeaderHeight() const noexcept;
+		[[nodiscard]] long CalculateListViewItemHeightUpToIndex(std::size_t index) const noexcept;
+		[[nodiscard]] long GetTotalListViewItemHeight() const noexcept;
 
 		void SetStateWithSelected(std::size_t index, ListViewItemState state) noexcept;
 		void AddStateIfSelected(std::size_t index, ListViewItemState state) noexcept;
 
+		void UpdateScrollBar();
+		void OnScroll();
+
+		Core::WindowPtr<ScrollBar> scrollBar;
+
+		Core::Event<void> itemsChangedEvent;
 		Core::Event<void> selectionChangedEvent;
 
 		std::optional<std::size_t> lastPressedIndex = std::nullopt;
@@ -146,10 +225,13 @@ namespace PGUI::UI::Controls
 
 		SelectionMode selectionMode = SelectionMode::Single;
 
+		Core::HandlerResult OnCreate(UINT msg, WPARAM wParam, LPARAM lParam);
 		Core::HandlerResult OnPaint(UINT msg, WPARAM wParam, LPARAM lParam);
+		Core::HandlerResult OnMouseWheel(UINT msg, WPARAM wParam, LPARAM lParam);
 		Core::HandlerResult OnMouseMove(UINT msg, WPARAM wParam, LPARAM lParam);
 		Core::HandlerResult OnMouseLButtonDown(UINT msg, WPARAM wParam, LPARAM lParam);
 		Core::HandlerResult OnMouseLButtonUp(UINT msg, WPARAM wParam, LPARAM lParam);
 		Core::HandlerResult OnMouseLeave(UINT msg, WPARAM wParam, LPARAM lParam);
+		Core::HandlerResult OnSize(UINT msg, WPARAM wParam, LPARAM lParam);
 	};
 }

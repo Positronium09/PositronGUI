@@ -182,7 +182,7 @@ namespace PGUI::UI
 	{
 	}
 
-	RGBA::RGBA(const ABI::Windows::UI::Color& color) noexcept : 
+	RGBA::RGBA(const winrt::Windows::UI::Color& color) noexcept : 
 		r(color.R / 255.0f), g(color.G / 255.0f), b(color.B / 255.0f), a(color.A / 255.0f)
 	{
 	}
@@ -196,9 +196,9 @@ namespace PGUI::UI
 		return D2D1::ColorF(r, g, b, a);
 	}
 
-	RGBA::operator ABI::Windows::UI::Color() const noexcept
+	RGBA::operator winrt::Windows::UI::Color() const noexcept
 	{
-		ABI::Windows::UI::Color color{ };
+		winrt::Windows::UI::Color color{ };
 		
 		color.R = static_cast<BYTE>(r / 255.0f);
 		color.G = static_cast<BYTE>(g / 255.0f);
@@ -206,6 +206,15 @@ namespace PGUI::UI
 		color.A = static_cast<BYTE>(a / 255.0f);
 
 		return color;
+	}
+
+	RGBA::operator COLORREF() const noexcept
+	{
+		auto R = static_cast<DWORD>(r * 255);
+		auto G = static_cast<DWORD>(g * 255);
+		auto B = static_cast<DWORD>(b * 255);
+
+		return R | (G << 8) | (B << 16);
 	}
 
 	void RGBA::Lighten(FLOAT amount) noexcept

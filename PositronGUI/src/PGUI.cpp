@@ -1,8 +1,6 @@
 #include "PGUI.hpp"
 #include "core/Exceptions.hpp"
 
-#include <windows.foundation.h>
-
 
 namespace PGUI
 {
@@ -12,7 +10,9 @@ namespace PGUI
 		
 		BOOL suoParam = TRUE;
 		if (BOOL succeeded =
-			SetUserObjectInformationW(GetCurrentProcess(), UOI_TIMERPROC_EXCEPTION_SUPPRESSION, &suoParam, sizeof(suoParam));
+			SetUserObjectInformationW(GetCurrentProcess(), 
+				UOI_TIMERPROC_EXCEPTION_SUPPRESSION, 
+				&suoParam, sizeof(suoParam));
 			succeeded == 0)
 		{
 			HR_L(HRESULT_FROM_WIN32(GetLastError()));
@@ -22,7 +22,7 @@ namespace PGUI
 	}
 	void InitializeWindowsFoundation()
 	{
-		HRESULT hr = Windows::Foundation::Initialize(RO_INIT_MULTITHREADED); HR_T(hr);
+		HRESULT hr = Windows::Foundation::Initialize(RO_INIT_SINGLETHREADED); HR_T(hr);
 	}
 
 	void UninitializeWindowsFoundation()

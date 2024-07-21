@@ -15,6 +15,7 @@ namespace PGUI::UI
 		RegisterMessageHandler(WM_GETTEXT, &AppWindow::OnGetText);
 		RegisterMessageHandler(WM_GETTEXTLENGTH, &AppWindow::OnGetTextLength);
 		RegisterMessageHandler(WM_GETMINMAXINFO, &AppWindow::OnGetMinMaxInfo);
+		RegisterMessageHandler(WM_LBUTTONDOWN, &AppWindow::OnLButtonDown);
 	}
 
 	bool AppWindow::IsFullScreen() const noexcept
@@ -117,6 +118,12 @@ namespace PGUI::UI
 		minMaxInfo->ptMinTrackSize.y = minSize.cy + frameY + padding;
 
 		minMaxInfo->ptMinTrackSize.x = minSize.cx + 2 * (frameX + padding);
+
+		return 0;
+	}
+	Core::HandlerResult AppWindow::OnLButtonDown(UINT, WPARAM, LPARAM) const noexcept
+	{
+		SetFocus(Hwnd());
 
 		return 0;
 	}

@@ -22,8 +22,7 @@ namespace PGUI::UI::Controls
 	{
 		HeaderTextItemColors colors;
 
-		if (const auto uiColors = UIColors::GetInstance();
-			uiColors->IsDarkMode())
+		if (UIColors::IsDarkMode())
 		{
 			colors.normalText = Colors::Aliceblue;
 			colors.normalBackground = RGBA{ 0x1b1b1b };
@@ -54,17 +53,16 @@ namespace PGUI::UI::Controls
 	{
 		HeaderTextItemColors colors;
 
-		if (const auto uiColors = UIColors::GetInstance();
-			uiColors->IsDarkMode())
+		if (UIColors::IsDarkMode())
 		{
 			colors.normalText = Colors::Aliceblue;
 			colors.normalBackground = RGBA{ 0x1b1b1b };
 
 			colors.hoverText = RGBA{ 0x1b1b1b };
-			colors.hoverBackground = uiColors->GetAccentColor();
+			colors.hoverBackground = UIColors::GetAccentColor();
 
 			colors.pressedText = RGBA{ 0x1b1b1b };
-			colors.pressedBackground = uiColors->GetAccentDark1Color();
+			colors.pressedBackground = UIColors::GetAccentDark1Color();
 
 		}
 		else
@@ -73,10 +71,10 @@ namespace PGUI::UI::Controls
 			colors.normalBackground = RGBA{ 0xf3f3f3 };
 
 			colors.hoverText = Colors::Black;
-			colors.hoverBackground = uiColors->GetAccentLight2Color();
+			colors.hoverBackground = UIColors::GetAccentLight2Color();
 
 			colors.pressedText = Colors::Black;
-			colors.pressedBackground = uiColors->GetAccentColor();
+			colors.pressedBackground = UIColors::GetAccentColor();
 		}
 
 		return colors;
@@ -107,6 +105,7 @@ namespace PGUI::UI::Controls
 				static_cast<float>(height) 
 			}
 		};
+		textBrush.ReleaseBrush();
 	}
 
 	void HeaderTextItem::OnStateChanged() noexcept
@@ -169,6 +168,11 @@ namespace PGUI::UI::Controls
 		backgroundBrush.ReleaseBrush();
 	}
 
+	void HeaderTextItem::OnHeaderSizeChanged()
+	{
+		InitTextLayout();
+	}
+
 	#pragma endregion
 
 	#pragma region Header
@@ -182,9 +186,9 @@ namespace PGUI::UI::Controls
 		RegisterMessageHandler(WM_LBUTTONUP, &Header::OnMouseLButtonUp);
 		RegisterMessageHandler(WM_MOUSELEAVE, &Header::OnMouseLeave);
 		RegisterMessageHandler(WM_SETCURSOR, &Header::OnSetCursor);
+		RegisterMessageHandler(WM_SIZE, &Header::OnSize);
 
-		if (const auto& uiColors = UIColors::GetInstance();
-			uiColors->IsDarkMode())
+		if (UIColors::IsDarkMode())
 		{
 			seperatorBrush.SetParameters(RGBA{ 0x272727 });
 			backgroundBrush.SetParameters(RGBA{ 0x181818 });
@@ -461,6 +465,16 @@ namespace PGUI::UI::Controls
 		SetCursor(hCursor);
 
 		return 1;
+	}
+
+	Core::HandlerResult Header::OnSize(UINT, WPARAM, LPARAM) const
+	{
+		std::ranges::for_each(headerItems, [](const auto& item)
+		{
+			item->OnHeaderSizeChanged();
+		});
+		
+		return 0;
 	}
 
 	#pragma endregion

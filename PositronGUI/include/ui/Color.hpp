@@ -4,7 +4,7 @@
 #include <d2d1.h>
 #include <wincodec.h>
 #include <Windows.h>
-#include <windows.ui.viewmanagement.h>
+#include <winrt/windows.ui.viewmanagement.h>
 
 
 #undef RGB
@@ -54,11 +54,12 @@ namespace PGUI::UI
 
 		explicit(false) RGBA(const RGB& rgb) noexcept;
 		explicit(false) RGBA(const D2D1_COLOR_F& color) noexcept;
-		explicit(false) RGBA(const ABI::Windows::UI::Color& color) noexcept;
+		explicit(false) RGBA(const winrt::Windows::UI::Color& color) noexcept;
 
 		explicit(false) operator RGB() noexcept;
 		explicit(false) operator D2D1_COLOR_F() const noexcept;
-		explicit(false) operator ABI::Windows::UI::Color() const noexcept;
+		explicit(false) operator winrt::Windows::UI::Color() const noexcept;
+		explicit(false) operator COLORREF() const noexcept;
 
 		constexpr [[nodiscard]] bool operator==(const RGBA& other) const noexcept = default;
 

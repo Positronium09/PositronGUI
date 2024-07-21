@@ -146,7 +146,7 @@ namespace PGUI::Core
 	}
 
 	TimerId Window::AddTimer(TimerId id, std::chrono::milliseconds delay, 
-		const TimerCallback& callback)
+		std::optional<TimerCallback> callback)
 	{
 		 if (TimerId setTimerId = 
 			 SetTimer(Hwnd(), id, static_cast<UINT>(delay.count()), nullptr); 
@@ -156,7 +156,10 @@ namespace PGUI::Core
 			 return setTimerId;
 		 }
 
-		 timerMap[id] = callback;
+		 if (callback.has_value())
+		 {
+			 timerMap[id] = *callback;
+		 }
 
 		 return id;
 	}
@@ -174,7 +177,10 @@ namespace PGUI::Core
 			}
 		}
 
-		timerMap.erase(id);
+		if (timerMap.contains(id))
+		{
+			timerMap.erase(id);
+		}
 	}
 
 	void Window::Enable(bool enable) const noexcept
@@ -270,6 +276,11 @@ namespace PGUI::Core
 		handlerMap[msg].push_back(handler);
 	}
 	
+	void Window::RemoveGeneralHandler()
+	{
+		generalHandler.reset();
+	}
+
 	HandlerResult Window::OnDPIChange(float dpiScale, RectI suggestedRect)
 	{
 		MoveAndResize(suggestedRect);
@@ -355,6 +366,11 @@ namespace PGUI::Core
 
 		else if (!window->handlerMap.contains(msg))
 		{
+			if (window->generalHandler.has_value())
+			{
+				result = window->generalHandler.value()(msg, wParam, lParam).result;
+				return result;
+			}
 			result = DefWindowProcW(hWnd, msg, wParam, lParam);
 			return result;
 		}

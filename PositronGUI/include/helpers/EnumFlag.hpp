@@ -18,9 +18,10 @@ namespace PGUI
 	{
 		private:
 		using EnumType = EnumDefType::EnumValues;
-		using UnderlyingType = underlying_t<EnumType>;
 
 		public:
+		using UnderlyingType = underlying_t<EnumType>;
+
 		constexpr explicit(false) EnumFlag(UnderlyingType _val) noexcept : val(static_cast<EnumType>(_val))
 		{
 		}

@@ -10,115 +10,50 @@
 
 namespace PGUI::UI
 {
-	namespace abi_vm = ABI::Windows::UI::ViewManagement;
-	namespace wrl = Microsoft::WRL;
-	namespace wf = Windows::Foundation;
+	using enum winrt::Windows::UI::ViewManagement::UIColorType;
 
-	template<typename ...Arg> std::unique_ptr<UIColors> static CreateUIColorsUniquePtr(Arg&&...arg)
+	RGBA UIColors::GetForegroundColor() noexcept
 	{
-		struct EnableMakeShared : public UIColors
-		{
-			explicit(false) EnableMakeShared(Arg&&...arg) : UIColors(arg...) { }
-		};
-		return std::make_unique<EnableMakeShared>(std::forward<Arg>(arg)...);
+		return uiSettings.GetColorValue(Foreground);
 	}
-
-	UIColors* UIColors::GetInstance() noexcept
+	RGBA UIColors::GetBackgroundColor() noexcept
 	{
-		if (!instance)
-		{
-			instance = CreateUIColorsUniquePtr();
-
-			ComPtr<abi_vm::IUISettings> settings;
-
-			HRESULT hr = wf::ActivateInstance(wrl::Wrappers::HStringReference(
-				RuntimeClass_Windows_UI_ViewManagement_UISettings).Get(), &settings); HR_T(hr);
-
-			settings.As<abi_vm::IUISettings3>(&instance->uiSettings);
-		}
-
-		return instance.get();
+		return uiSettings.GetColorValue(Background);
 	}
-
-	RGBA UIColors::GetForegroundColor() const noexcept
-	{
-		ABI::Windows::UI::Color color;
-		HRESULT hr = uiSettings->GetColorValue(
-			ABI::Windows::UI::ViewManagement::UIColorType_Foreground, &color); HR_L(hr);
-
-		return color;
-	}
-	RGBA UIColors::GetBackgroundColor() const noexcept
-	{
-		ABI::Windows::UI::Color color;
-		HRESULT hr = uiSettings->GetColorValue(
-			ABI::Windows::UI::ViewManagement::UIColorType_Background, &color); HR_L(hr);
-
-		return color;
-	}
-	RGBA UIColors::GetAccentColor() const noexcept
+	RGBA UIColors::GetAccentColor() noexcept
 	{	
-		ABI::Windows::UI::Color color;
-		HRESULT hr = uiSettings->GetColorValue(
-			ABI::Windows::UI::ViewManagement::UIColorType_Accent, &color); HR_L(hr);
-
-		return color;
+		return uiSettings.GetColorValue(Accent);
 	}
-	RGBA UIColors::GetAccentDark1Color() const noexcept
+	RGBA UIColors::GetAccentDark1Color() noexcept
 	{	
-		ABI::Windows::UI::Color color;
-		HRESULT hr = uiSettings->GetColorValue(
-			ABI::Windows::UI::ViewManagement::UIColorType_AccentDark1, &color); HR_L(hr);
-
-		return color;
+		return uiSettings.GetColorValue(AccentDark1);
 	}
-	RGBA UIColors::GetAccentDark2Color() const noexcept
+	RGBA UIColors::GetAccentDark2Color() noexcept
 	{	
-		ABI::Windows::UI::Color color;
-		HRESULT hr = uiSettings->GetColorValue(
-			ABI::Windows::UI::ViewManagement::UIColorType_AccentDark2, &color); HR_L(hr);
-
-		return color;
+		return uiSettings.GetColorValue(AccentDark2);
 	}
-	RGBA UIColors::GetAccentDark3Color() const noexcept
+	RGBA UIColors::GetAccentDark3Color() noexcept
 	{
-		ABI::Windows::UI::Color color;
-		HRESULT hr = uiSettings->GetColorValue(
-			ABI::Windows::UI::ViewManagement::UIColorType_AccentDark3, &color); HR_L(hr);
-
-		return color;
+		return uiSettings.GetColorValue(AccentDark3);
 	}
-	RGBA UIColors::GetAccentLight1Color() const noexcept
+	RGBA UIColors::GetAccentLight1Color() noexcept
 	{
-		ABI::Windows::UI::Color color;
-		HRESULT hr = uiSettings->GetColorValue(
-			ABI::Windows::UI::ViewManagement::UIColorType_AccentLight1, &color); HR_L(hr);
-
-		return color;
+		return uiSettings.GetColorValue(AccentLight1);
 	}
-	RGBA UIColors::GetAccentLight2Color() const noexcept
+	RGBA UIColors::GetAccentLight2Color() noexcept
 	{
-
-		ABI::Windows::UI::Color color;
-		HRESULT hr = uiSettings->GetColorValue(
-			ABI::Windows::UI::ViewManagement::UIColorType_AccentLight2, &color); HR_L(hr);
-
-		return color;
+		return uiSettings.GetColorValue(AccentLight2);
 	}
-	RGBA UIColors::GetAccentLight3Color() const noexcept
+	RGBA UIColors::GetAccentLight3Color() noexcept
 	{
-		ABI::Windows::UI::Color color;
-		HRESULT hr = uiSettings->GetColorValue(
-			ABI::Windows::UI::ViewManagement::UIColorType_AccentLight3, &color); HR_L(hr);
-
-		return color;
+		return uiSettings.GetColorValue(AccentLight3);
 	}
 
-	bool UIColors::IsDarkMode() const noexcept
+	bool UIColors::IsDarkMode() noexcept
 	{
 		return !IsLightMode();
 	}
-	bool UIColors::IsLightMode() const noexcept
+	bool UIColors::IsLightMode() noexcept
 	{
 		DWORD value = 1;
 		DWORD size = sizeof(value);

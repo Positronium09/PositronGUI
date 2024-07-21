@@ -42,11 +42,13 @@ namespace PGUI::UI::Controls
 		explicit ScrollBar(const ScrollBarParams& params) noexcept;
 
 		[[nodiscard]] std::int64_t GetPageSize() const noexcept { return pageSize; }
+		[[nodiscard]] std::int64_t GetLineCount() const noexcept { return lineCount; }
 		[[nodiscard]] std::int64_t GetMaxScroll() const noexcept { return maxScroll; }
 		[[nodiscard]] std::int64_t GetMinScroll() const noexcept { return minScroll; }
 		[[nodiscard]] std::int64_t GetScrollPos() const noexcept { return scrollPos; }
 
 		void SetPageSize(std::int64_t pageSize) noexcept;
+		void SetLineCount(std::int64_t lineCount) noexcept;
 		void SetMaxScroll(std::int64_t maxScroll) noexcept;
 		void SetMinScroll(std::int64_t minScroll) noexcept;
 		void SetScrollPos(std::int64_t scrollPos) noexcept;
@@ -66,6 +68,8 @@ namespace PGUI::UI::Controls
 
 		[[nodiscard]] float GetThumbPadding() const noexcept { return thumbPadding; }
 		[[nodiscard]] std::pair<float, float> GetThumbRadii() const noexcept { return { thumbXRadius, thumbYRadius }; }
+
+		[[nodiscard]] ScrollBarDirection GetDirection() const noexcept { return direction; }
 
 		void SetThumbPadding(float padding) noexcept;
 		void SetThumbRadii(std::pair<float, float> radii) noexcept;

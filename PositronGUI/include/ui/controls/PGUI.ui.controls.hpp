@@ -7,3 +7,4 @@
 #include "Header.hpp"
 #include "ScrollBar.hpp"
 #include "ListView.hpp"
+#include "Edit.hpp"

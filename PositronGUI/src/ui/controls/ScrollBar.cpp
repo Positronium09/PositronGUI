@@ -26,8 +26,7 @@ namespace PGUI::UI::Controls
 		RegisterMessageHandler(WM_SIZING, &ScrollBar::OnSizing);
 		RegisterMessageHandler(WM_NCCALCSIZE, &ScrollBar::OnNCCalcSize);
 
-		if (auto uiColors = UIColors::GetInstance();
-			uiColors->IsDarkMode())
+		if (UIColors::IsDarkMode())
 		{
 			thumbBrush.SetParameters(RGBA{ 0x555555 });
 			backgroundBrush.SetParameters(RGBA{ 0x181818 });
@@ -45,15 +44,23 @@ namespace PGUI::UI::Controls
 		if (_pageSize < maxScroll - minScroll)
 		{
 			pageSize = _pageSize;
+			Invalidate();
 		}
+	}
+	void ScrollBar::SetLineCount(std::int64_t _lineCount) noexcept
+	{
+		lineCount = _lineCount;
+		Invalidate();
 	}
 	void ScrollBar::SetMaxScroll(std::int64_t _maxScroll) noexcept
 	{
 		maxScroll = _maxScroll;
+		Invalidate();
 	}
 	void ScrollBar::SetMinScroll(std::int64_t _minScroll) noexcept
 	{
 		minScroll = _minScroll;
+		Invalidate();
 	}
 	void ScrollBar::SetScrollPos(std::int64_t _scrollPos) noexcept
 	{
@@ -89,7 +96,7 @@ namespace PGUI::UI::Controls
 		auto lines = wheelDelta * scroll / WHEEL_DELTA;
 		
 		wheelScrollExtra = wheelDelta - lines * WHEEL_DELTA / scroll;
-		ScrollRelative(-lines);
+		ScrollRelative(-lines * (maxScroll - minScroll) / lineCount);
 	}
 
 	void ScrollBar::SetThumbBrush(Brush& brush)
@@ -209,9 +216,7 @@ namespace PGUI::UI::Controls
 			static_cast<DWORD>(GetWindowLongPtrW(Hwnd(), GWL_STYLE)), FALSE);
 		cyClient = (rc->bottom - rc->top) - (rect.bottom - rect.top);
 		cyAdjust = cyClient % pageSize;
-		/*
-		 *  Remove the fractional pixels from the top or bottom.
-		 */
+
 		switch (wParam)
 		{
 			case WMSZ_TOP:

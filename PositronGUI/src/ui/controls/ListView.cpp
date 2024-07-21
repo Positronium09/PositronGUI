@@ -1,5 +1,8 @@
 #include "ui/controls/ListView.hpp"
 
+#include "ui/UIColors.hpp"
+#include "ui/Colors.hpp"
+
 #include <windowsx.h>
 #include <span>
 #include <ranges>
@@ -16,79 +19,165 @@ namespace PGUI::UI::Controls
 
 	#pragma region ListViewTextItem
 
-	ListViewTextItem::ListViewTextItem() noexcept : 
-		ListViewItem{ 100 }
+	ListViewTextItem::ListViewTextItem(std::wstring_view text, long height, TextFormat _textFormat) noexcept :
+		ListViewItem{ height },
+		text{ text }, textFormat{ _textFormat }
 	{
+		if (!textFormat)
+		{
+			textFormat = TextFormat::GetDefTextFormat();
+		}
+		selectedIndicatorBrush.SetParameters(UIColors::GetAccentColor());
+
+		if (UIColors::IsDarkMode())
+		{
+			textBrush = Colors::Aliceblue;
+			normalBrush = RGBA{ 0x1b1b1b };
+			hoverBrush = RGBA{ 0x202020 };
+			pressedBrush = RGBA{ 0x191919 };
+		}
+		else
+		{
+			textBrush = Colors::Black;
+			normalBrush = RGBA{ 0xf3f3f3 };
+			hoverBrush = RGBA{ 0xffffff };
+			pressedBrush = RGBA{ 0xe5e5e5 };
+		}
+	}
+
+	void ListViewTextItem::SetTextFormat(TextFormat _textFormat) noexcept
+	{
+		textFormat = _textFormat;
+		InitTextLayout();
+	}
+
+	void ListViewTextItem::InitTextLayout()
+	{
+		textLayout.Reset();
+
+		auto width = GetListViewWindow()->GetClientSize().cx;
+
+		textLayout = TextLayout{ text, textFormat,
+			SizeF{
+				static_cast<float>(width),
+				static_cast<float>(GetHeight())
+		} };
+		textBrush.ReleaseBrush();
+	}
+
+	void ListViewTextItem::SetColors(const ListViewTextItemColors& colors) noexcept
+	{
+		normalBrush.SetParameters(colors.normal);
+		hoverBrush.SetParameters(colors.hover);
+		pressedBrush.SetParameters(colors.pressed);
+		selectedIndicatorBrush.SetParameters(colors.selectedIndicator);
+		textBrush.SetParameters(colors.text);
+
+		DiscardDeviceResources(nullptr);
+		Invalidate();
+	}
+
+	ListViewTextItem::ListViewTextItemColors ListViewTextItem::GetColors() const noexcept
+	{
+		ListViewTextItemColors colors;
+		colors.normal = normalBrush.GetParameters();
+		colors.hover = hoverBrush.GetParameters();
+		colors.pressed = pressedBrush.GetParameters();
+		colors.selectedIndicator = selectedIndicatorBrush.GetParameters();
+		colors.text = textBrush.GetParameters();
+
+		return colors;
 	}
 
 	void ListViewTextItem::Create()
 	{
-		normal.SetParameters(RGBA{ 0xffffff });
-		hover.SetParameters(RGBA{ 0x0000ff });
-		pressed.SetParameters(RGBA{ 0x00ff00 });
-		selected.SetParameters(RGBA{ 0xff0000 });
-		selectedHover.SetParameters(RGBA{ 0xffff00 });
-		selectedPressed.SetParameters(RGBA{ 0xff00ff });
+		InitTextLayout();
 	}
 	void ListViewTextItem::Render(ComPtr<ID2D1DeviceContext7> dc, RectF renderRect)
 	{
-		ListViewItemState s = GetState();
+		ListViewItemState currentState = GetState();
 
-		switch (s)
+		switch (currentState)
 		{
 			using enum ListViewItemState::EnumValues;
 
 			case Normal:
+			case Selected:
 			{
-				dc->DrawRectangle(renderRect, normal->GetBrushPtr(), 5.0f);
+				dc->FillRectangle(renderRect, normalBrush->GetBrushPtr());
 				break;
 			}
 			case Hover:
+			case Selected | Hover:
 			{
-				dc->DrawRectangle(renderRect, hover->GetBrushPtr(), 5.0f);
+				dc->FillRectangle(renderRect, hoverBrush->GetBrushPtr());
 				break;
 			}
 			case Pressed:
-			{
-				dc->DrawRectangle(renderRect, pressed->GetBrushPtr(), 5.0f);
-				break;
-			}
-			case Selected:
-			{
-				dc->DrawRectangle(renderRect, selected->GetBrushPtr(), 5.0f);
-				break;
-			}
-			case Selected | Hover:
-			{
-				dc->DrawRectangle(renderRect, selectedHover->GetBrushPtr(), 5.0f);
-				break;
-			}
 			case Selected | Pressed:
 			{
-				dc->DrawRectangle(renderRect, selectedPressed->GetBrushPtr(), 5.0f);
+				dc->FillRectangle(renderRect, pressedBrush->GetBrushPtr());
 				break;
 			}
 			default:
 				break;
 		}
+
+		if (currentState & ListViewItemState::Selected)
+		{
+			auto selectedIndicatorRect = renderRect;
+			selectedIndicatorRect.top += 10;
+			selectedIndicatorRect.bottom -= 10;
+			selectedIndicatorRect.left -= 5;
+			selectedIndicatorRect.right = selectedIndicatorRect.left + 10;
+
+			dc->FillRoundedRectangle(RoundedRect{ selectedIndicatorRect, 3.5f, 5 }, selectedIndicatorBrush->GetBrushPtr());
+		}
+
+		dc->DrawTextLayout(renderRect.TopLeft(), textLayout, textBrush->GetBrushPtr());
 	}
 	void ListViewTextItem::CreateDeviceResources(ComPtr<ID2D1DeviceContext7> dc)
 	{
-		normal.CreateBrush(dc);
-		hover.CreateBrush(dc);
-		pressed.CreateBrush(dc);
-		selected.CreateBrush(dc);
-		selectedHover.CreateBrush(dc);
-		selectedPressed.CreateBrush(dc);
+		if (!normalBrush)
+		{
+			SetGradientBrushRect(normalBrush, GetListViewWindow()->GetClientRect());
+			normalBrush.CreateBrush(dc);
+		}
+
+		if (!hoverBrush)
+		{
+			SetGradientBrushRect(hoverBrush, GetListViewWindow()->GetClientRect());
+			hoverBrush.CreateBrush(dc);
+		}
+
+		if (!pressedBrush)
+		{
+			SetGradientBrushRect(pressedBrush, GetListViewWindow()->GetClientRect());
+			pressedBrush.CreateBrush(dc);
+		}
+
+		if (!textBrush)
+		{
+			SetGradientBrushRect(normalBrush, textLayout.GetBoundingRect());
+			textBrush.CreateBrush(dc);
+		}
+		if (!selectedIndicatorBrush)
+		{
+			selectedIndicatorBrush.CreateBrush(dc);
+		}
 	}
-	void ListViewTextItem::DiscardDeviceResources(ComPtr<ID2D1DeviceContext7> dc)
+	void ListViewTextItem::DiscardDeviceResources(ComPtr<ID2D1DeviceContext7>)
 	{
-		normal.ReleaseBrush();
-		hover.ReleaseBrush();
-		pressed.ReleaseBrush();
-		selected.ReleaseBrush();
-		selectedHover.ReleaseBrush();
-		selectedPressed.ReleaseBrush();
+		normalBrush.ReleaseBrush();
+		hoverBrush.ReleaseBrush();
+		pressedBrush.ReleaseBrush();
+		textBrush.ReleaseBrush();
+		selectedIndicatorBrush.ReleaseBrush();
+	}
+
+	void ListViewTextItem::OnListViewSizeChanged()
+	{
+		InitTextLayout();
 	}
 
 	#pragma endregion
@@ -98,27 +187,54 @@ namespace PGUI::UI::Controls
 	ListView::ListView() noexcept :
 		Control{ Core::WindowClass::Create(L"ListView_UIControl") }
 	{
+		RegisterMessageHandler(WM_CREATE, &ListView::OnCreate);
 		RegisterMessageHandler(WM_PAINT, &ListView::OnPaint);
 		RegisterMessageHandler(WM_MOUSEMOVE, &ListView::OnMouseMove);
 		RegisterMessageHandler(WM_LBUTTONDOWN, &ListView::OnMouseLButtonDown);
 		RegisterMessageHandler(WM_LBUTTONUP, &ListView::OnMouseLButtonUp);
 		RegisterMessageHandler(WM_MOUSELEAVE, &ListView::OnMouseLeave);
+		RegisterMessageHandler(WM_MOUSEWHEEL, &ListView::OnMouseWheel);
+		RegisterMessageHandler(WM_SIZE, &ListView::OnSize);
 
-		backgroundBrush.SetParameters(RGBA{ 0 });
+		itemsChangedEvent.Subscribe(BindMemberFunc(&ListView::UpdateScrollBar, this));
 
-		listViewItems.push_back(std::make_unique<ListViewTextItem>());
-		listViewItems.push_back(std::make_unique<ListViewTextItem>());
-		listViewItems.push_back(std::make_unique<ListViewTextItem>());
-		listViewItems.push_back(std::make_unique<ListViewTextItem>());
-		listViewItems.push_back(std::make_unique<ListViewTextItem>());
-		listViewItems.push_back(std::make_unique<ListViewTextItem>());
+		if (UIColors::IsDarkMode())
+		{
+			backgroundBrush.SetParameters(RGBA{ 0x181818 });
+		}
+		else
+		{
+			backgroundBrush.SetParameters(Colors::White);
+		}
 
 		for (const auto& item : listViewItems)
 		{
 			item->Create();
 		}
 	}
+
+	void ListView::RemoveItem(std::size_t index) noexcept
+	{
+		if (std::ranges::contains(selectedItemIndexes, index))
+		{
+			const auto found = std::ranges::find(selectedItemIndexes, index);
+			selectedItemIndexes.erase(found);
+		}
+		listViewItems.erase(std::ranges::next(listViewItems.begin(), index));
+	}
 	
+	std::vector<ListViewItem*> ListView::GetSelectedItems() const noexcept
+	{
+		std::vector<ListViewItem*> selectedItems{ selectedItemIndexes.size() };
+
+		std::ranges::for_each(selectedItemIndexes, [this, &selectedItems](const auto& index)
+		{
+			selectedItems.push_back(listViewItems.at(index).get());
+		});
+
+		return selectedItems;
+	}
+
 	void ListView::SetBackgroundBrush(Brush& brush) noexcept
 	{
 		backgroundBrush.SetParameters(brush.GetParameters());
@@ -203,14 +319,14 @@ namespace PGUI::UI::Controls
 
 		return std::nullopt;
 	}
-	long ListView::CalculateHeaderItemHeightUpToIndex(std::size_t index) const noexcept
+	long ListView::CalculateListViewItemHeightUpToIndex(std::size_t index) const noexcept
 	{
 		return std::accumulate(
 			listViewItems.cbegin(), std::next(listViewItems.cbegin(), index), 0,
 			[](long y, const auto& item) { return y + item->GetHeight(); }
 		);
 	}
-	long ListView::GetTotalHeaderHeight() const noexcept
+	long ListView::GetTotalListViewItemHeight() const noexcept
 	{
 		return std::accumulate(
 			listViewItems.cbegin(), listViewItems.cend(), 0,
@@ -235,6 +351,50 @@ namespace PGUI::UI::Controls
 		}
 	}
 
+	void ListView::UpdateScrollBar()
+	{
+		auto clientRect = GetClientRect();
+		auto clientSize = clientRect.Size();
+		auto totalItemHeight = GetTotalListViewItemHeight();
+
+		if (totalItemHeight <= clientSize.cy)
+		{
+			scrollBar->Show(SW_HIDE);
+			return;
+		}
+		else
+		{
+			scrollBar->Show();
+		}
+
+		scrollBar->SetMaxScroll(static_cast<std::int64_t>(totalItemHeight - clientSize.cy));
+		scrollBar->SetPageSize(scrollBar->GetMaxScroll() / scrollBar->GetLineCount());
+	}
+
+	void ListView::OnScroll()
+	{
+		Invalidate();
+	}
+
+	Core::HandlerResult ListView::OnCreate(UINT, WPARAM, LPARAM)
+	{
+		auto clientRect = GetClientRect();
+		auto clientSize = GetClientRect().Size();
+		auto totalItemHeight = GetTotalListViewItemHeight();
+		
+		ScrollBar::ScrollBarParams params{ (totalItemHeight - clientSize.cy) / 10,
+			10, totalItemHeight - clientSize.cy, 0 };
+
+		scrollBar = AddChildWindow<ScrollBar>(
+			Core::WindowCreateParams{ L"ListView_ScrollBar", PointI{ clientRect.right - 20, 0 }, SizeI{ 20, clientSize.cy }, NULL },
+			params
+		);
+		scrollBar->ScrolledEvent().Subscribe(BindMemberFunc(&ListView::OnScroll, this));
+		scrollBar->Show();
+
+		return 0;
+	}
+
 	Core::HandlerResult ListView::OnPaint(UINT, WPARAM, LPARAM)
 	{
 		BeginDraw();
@@ -245,13 +405,19 @@ namespace PGUI::UI::Controls
 		auto renderer = GetRenderingInterface();
 
 		renderer->FillRectangle(GetClientRect(), backgroundBrush->GetBrushPtr());
+		
+		renderer->SetTransform(
+			D2D1::Matrix3x2F::Translation(
+				SizeF{ 0, -static_cast<float>(scrollBar->GetScrollPos()) }
+			)
+		);
 
 		for (const auto& listViewItem : listViewItems)
 		{
 			auto itemRect = RectF{
 				0,
 				static_cast<float>(totalHeight),
-				static_cast<float>(width),
+				static_cast<float>(width - 20 * IsWindowVisible(scrollBar->Hwnd())),
 				static_cast<float>(totalHeight + listViewItem->GetHeight())
 			};
 
@@ -264,7 +430,15 @@ namespace PGUI::UI::Controls
 			totalHeight += listViewItem->GetHeight();
 		}
 
+		renderer->SetTransform(D2D1::IdentityMatrix());
+
 		EndDraw();
+
+		return 0;
+	}
+	Core::HandlerResult ListView::OnMouseWheel(UINT, WPARAM wParam, LPARAM)
+	{
+		scrollBar->WheelScroll(GET_WHEEL_DELTA_WPARAM(wParam));
 
 		return 0;
 	}
@@ -277,11 +451,12 @@ namespace PGUI::UI::Controls
 		TrackMouseEvent(&tme);
 
 		PointL mousePos = MAKEPOINTS(lParam);
+		mousePos.y += static_cast<long>(scrollBar->GetScrollPos());
 
 		const auto prevHoveredItemIndex = hoveringIndex;
 		hoveringIndex = GetHoveredListViewItemIndex(mousePos.y);
 
-		if (mousePos.y > GetTotalHeaderHeight())
+		if (mousePos.y > GetTotalListViewItemHeight())
 		{
 			if (prevHoveredItemIndex.has_value())
 			{
@@ -497,6 +672,17 @@ namespace PGUI::UI::Controls
 			Invalidate();
 		}
 		hoveringIndex = std::nullopt;
+
+		return 0;
+	}
+	Core::HandlerResult ListView::OnSize(UINT, WPARAM, LPARAM)
+	{
+		UpdateScrollBar();
+
+		std::ranges::for_each(listViewItems, [](const auto& item)
+		{
+			item->OnListViewSizeChanged();
+		});
 
 		return 0;
 	}

@@ -3,6 +3,7 @@
 #include "ui/bmp/Bitmap.hpp"
 #include "ui/Dialog.hpp"
 #include "ui/controls/TextButton.hpp"
+#include "ui/controls/StaticText.hpp"
 #include "ui/Colors.hpp"
 
 
@@ -65,17 +66,16 @@ namespace PGUI::UI::Dialogs
 		std::wstring text;
 		std::vector<Core::WindowPtr<Controls::TextButton>> buttons;
 
+		Core::WindowPtr<Controls::StaticText> staticText;
+
 		MessageBoxButtonSet buttonSet;
 		MessageBoxChoice choice = MessageBoxChoice::Ok;
-
-		TextFormat textFormat;
-		TextLayout textLayout;
 
 		Bmp::Bitmap icon;
 		ComPtr<ID2D1Bitmap> iconBmp;
 
-		Brush textBrush{ Colors::Aliceblue };
 		Brush buttonHighlightBrush{ Colors::Black };
+		RGBA backgroundColor;
 
 		void CreateDeviceResources() override;
 		void DiscardDeviceResources() override;
@@ -84,9 +84,6 @@ namespace PGUI::UI::Dialogs
 		void CreateButtons();
 		void SetToRequiredSize() const noexcept;
 		void ButtonHandler(MessageBoxChoice choice) noexcept;
-
-		void InitTextFormat();
-		void InitTextLayout();
 
 		SizeI CalculateSize() const noexcept;
 

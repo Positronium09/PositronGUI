@@ -217,7 +217,7 @@ namespace PGUI::Core
 		[[nodiscard]] RectL MapRect(HWND hWndTo, RectL rect) const noexcept;
 
 		TimerId AddTimer(TimerId id, std::chrono::milliseconds delay, 
-			const TimerCallback& callback);
+			std::optional<TimerCallback> callback = std::nullopt);
 		void RemoveTimer(TimerId id);
 
 		void Enable(bool enable) const noexcept;
@@ -258,6 +258,18 @@ namespace PGUI::Core
 			RegisterMessageHandler(msg, std::bind_front(memberFunction, std::bit_cast<const T*>(this)));
 		}
 
+		template <typename T>
+		void RegisterGeneralMessageHandler(HandlerResult(T::* memberFunction)(UINT, WPARAM, LPARAM)) noexcept
+		{
+			generalHandler = std::bind_front(memberFunction, std::bit_cast<T*>(this));
+		}
+		template <typename T>
+		void RegisterGeneralHandler(HandlerResult(T::* memberFunction)(UINT, WPARAM, LPARAM) const) noexcept
+		{
+			generalHandler = std::bind_front(memberFunction, std::bit_cast<const T*>(this));
+		}
+		void RemoveGeneralHandler();
+
 		virtual HandlerResult OnDPIChange(float dpiScale, RectI suggestedRect);
 		virtual void AdjustChildWindowsForDPI(float dpiScale);
 
@@ -269,6 +281,7 @@ namespace PGUI::Core
 		UINT prevDpi = USER_DEFAULT_SCREEN_DPI;
 
 		HandlerMap handlerMap;
+		std::optional<Handler> generalHandler;
 		TimerMap timerMap;
 		WindowClass::WindowClassPtr windowClass;
 		

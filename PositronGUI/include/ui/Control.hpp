@@ -13,5 +13,6 @@ namespace PGUI::UI
 
 		private:
 		Core::HandlerResult OnCreate(UINT msg, WPARAM wParam, LPARAM lParam) const noexcept;
+		Core::HandlerResult OnLButtonDown(UINT msg, WPARAM wParam, LPARAM lParam) const noexcept;
 	};
 }

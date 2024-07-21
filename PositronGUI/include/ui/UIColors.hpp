@@ -4,7 +4,7 @@
 #include "ui/Color.hpp"
 
 #include <memory>
-#include <windows.ui.viewmanagement.h>
+#include <winrt/windows.ui.viewmanagement.h>
 
 
 
@@ -16,27 +16,25 @@ namespace PGUI::UI
 		UIColors(UIColors&) = delete;
 		void operator=(const UIColors&) = delete;
 
-		static [[nodiscard]] UIColors* GetInstance() noexcept;
+		static [[nodiscard]] auto GetInstance() noexcept -> winrt::Windows::UI::ViewManagement::UISettings& { return uiSettings; }
 
-		[[nodiscard]] RGBA GetForegroundColor() const noexcept;
-		[[nodiscard]] RGBA GetBackgroundColor() const noexcept;
-		[[nodiscard]] RGBA GetAccentColor() const noexcept;
-		[[nodiscard]] RGBA GetAccentDark1Color() const noexcept;
-		[[nodiscard]] RGBA GetAccentDark2Color() const noexcept;
-		[[nodiscard]] RGBA GetAccentDark3Color() const noexcept;
-		[[nodiscard]] RGBA GetAccentLight1Color() const noexcept;
-		[[nodiscard]] RGBA GetAccentLight2Color() const noexcept;
-		[[nodiscard]] RGBA GetAccentLight3Color() const noexcept;
+		static [[nodiscard]] RGBA GetForegroundColor() noexcept;
+		static [[nodiscard]] RGBA GetBackgroundColor() noexcept;
+		static [[nodiscard]] RGBA GetAccentColor() noexcept;
+		static [[nodiscard]] RGBA GetAccentDark1Color() noexcept;
+		static [[nodiscard]] RGBA GetAccentDark2Color() noexcept;
+		static [[nodiscard]] RGBA GetAccentDark3Color() noexcept;
+		static [[nodiscard]] RGBA GetAccentLight1Color() noexcept;
+		static [[nodiscard]] RGBA GetAccentLight2Color() noexcept;
+		static [[nodiscard]] RGBA GetAccentLight3Color() noexcept;
 
-		[[nodiscard]] bool IsDarkMode() const noexcept;
-		[[nodiscard]] bool IsLightMode() const noexcept;
+		static [[nodiscard]] bool IsDarkMode() noexcept;
+		static [[nodiscard]] bool IsLightMode() noexcept;
 
 		protected:
 		UIColors() = default;
 
 		private:
-		ComPtr<ABI::Windows::UI::ViewManagement::IUISettings3> uiSettings;
-
-		static inline std::unique_ptr<UIColors> instance = nullptr;
+		static inline winrt::Windows::UI::ViewManagement::UISettings uiSettings{ };
 	};
 }

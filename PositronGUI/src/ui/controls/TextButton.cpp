@@ -14,8 +14,7 @@ namespace PGUI::UI::Controls
 	{
 		TextButton::TextButtonColors colors;
 
-		if (const auto uiColors = UIColors::GetInstance();
-			uiColors->IsDarkMode())
+		if (UIColors::IsDarkMode())
 		{
 			colors.normalText = Colors::Aliceblue;
 			colors.normalBackground = RGBA{ 0x1b1b1b };
@@ -45,17 +44,16 @@ namespace PGUI::UI::Controls
 	{
 		TextButton::TextButtonColors colors;
 
-		if (const auto uiColors = UIColors::GetInstance();
-			uiColors->IsDarkMode())
+		if (UIColors::IsDarkMode())
 		{
 			colors.normalText = Colors::Aliceblue;
 			colors.normalBackground = RGBA{ 0x1b1b1b };
 
 			colors.hoverText = RGBA{ 0x1b1b1b };
-			colors.hoverBackground = uiColors->GetAccentColor();
+			colors.hoverBackground = UIColors::GetAccentColor();
 
 			colors.clickedText = RGBA{ 0x1b1b1b };
-			colors.clickedBackground = uiColors->GetAccentDark1Color();
+			colors.clickedBackground = UIColors::GetAccentDark1Color();
 
 		}
 		else
@@ -64,10 +62,10 @@ namespace PGUI::UI::Controls
 			colors.normalBackground = RGBA{ 0xf3f3f3 };
 
 			colors.hoverText = Colors::Black;
-			colors.hoverBackground = uiColors->GetAccentLight2Color();
+			colors.hoverBackground = UIColors::GetAccentLight2Color();
 
 			colors.clickedText = Colors::Black;
-			colors.clickedBackground = uiColors->GetAccentColor();
+			colors.clickedBackground = UIColors::GetAccentColor();
 		}
 
 		return colors;
@@ -113,6 +111,7 @@ namespace PGUI::UI::Controls
 		auto size = GetClientSize();
 
 		textLayout = TextLayout{ text, textFormat, size };
+		textBrush.ReleaseBrush();
 	}
 
 	void TextButton::SetText(std::wstring_view newText) noexcept

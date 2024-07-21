@@ -31,5 +31,6 @@ namespace PGUI::UI
 		Core::HandlerResult OnGetText(UINT msg, WPARAM wParam, LPARAM lParam) const noexcept;
 		Core::HandlerResult OnGetTextLength(UINT msg, WPARAM wParam, LPARAM lParam) const noexcept;
 		Core::HandlerResult OnGetMinMaxInfo(UINT msg, WPARAM wParam, LPARAM lParam) const noexcept;
+		Core::HandlerResult OnLButtonDown(UINT msg, WPARAM wParam, LPARAM lParam) const noexcept;
 	};
 }
