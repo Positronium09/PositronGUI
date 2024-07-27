@@ -50,6 +50,14 @@ namespace PGUI
 		{
 			return { left, top };
 		}
+		[[nodiscard]] constexpr Point<T> BottomLeft() const noexcept
+		{
+			return { left, bottom };
+		}
+		[[nodiscard]] constexpr Point<T> TopRight() const noexcept
+		{
+			return { right, top };
+		}
 		[[nodiscard]] constexpr Point<T> BottomRight() const noexcept
 		{
 			return { right, bottom };
@@ -83,11 +91,24 @@ namespace PGUI
 			top += yOffset;
 			bottom += yOffset;
 		}
-
 		[[nodiscard]] constexpr Rect<T> Shifted(T xOffset, T yOffset) const noexcept
 		{
 			auto rect = *this;
 			rect.Shift(xOffset, yOffset);
+			return rect;
+		}
+
+		constexpr void Inflate(T dx, T dy) noexcept
+		{
+			left += -dx;
+			right += dx;
+			top -= dy;
+			bottom += dy;
+		}
+		[[nodiscard]] constexpr Rect<T> Inflated(T dx, T dy) const noexcept
+		{
+			auto rect = *this;
+			rect.Inflate(dx, dy);
 			return rect;
 		}
 

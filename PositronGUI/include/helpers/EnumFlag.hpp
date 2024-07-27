@@ -41,22 +41,22 @@ namespace PGUI
 		{
 			return static_cast<bool>(static_cast<UnderlyingType>(val));
 		}
-		constexpr UnderlyingType operator~() const noexcept
+		constexpr EnumFlag operator~() const noexcept
 		{
 			return ~static_cast<UnderlyingType>(val);
 		}
 
-		constexpr UnderlyingType& operator&=(const EnumFlag& other) noexcept
+		constexpr EnumFlag& operator&=(const EnumFlag& other) noexcept
 		{
 			val = static_cast<EnumType>(static_cast<UnderlyingType>(val) & static_cast<UnderlyingType>(other.val));
 			return *this;
 		}
-		constexpr UnderlyingType& operator|=(const EnumFlag& other) noexcept
+		constexpr EnumFlag& operator|=(const EnumFlag& other) noexcept
 		{
 			val = static_cast<EnumType>(static_cast<UnderlyingType>(val) | static_cast<UnderlyingType>(other.val));
 			return *this;
 		}
-		constexpr UnderlyingType& operator^=(const EnumFlag& other) noexcept
+		constexpr EnumFlag& operator^=(const EnumFlag& other) noexcept
 		{
 			val = static_cast<EnumType>(static_cast<UnderlyingType>(val) ^ static_cast<UnderlyingType>(other.val));
 			return *this;

@@ -219,9 +219,9 @@ namespace PGUI::UI::Controls
 
 			EditParams(
 				long fontSize = 24, 
+				bool singleLine = false,
 				std::wstring_view fontFace = L"Segoe UI", 
 				wchar_t passwordChar = L'*', 
-				bool singleLine = false,
 				DWORD propertyBits = TXTBIT_RICHTEXT | TXTBIT_SAVESELECTION) noexcept :
 				fontSize{ fontSize }, fontFace{ fontFace }, 
 				passwordChar{ passwordChar }, propertyBits{ propertyBits | (singleLine ? 0 : TXTBIT_MULTILINE) }
@@ -232,7 +232,6 @@ namespace PGUI::UI::Controls
 		static long PixelsToTwips(long pixels) noexcept;
 		
 		explicit Edit(const EditParams& params = EditParams{ });
-		~Edit() override;
 
 		void SetText(std::wstring_view text) const noexcept;
 		[[nodiscard]] std::wstring GetText() const noexcept;
@@ -290,7 +289,13 @@ namespace PGUI::UI::Controls
 		void SetModified(bool modified = true) const noexcept;
 
 		[[nodiscard]] bool IsReadOnly() const noexcept;
-		void SetReadOnly(bool readonly = true) const noexcept;
+		void SetReadOnly(bool readonly = true) noexcept;
+
+		[[nodiscard]] bool IsOnlyNumber() const noexcept;
+		void SetOnlyNumber(bool onlyNumber = true) const noexcept;
+
+		[[nodiscard]] bool IsPassword() const noexcept;
+		void SetPassword(bool password = true) noexcept;
 
 		/**
 		 * @param flags - Specifies the behavior of the search operation (https://learn.microsoft.com/en-us/windows/win32/Controls/em-findtextex)
@@ -470,6 +475,7 @@ namespace PGUI::UI::Controls
 
 		Core::HandlerResult ForwardToTextServices(UINT msg, WPARAM wParam, LPARAM lParam) const;
 		Core::HandlerResult OnCreate(UINT msg, WPARAM wParam, LPARAM lParam);
+		Core::HandlerResult OnDestroy(UINT msg, WPARAM wParam, LPARAM lParam) noexcept;
 		Core::HandlerResult OnPaint(UINT msg, WPARAM wParam, LPARAM lParam) noexcept;
 		Core::HandlerResult OnSetCursor(UINT msg, WPARAM wParam, LPARAM lParam) const noexcept;
 		Core::HandlerResult OnSetFocus(UINT msg, WPARAM wParam, LPARAM lParam) const noexcept;

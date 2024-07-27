@@ -39,6 +39,9 @@ namespace PGUI::UI
 		void Lighten(FLOAT amount) noexcept;
 		void Darken(FLOAT amount) noexcept;
 
+		[[nodiscard]] RGB Lightened(FLOAT amount) const noexcept;
+		[[nodiscard]] RGB Darkened(FLOAT amount) const noexcept;
+
 		FLOAT r = 0.0f;
 		FLOAT g = 0.0f;
 		FLOAT b = 0.0f;
@@ -65,6 +68,9 @@ namespace PGUI::UI
 
 		void Lighten(FLOAT amount) noexcept;
 		void Darken(FLOAT amount) noexcept;
+
+		[[nodiscard]] RGBA Lightened(FLOAT amount) const noexcept;
+		[[nodiscard]] RGBA Darkened(FLOAT amount) const noexcept;
 
 		FLOAT r = 0.0f;
 		FLOAT g = 0.0f;

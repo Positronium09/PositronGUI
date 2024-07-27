@@ -21,6 +21,7 @@
   <ItemGroup>
     <ClCompile Include="src\ui\bmp\Bitmap.cpp" />
     <ClCompile Include="src\ui\bmp\BitmapSource.cpp" />
+    <ClCompile Include="src\ui\controls\CheckBox.cpp" />
     <ClCompile Include="src\ui\controls\Header.cpp" />
     <ClCompile Include="src\ui\controls\ListView.cpp" />
     <ClCompile Include="src\ui\controls\ScrollBar.cpp" />
@@ -61,6 +62,7 @@
     <ClCompile Include="src\helpers\HelperFunctions.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="include\ui\controls\CheckBox.hpp" />
     <ClInclude Include="include\ui\controls\Edit.hpp" />
     <ClInclude Include="include\ui\controls\Header.hpp" />
     <ClInclude Include="include\ui\controls\ScrollBar.hpp" />
@@ -217,7 +219,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
     <Lib>
-      <AdditionalDependencies>dwmapi.lib;d2d1.lib;dwrite.lib;dxgi.lib;dcomp.lib;d3d11.lib;runtimeobject.lib</AdditionalDependencies>
+      <AdditionalDependencies>dwmapi.lib;d2d1.lib;dwrite.lib;dxgi.lib;dcomp.lib;d3d11.lib;runtimeobject.lib;Imm32.lib;dxguid.lib</AdditionalDependencies>
       <AdditionalOptions> /ignore:4006 %(AdditionalOptions)</AdditionalOptions>
     </Lib>
   </ItemDefinitionGroup>
@@ -243,7 +245,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
     <Lib>
-      <AdditionalDependencies>dwmapi.lib;d2d1.lib;dwrite.lib;dxgi.lib;dcomp.lib;d3d11.lib;runtimeobject.lib</AdditionalDependencies>
+      <AdditionalDependencies>dwmapi.lib;d2d1.lib;dwrite.lib;dxgi.lib;dcomp.lib;d3d11.lib;runtimeobject.lib;Imm32.lib;dxguid.lib</AdditionalDependencies>
       <AdditionalOptions> /ignore:4006 %(AdditionalOptions)</AdditionalOptions>
     </Lib>
   </ItemDefinitionGroup>
@@ -291,7 +293,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
     <Lib>
-      <AdditionalDependencies>dwmapi.lib;d2d1.lib;dwrite.lib;dxgi.lib;dcomp.lib;d3d11.lib;runtimeobject.lib</AdditionalDependencies>
+      <AdditionalDependencies>dwmapi.lib;d2d1.lib;dwrite.lib;dxgi.lib;dcomp.lib;d3d11.lib;runtimeobject.lib;Imm32.lib;dxguid.lib</AdditionalDependencies>
       <AdditionalOptions> /ignore:4006 %(AdditionalOptions)</AdditionalOptions>
     </Lib>
   </ItemDefinitionGroup>

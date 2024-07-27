@@ -156,6 +156,20 @@ namespace PGUI::UI
 		b = std::clamp(b - amount, 0.0f, 1.0f);
 	}
 
+	RGB RGB::Lightened(FLOAT amount) const noexcept
+	{
+		auto color = *this;
+		color.Lighten(amount);
+		return color;
+	}
+
+	RGB RGB::Darkened(FLOAT amount) const noexcept
+	{
+		auto color = *this;
+		color.Darken(amount);
+		return color;
+	}
+
 	#pragma endregion
 
 	#pragma region RGBA
@@ -229,6 +243,20 @@ namespace PGUI::UI
 		r = std::clamp(r - amount, 0.0f, 1.0f);
 		g = std::clamp(g - amount, 0.0f, 1.0f);
 		b = std::clamp(b - amount, 0.0f, 1.0f);
+	}
+
+	RGBA RGBA::Lightened(FLOAT amount) const noexcept
+	{
+		auto color = *this;
+		color.Lighten(amount);
+		return color;
+	}
+
+	RGBA RGBA::Darkened(FLOAT amount) const noexcept
+	{
+		auto color = *this;
+		color.Darken(amount);
+		return color;
 	}
 
 	#pragma endregion

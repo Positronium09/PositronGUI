@@ -18,8 +18,13 @@ namespace PGUI
 			HR_L(HRESULT_FROM_WIN32(GetLastError()));
 			throw Core::ErrorHandling::Win32Exception{ };
 		}
-
 	}
+
+	void Uninitialize()
+	{
+		UninitializeWindowsFoundation();
+	}
+
 	void InitializeWindowsFoundation()
 	{
 		HRESULT hr = Windows::Foundation::Initialize(RO_INIT_SINGLETHREADED); HR_T(hr);

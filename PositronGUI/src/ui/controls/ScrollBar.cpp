@@ -19,6 +19,7 @@ namespace PGUI::UI::Controls
 		RegisterMessageHandler(WM_CREATE, &ScrollBar::OnCreate);
 		RegisterMessageHandler(WM_PAINT, &ScrollBar::OnPaint);
 		RegisterMessageHandler(WM_LBUTTONDOWN, &ScrollBar::OnLButtonDown);
+		RegisterMessageHandler(WM_LBUTTONUP, &ScrollBar::OnLButtonUp);
 		RegisterMessageHandler(WM_MOUSEMOVE, &ScrollBar::OnMouseMove);
 		RegisterMessageHandler(WM_MOUSEWHEEL, &ScrollBar::OnMouseWheel);
 		RegisterMessageHandler(WM_MOUSEHWHEEL, &ScrollBar::OnMouseWheel);
@@ -36,7 +37,6 @@ namespace PGUI::UI::Controls
 			thumbBrush.SetParameters(RGBA{ 0x808080 });
 			backgroundBrush.SetParameters(RGBA{ 0xF3F3F3 });
 		}
-
 	}
 
 	void ScrollBar::SetPageSize(std::int64_t _pageSize) noexcept
@@ -49,7 +49,7 @@ namespace PGUI::UI::Controls
 	}
 	void ScrollBar::SetLineCount(std::int64_t _lineCount) noexcept
 	{
-		lineCount = _lineCount;
+		lineCount = std::clamp(_lineCount, 1LL, _lineCount + 1LL);
 		Invalidate();
 	}
 	void ScrollBar::SetMaxScroll(std::int64_t _maxScroll) noexcept
@@ -353,7 +353,14 @@ namespace PGUI::UI::Controls
 		PointI pos = MAKEPOINTS(lParam);
 
 		SetScrollPos(GetScrollPosFromPoint(pos));
+		SetCapture(Hwnd());
 
+		return 0;
+	}
+	Core::HandlerResult ScrollBar::OnLButtonUp(UINT, WPARAM, LPARAM) const noexcept
+	{
+		ReleaseCapture();
+		
 		return 0;
 	}
 	Core::HandlerResult ScrollBar::OnMouseMove(UINT, WPARAM wParam, LPARAM lParam)

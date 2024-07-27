@@ -202,6 +202,7 @@ namespace PGUI::Core
 		[[nodiscard]] HWND ParentHwnd() const noexcept { return parenthWnd; }
 
 		void Show(int show=SW_SHOW) const noexcept;
+		bool IsVisible() const noexcept;
 
 		void Move(PointL newPos) const noexcept;
 		void Resize(SizeL newSize) const noexcept;

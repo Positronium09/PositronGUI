@@ -115,6 +115,7 @@ namespace PGUI::UI::Controls
 		Core::HandlerResult OnCreate(UINT msg, WPARAM wParam, LPARAM lParam);
 		Core::HandlerResult OnPaint(UINT msg, WPARAM wParam, LPARAM lParam);
 		Core::HandlerResult OnLButtonDown(UINT msg, WPARAM wParam, LPARAM lParam);
+		Core::HandlerResult OnLButtonUp(UINT msg, WPARAM wParam, LPARAM lParam) const noexcept;
 		Core::HandlerResult OnMouseMove(UINT msg, WPARAM wParam, LPARAM lParam);
 		Core::HandlerResult OnMouseWheel(UINT msg, WPARAM wParam, LPARAM lParam);
 		Core::HandlerResult OnWindowPosChanging(UINT msg, WPARAM wParam, LPARAM lParam) const;

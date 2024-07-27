@@ -148,7 +148,7 @@ namespace PGUI::UI::Controls
 	{
 		switch (newState)
 		{
-			using enum PGUI::UI::Controls::ButtonState;
+			using enum PGUI::UI::Controls::ButtonState::EnumValues;
 
 			case Normal:
 			{
@@ -162,7 +162,7 @@ namespace PGUI::UI::Controls
 				backgroundBrush.SetParameters(colors.hoverBackground);
 				break;
 			}
-			case Clicked:
+			case Pressed:
 			{
 				textBrush.SetParameters(colors.clickedText);
 				backgroundBrush.SetParameters(colors.clickedBackground);

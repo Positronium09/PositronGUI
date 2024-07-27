@@ -302,6 +302,7 @@ namespace PGUI::UI::Controls
 		BeginDraw();
 
 		long totalWidth = 0;
+		long width = GetClientSize().cx;
 		long height = GetClientSize().cy;
 
 		auto renderer = GetRenderingInterface();
@@ -310,6 +311,11 @@ namespace PGUI::UI::Controls
 
 		for (const auto& headerItem : headerItems)
 		{
+			if (totalWidth > width)
+			{
+				break;
+			}
+
 			auto headerRect = RectF{
 				static_cast<float>(totalWidth),
 				0,

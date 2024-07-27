@@ -93,6 +93,7 @@ namespace PGUI::UI::Controls
 		textHost.parentWindow = this;
 
 		RegisterMessageHandler(WM_CREATE, &Edit::OnCreate);
+		RegisterMessageHandler(WM_DESTROY, &Edit::OnDestroy);
 		RegisterMessageHandler(WM_PAINT, &Edit::OnPaint);
 		RegisterMessageHandler(WM_SETFOCUS, &Edit::OnSetFocus);
 		RegisterMessageHandler(WM_KILLFOCUS, &Edit::OnKillFocus);
@@ -129,10 +130,6 @@ namespace PGUI::UI::Controls
 
 		Msftedit::LoadMsftedit();
 	}
-	Edit::~Edit()
-	{
-		HRESULT hr = Msftedit::shutdownTextServices(textServices.Get()); HR_L(hr);
-	}
 
 	void Edit::SetText(std::wstring_view text) const noexcept
 	{
@@ -142,9 +139,9 @@ namespace PGUI::UI::Controls
 
 	std::wstring Edit::GetText() const noexcept
 	{
-		std::wstring text(GetTextLength() + 1, L'\0');
+		std::wstring text(GetTextLength(), L'\0');
 
-		HRESULT hr = textServices->TxSendMessage(WM_GETTEXT, text.length(),
+		HRESULT hr = textServices->TxSendMessage(WM_GETTEXT, text.length() + 1,
 			std::bit_cast<LPARAM>(text.data()), nullptr);
 		HR_L(hr);
 
@@ -293,14 +290,55 @@ namespace PGUI::UI::Controls
 
 	bool Edit::IsReadOnly() const noexcept
 	{
-		return GetWindowLongPtrW(Hwnd(), GWL_STYLE) & ES_READONLY;
+		return propertyBits & TXTBIT_READONLY;
 	}
 
-	void Edit::SetReadOnly(bool readonly) const noexcept
+	void Edit::SetReadOnly(bool readonly) noexcept
 	{
-		HRESULT hr =
-			textServices->TxSendMessage(EM_SETREADONLY, readonly, NULL, nullptr);
-		HR_L(hr);
+		if (readonly)
+		{
+			propertyBits |= TXTBIT_READONLY;
+			return;
+		}
+		else
+		{
+			propertyBits &= ~TXTBIT_READONLY;
+		}
+		textServices->OnTxPropertyBitsChange(propertyBits, propertyBits);
+	}
+
+	bool Edit::IsOnlyNumber() const noexcept
+	{
+		return GetWindowLongPtrW(Hwnd(), GWL_STYLE) & ES_NUMBER;
+	}
+
+	void Edit::SetOnlyNumber(bool onlyNumber) const noexcept
+	{
+		if (onlyNumber)
+		{
+			SetWindowLongPtrW(Hwnd(), GWL_STYLE, GetWindowLongPtrW(Hwnd(), GWL_STYLE) | ES_NUMBER);
+			return;
+		}
+		SetWindowLongPtrW(Hwnd(), GWL_STYLE, GetWindowLongPtrW(Hwnd(), GWL_STYLE) & ~ES_NUMBER);
+	}
+
+	bool Edit::IsPassword() const noexcept
+	{
+		return propertyBits & TXTBIT_USEPASSWORD;
+	}
+
+	void Edit::SetPassword(bool password) noexcept
+	{
+		if (password)
+		{
+			propertyBits |= TXTBIT_USEPASSWORD;
+			return;
+		}
+		else
+		{
+			propertyBits &= ~TXTBIT_USEPASSWORD;
+		}
+		textServices->OnTxPropertyBitsChange(propertyBits, propertyBits);
 	}
 
 	CharRange Edit::Find(EditFindFlag flags, std::wstring_view text, CharRange searchRange) const noexcept
@@ -844,6 +882,13 @@ namespace PGUI::UI::Controls
 		return 0;
 	}
 
+	Core::HandlerResult Edit::OnDestroy(UINT, WPARAM, LPARAM) noexcept
+	{
+		HRESULT hr = Msftedit::shutdownTextServices(textServices.Get()); HR_L(hr);
+		textServices.Detach();
+		return 0;
+	}
+
 	Core::HandlerResult Edit::OnPaint(UINT, WPARAM, LPARAM) noexcept
 	{
 		BeginDraw();
@@ -854,8 +899,8 @@ namespace PGUI::UI::Controls
 		renderer->FillRectangle(clientRect, backgroundBrush->GetBrushPtr());
 
 		RECT bounds = clientRect;
-		bounds.right -= 20;
-		bounds.bottom -= 20;
+		bounds.right -= verticalScrollBar->IsVisible() ? 20 : 0;
+		bounds.bottom -= horizontalScrollBar->IsVisible() ? 20 : 0;
 
 		textServices->TxDrawD2D(renderer.Get(), std::bit_cast<LPRECTL>(&bounds), nullptr, TXTVIEW_ACTIVE);
 
@@ -907,7 +952,7 @@ namespace PGUI::UI::Controls
 	}
 	Core::HandlerResult Edit::OnKillFocus(UINT msg, WPARAM wParam, LPARAM lParam) const noexcept
 	{
-		textServices->OnTxInPlaceDeactivate();
+		textServices->OnTxUIDeactivate();
 
 		LRESULT res{ };
 		textServices->TxSendMessage(msg, wParam, lParam, &res);

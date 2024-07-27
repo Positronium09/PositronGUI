@@ -60,6 +60,11 @@ namespace PGUI::Core
 		ShowWindow(hWnd, show);
 	}
 
+	bool Window::IsVisible() const noexcept
+	{
+		return IsWindowVisible(Hwnd());
+	}
+
 	WindowClass::WindowClassPtr Window::GetWindowClass() const noexcept
 	{
 		return windowClass;

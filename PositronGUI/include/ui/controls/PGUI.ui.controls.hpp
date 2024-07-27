@@ -8,3 +8,4 @@
 #include "ScrollBar.hpp"
 #include "ListView.hpp"
 #include "Edit.hpp"
+#include "CheckBox.hpp"

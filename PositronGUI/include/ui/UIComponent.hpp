@@ -14,6 +14,7 @@ namespace PGUI::UI
 
 		void SetClip(const ClipParameters& params) noexcept;
 		void ClearClip() noexcept;
+		const Clip& GetClip() const noexcept { return clip; }
 		void HitTestClipGeometry(bool enable) noexcept;
 
 		void EnableInput() const noexcept;

@@ -34,19 +34,38 @@ namespace PGUI::UI::Controls
 		state = _state;
 		stateChangedEvent.Emit(state);
 	}
+	void ButtonBase::SetMouseState(ButtonState _state) noexcept
+	{
+		state = _state | GetSelectionState();
+		stateChangedEvent.Emit(state);
+	}
+	void ButtonBase::SetSelectionState(ButtonState _state) noexcept
+	{
+		state = _state | GetMouseState();
+		stateChangedEvent.Emit(state);
+	}
+
 	ButtonState Controls::ButtonBase::GetState() const noexcept
 	{
 		return state;
 	}
+	ButtonState ButtonBase::GetMouseState() const noexcept
+	{
+		return (state & ButtonState::Normal) | (state & ButtonState::Hover) | (state & ButtonState::Pressed);
+	}
+	ButtonState ButtonBase::GetSelectionState() const noexcept
+	{
+		return (state & ButtonState::Unchecked) | (state & ButtonState::Checked) | (state & ButtonState::Indeterminate);
+	}
 	
 	Core::HandlerResult ButtonBase::OnMouseMove(UINT, WPARAM, LPARAM) noexcept
 	{
-		if (state == ButtonState::Clicked)
+		if (state & ButtonState::Pressed)
 		{
 			return 0;
 		}
 
-		SetState(ButtonState::Hover);
+		SetMouseState(ButtonState::Hover);
 
 		TRACKMOUSEEVENT tme{ };
 		tme.cbSize = sizeof(TRACKMOUSEEVENT);
@@ -61,26 +80,26 @@ namespace PGUI::UI::Controls
 
 	Core::HandlerResult Controls::ButtonBase::OnMouseLeave(UINT, WPARAM, LPARAM) noexcept
 	{
-		SetState(ButtonState::Normal);
+		SetMouseState(ButtonState::Normal);
 
 		return 0;
 	}
 
 	Core::HandlerResult Controls::ButtonBase::OnLButtonDown(UINT, WPARAM, LPARAM) noexcept
 	{
-		SetState(ButtonState::Clicked);
+		SetMouseState(ButtonState::Pressed);
 
 		return 0;
 	}
 
 	Core::HandlerResult ButtonBase::OnLButtonUp(UINT, WPARAM, LPARAM) noexcept
 	{
-		if (state == ButtonState::Clicked)
+		if (state & ButtonState::Pressed)
 		{
 			clickedEvent.Emit();
 		}
 
-		SetState(ButtonState::Hover);
+		SetMouseState(ButtonState::Hover);
 
 		return 0;
 	}

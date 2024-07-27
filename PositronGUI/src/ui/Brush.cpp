@@ -41,9 +41,13 @@ namespace PGUI::UI
 
 		const auto& gradientStops = gradient.GetGradientStops();
 
-		ComPtr<ID2D1GradientStopCollection> gradientStopCollection;
+		ComPtr<ID2D1GradientStopCollection1> gradientStopCollection;
 		HRESULT hr = renderTarget->CreateGradientStopCollection(
-			gradientStops.data(), static_cast<UINT32>(gradientStops.size()), gradientStopCollection.GetAddressOf()); HR_T(hr);
+			gradientStops.data(), static_cast<UINT32>(gradientStops.size()), 
+			D2D1_COLOR_SPACE_SRGB, D2D1_COLOR_SPACE_SRGB,
+			D2D1_BUFFER_PRECISION_32BPC_FLOAT, D2D1_EXTEND_MODE_CLAMP,
+			D2D1_COLOR_INTERPOLATION_MODE_PREMULTIPLIED,
+			gradientStopCollection.GetAddressOf()); HR_T(hr);
 
 		if (FAILED(hr))
 		{

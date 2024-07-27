@@ -56,6 +56,8 @@ namespace PGUI::UI::Controls
 		[[nodiscard]] long GetHeight() const noexcept { return height; }
 		[[nodiscard]] long GetMinHeight() const noexcept { return minHeight; }
 
+		bool IsSelected() const noexcept { return state & ListViewItemState::Selected; }
+
 		protected:
 		explicit ListViewItem(long height) noexcept :
 			height{ height }
@@ -142,8 +144,11 @@ namespace PGUI::UI::Controls
 			listViewItems.at(listViewItems.size() - 1)->Create();
 			itemsChangedEvent.Emit();
 		}
-
 		void RemoveItem(std::size_t index) noexcept;
+
+		void Clear() noexcept;
+		void ClearSelected() noexcept;
+		void ClearUnselected() noexcept;
 
 		template <std::derived_from<ListViewItem> T>
 		[[nodiscard]] T* GetItem(std::size_t index) const
@@ -172,19 +177,17 @@ namespace PGUI::UI::Controls
 		[[nodiscard]] std::vector<ListViewItem*> GetSelectedItems() const noexcept;
 
 		[[nodiscard]] const ListViewItemList& GetListViewItems() const noexcept { return listViewItems; }
-		[[nodiscard]] std::span<const std::size_t> GetSelectedItemIndexes() const noexcept { return selectedItemIndexes; }
-		[[nodiscard]] std::optional<std::size_t> GetSelectedItemIndex() const noexcept
-		{
-			try
-			{
-				return selectedItemIndexes.at(0);
+		[[nodiscard]] std::optional<std::size_t> GetSelectedItemIndex() const noexcept;
+		[[nodiscard]] std::vector<std::size_t> GetSelectedItemIndexes() const noexcept;
+		[[nodiscard]] bool IsIndexSelected(std::size_t index) const noexcept;
 
-			}
-			catch (std::out_of_range&)
-			{
-				return std::nullopt;
-			}
-		}
+		[[nodiscard]] long CalculateListViewItemHeightUpToIndex(std::size_t index) const noexcept;
+		[[nodiscard]] long GetTotalListViewItemHeight() const noexcept;
+
+		void Select(std::size_t index) noexcept;
+		void Deselect(std::size_t index) noexcept;
+
+		auto GetScrollBar() const noexcept { return scrollBar; }
 
 		void SetBackgroundBrush(Brush& brush) noexcept;
 		[[nodiscard]] const Brush& GetBackgroundBrush() const noexcept { return backgroundBrush; }
@@ -192,8 +195,8 @@ namespace PGUI::UI::Controls
 		void SetSelectionMode(SelectionMode selectionMode) noexcept;
 		[[nodiscard]] SelectionMode GetSelectionMode() const noexcept { return selectionMode; }
 
-		Core::Event<void> SelectionChangedEvent() const noexcept { return selectionChangedEvent; }
-		Core::Event<void> ItemsChangedEvent() const noexcept { return itemsChangedEvent; }
+		Core::Event<void>& SelectionChangedEvent() noexcept { return selectionChangedEvent; }
+		Core::Event<void>& ItemsChangedEvent() noexcept { return itemsChangedEvent; }
 
 		private:
 		void CreateDeviceResources() override;
@@ -201,14 +204,17 @@ namespace PGUI::UI::Controls
 
 		[[nodiscard]] std::optional<std::size_t> GetHoveredListViewItemIndex(long yPos) const noexcept;
 
-		[[nodiscard]] long CalculateListViewItemHeightUpToIndex(std::size_t index) const noexcept;
-		[[nodiscard]] long GetTotalListViewItemHeight() const noexcept;
-
 		void SetStateWithSelected(std::size_t index, ListViewItemState state) noexcept;
 		void AddStateIfSelected(std::size_t index, ListViewItemState state) noexcept;
+		void AddSelected(std::size_t index) noexcept;
+		void RemoveSelected(std::size_t index) noexcept;
 
 		void UpdateScrollBar();
 		void OnScroll();
+
+		void SelectSingle(std::size_t index) noexcept;
+		void SelectMultiple(std::size_t index) noexcept;
+		void SelectExtended(std::size_t index, bool shiftPressed = false, bool ctrlPressed = false) noexcept;
 
 		Core::WindowPtr<ScrollBar> scrollBar;
 
@@ -217,7 +223,6 @@ namespace PGUI::UI::Controls
 
 		std::optional<std::size_t> lastPressedIndex = std::nullopt;
 		std::optional<std::size_t> hoveringIndex = std::nullopt;
-		std::vector<std::size_t> selectedItemIndexes;
 
 		ListViewItemList listViewItems;
 

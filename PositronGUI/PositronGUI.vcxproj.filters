@@ -138,6 +138,9 @@
     <ClCompile Include="src\ui\controls\Edit.cpp">
       <Filter>Header Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\ui\controls\CheckBox.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\PGUI.hpp">
@@ -330,6 +333,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\ui\controls\Edit.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\ui\controls\CheckBox.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
