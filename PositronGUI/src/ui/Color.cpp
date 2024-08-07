@@ -3,8 +3,6 @@
 #include <cmath>
 #include <algorithm>
 
-#undef max
-#undef min
 
 namespace PGUI::UI
 {

@@ -1,9 +1,10 @@
 #include "ui/controls/Edit.hpp"
 
-#include "core/Logger.hpp"
+#include "helpers/HelperFunctions.hpp"
 #include "ui/Colors.hpp"
 #include "factories/WICFactory.hpp"
 
+#include <cwctype>
 #include <type_traits>
 #include <strsafe.h>
 #include <TOM.h>
@@ -29,7 +30,7 @@ namespace Msftedit
 		}
 		if (msftedit == nullptr)
 		{
-			PGUI::HR_T(HRESULT_FROM_WIN32(GetLastError()));
+			PGUI::HR_T(PGUI::HresultFromWin32());
 		}
 
 		if (!createTextServices)
@@ -38,7 +39,7 @@ namespace Msftedit
 		}
 		if (createTextServices == nullptr)
 		{
-			PGUI::HR_T(HRESULT_FROM_WIN32(GetLastError()));
+			PGUI::HR_T(PGUI::HresultFromWin32());
 		}
 
 		if (!shutdownTextServices)
@@ -47,7 +48,7 @@ namespace Msftedit
 		}
 		if (shutdownTextServices == nullptr)
 		{
-			PGUI::HR_T(HRESULT_FROM_WIN32(GetLastError()));
+			PGUI::HR_T(PGUI::HresultFromWin32());
 		}
 		
 		if (!IIDITextServices2)
@@ -56,7 +57,7 @@ namespace Msftedit
 		}
 		if (IIDITextServices2 == nullptr)
 		{
-			PGUI::HR_T(HRESULT_FROM_WIN32(GetLastError()));
+			PGUI::HR_T(PGUI::HresultFromWin32());
 		}
 
 		if (!IIDITextHost)
@@ -65,7 +66,7 @@ namespace Msftedit
 		}
 		if (IIDITextHost == nullptr)
 		{
-			PGUI::HR_T(HRESULT_FROM_WIN32(GetLastError()));
+			PGUI::HR_T(PGUI::HresultFromWin32());
 		}
 
 		if (!IIDITextHost2)
@@ -74,7 +75,7 @@ namespace Msftedit
 		}
 		if (IIDITextHost2 == nullptr)
 		{
-			PGUI::HR_T(HRESULT_FROM_WIN32(GetLastError()));
+			PGUI::HR_T(PGUI::HresultFromWin32());
 		}
 	}
 }
@@ -146,6 +147,15 @@ namespace PGUI::UI::Controls
 		HR_L(hr);
 
 		return text;
+	}
+
+	void Edit::SetKeyFilter(const KeyFilterFunction& keyFilter) noexcept
+	{
+		filteringFunction = keyFilter;
+	}
+	void Edit::RemoveKeyFilter() noexcept
+	{
+		filteringFunction = nullptr;
 	}
 
 	void Edit::SetTextColor(RGBA color) noexcept
@@ -307,21 +317,6 @@ namespace PGUI::UI::Controls
 		textServices->OnTxPropertyBitsChange(propertyBits, propertyBits);
 	}
 
-	bool Edit::IsOnlyNumber() const noexcept
-	{
-		return GetWindowLongPtrW(Hwnd(), GWL_STYLE) & ES_NUMBER;
-	}
-
-	void Edit::SetOnlyNumber(bool onlyNumber) const noexcept
-	{
-		if (onlyNumber)
-		{
-			SetWindowLongPtrW(Hwnd(), GWL_STYLE, GetWindowLongPtrW(Hwnd(), GWL_STYLE) | ES_NUMBER);
-			return;
-		}
-		SetWindowLongPtrW(Hwnd(), GWL_STYLE, GetWindowLongPtrW(Hwnd(), GWL_STYLE) & ~ES_NUMBER);
-	}
-
 	bool Edit::IsPassword() const noexcept
 	{
 		return propertyBits & TXTBIT_USEPASSWORD;
@@ -348,7 +343,9 @@ namespace PGUI::UI::Controls
 		ft.lpstrText = text.data();
 
 		HRESULT hr =
-			textServices->TxSendMessage(EM_FINDTEXTEXW, flags, std::bit_cast<LPARAM>(&ft), nullptr);
+			textServices->TxSendMessage(EM_FINDTEXTEXW, 
+				static_cast<WPARAM>(flags), 
+				std::bit_cast<LPARAM>(&ft), nullptr);
 		HR_L(hr);
 		return ft.chrgText;
 	}
@@ -389,12 +386,13 @@ namespace PGUI::UI::Controls
 			textServices->TxSendMessage(EM_GETEVENTMASK, NULL, NULL, &ret);
 		HR_L(hr);
 
-		return static_cast<EditEventMaskFlag::UnderlyingType>(ret);
+		return static_cast<EditEventMaskFlag>(ret);
 	}
 	void Edit::SetEventMask(EditEventMaskFlag eventFlag) const noexcept
 	{
 		HRESULT hr =
-			textServices->TxSendMessage(EM_SETEVENTMASK, NULL, eventFlag, nullptr);
+			textServices->TxSendMessage(EM_SETEVENTMASK, NULL, 
+				static_cast<LPARAM>(eventFlag), nullptr);
 		HR_L(hr);
 	}
 
@@ -445,7 +443,7 @@ namespace PGUI::UI::Controls
 	{
 		HRESULT hr =
 			textServices->TxSendMessage(EM_GETOPTIONS, NULL,
-				options, nullptr);
+				static_cast<LPARAM>(options), nullptr);
 		HR_L(hr);
 	}
 
@@ -801,12 +799,12 @@ namespace PGUI::UI::Controls
 
 	void Edit::CreateDeviceResources()
 	{
-		auto renderer = GetRenderingInterface();
+		auto g = GetGraphics();
 
 		if (!backgroundBrush)
 		{
 			SetGradientBrushRect(backgroundBrush, GetClientRect());
-			backgroundBrush.CreateBrush(renderer);
+			g.CreateBrush(backgroundBrush);
 		}
 	}
 
@@ -821,11 +819,30 @@ namespace PGUI::UI::Controls
 		Invalidate();
 	}
 
+	Core::HandlerResult Edit::OnDPIChange(float dpiScale, RectI suggestedRect)
+	{
+		auto cf = GetDefaultCharFormat();
+		cf.yHeight = ScaleByDpi(cf.yHeight);
+		SetDefaultCharFormat(cf);
+
+		return Window::OnDPIChange(dpiScale, suggestedRect);
+	}
+
 	Core::HandlerResult Edit::ForwardToTextServices(UINT msg, WPARAM wParam, LPARAM lParam) const
 	{
 		if (!textServices)
 		{
 			return DefWindowProcW(Hwnd(), msg, wParam, lParam);
+		}
+
+		if (msg >= WM_KEYFIRST && msg <= WM_KEYLAST
+			&& filteringFunction)
+		{
+			if (auto process = filteringFunction(msg, wParam, lParam);
+				!process)
+			{
+				return DefWindowProcW(Hwnd(), msg, wParam, lParam);
+			}
 		}
 
 		LRESULT result{ };
@@ -844,7 +861,7 @@ namespace PGUI::UI::Controls
 		const auto clientRect = GetClientRect();
 		const auto clientSize = clientRect.Size();
 
-		auto params = ScrollBar::ScrollBarParams{ 5, 1, 5, 0 };
+		auto params = ScrollBar::ScrollBarParams{ 5, 0, 5 };
 		verticalScrollBar = AddChildWindow<ScrollBar>(
 			Core::WindowCreateParams{ L"Edit_VerticalScrollBar", 
 			{ clientSize.cx - 20, 0 }, { 20, clientSize.cy },
@@ -866,7 +883,7 @@ namespace PGUI::UI::Controls
 		paraFormat.cbSize = sizeof(PARAFORMAT2);
 
 		ComPtr<IUnknown> unk;
-		HRESULT hr = Msftedit::createTextServices(nullptr, &textHost, unk.GetAddressOf()); HR_T(hr);
+		HRESULT hr = Msftedit::createTextServices(nullptr, &textHost, &unk); HR_T(hr);
 		hr = unk->QueryInterface(*Msftedit::IIDITextServices2, 
 			std::bit_cast<void**>(textServices.GetAddressOf())); HR_T(hr);
 
@@ -893,23 +910,21 @@ namespace PGUI::UI::Controls
 	{
 		BeginDraw();
 
-		auto renderer = GetRenderingInterface();
+		auto g = GetGraphics();
 
-		auto clientRect = GetClientRect();
-		renderer->FillRectangle(clientRect, backgroundBrush->GetBrushPtr());
+		g.Clear(backgroundBrush);
 
-		RECT bounds = clientRect;
+		RECT bounds = GetClientRect();
 		bounds.right -= verticalScrollBar->IsVisible() ? 20 : 0;
 		bounds.bottom -= horizontalScrollBar->IsVisible() ? 20 : 0;
 
-		textServices->TxDrawD2D(renderer.Get(), std::bit_cast<LPRECTL>(&bounds), nullptr, TXTVIEW_ACTIVE);
+		textServices->TxDrawD2D(g, std::bit_cast<LPRECTL>(&bounds), nullptr, TXTVIEW_ACTIVE);
 
 		if (textHost.caretRenderTarget && showCaret)
 		{
-			ComPtr<ID2D1Bitmap> bmp;
-			textHost.caretRenderTarget->GetBitmap(&bmp);
+			auto bmp = textHost.caretRenderTarget.GetBitmap();
 
-			renderer->DrawImage(bmp.Get(), textHost.caretPos, RectF{ {}, bmp->GetSize() },
+			g->DrawImage(bmp, textHost.caretPos, RectF{ {}, bmp->GetSize() },
 				D2D1_INTERPOLATION_MODE_LINEAR, D2D1_COMPOSITE_MODE_MASK_INVERT);
 		}
 
@@ -956,6 +971,7 @@ namespace PGUI::UI::Controls
 
 		LRESULT res{ };
 		textServices->TxSendMessage(msg, wParam, lParam, &res);
+		Invalidate();
 
 		return res;
 	}
@@ -1052,20 +1068,20 @@ namespace PGUI::UI::Controls
 	}
 	BOOL Edit::TextHost::TxCreateCaret(HBITMAP, INT width, INT height)
 	{
-		auto renderer = parentWindow->GetRenderingInterface();
+		auto g = parentWindow->GetGraphics();
 
-		HRESULT hr = renderer->CreateCompatibleRenderTarget(
-			SizeI{ width, height }, &caretRenderTarget); HR_L(hr);
+		caretRenderTarget = g.CreateCompatibleRenderTarget(
+			SizeF{ static_cast<float>(width), static_cast<float>(height) });
 
 		caretRenderTarget->BeginDraw();
 
-		caretRenderTarget->Clear(RGBA{ 0xffffff, 1 });
+		caretRenderTarget.Clear(RGBA{ 0xffffff, 1 });
 
 		caretRenderTarget->EndDraw();
 
 		parentWindow->Invalidate();
 
-		return SUCCEEDED(hr) ? TRUE : FALSE;
+		return TRUE;
 	}
 	BOOL Edit::TextHost::TxShowCaret(BOOL show)
 	{
@@ -1308,7 +1324,8 @@ namespace PGUI::UI::Controls
 			{
 				auto selChange = std::bit_cast<SELCHANGE*>(data);
 
-				parentWindow->selectionChangeEvent.Emit(selChange->chrg, selChange->seltyp);
+				parentWindow->selectionChangeEvent.Emit(selChange->chrg, 
+					static_cast<EditSelectionFlag>(selChange->seltyp));
 
 				break;
 			}
@@ -1409,7 +1426,7 @@ namespace PGUI::UI::Controls
 		{
 			return S_OK;
 		}
-		return HRESULT_FROM_WIN32(GetLastError());
+		return HresultFromWin32();
 	}
 	HPALETTE Edit::TextHost::TxGetPalette()
 	{
@@ -1460,4 +1477,74 @@ namespace PGUI::UI::Controls
 	}
 
 	#pragma endregion
+
+	bool BuiltinFilters::NumericOnlyFilter(UINT&, WPARAM& wParam, LPARAM&) noexcept
+	{
+		if (auto c = static_cast<wchar_t>(wParam); 
+			std::isalnum(c))
+		{
+			if (std::isalpha(c) && (GetKeyState(VK_CONTROL) & 0x8000))
+			{
+				return true;
+			}
+			else if (std::isdigit(c))
+			{
+				return true;
+			}
+			return false;
+		}
+		return true;
+	}
+	bool BuiltinFilters::UppercaseOnlyFilter(UINT&, WPARAM& wParam, LPARAM&) noexcept
+	{
+		NLSVERSIONINFOEX v{ };
+		v.dwNLSVersionInfoSize = sizeof(NLSVERSIONINFO);
+		GetNLSVersionEx(COMPARE_STRING, LOCALE_NAME_USER_DEFAULT, &v);
+
+		const auto inputLang = GetCurrentInputMethodLanguage();
+		auto size = LCMapStringEx(inputLang.c_str(),
+			LCMAP_UPPERCASE,
+			std::bit_cast<LPCWSTR>(&wParam), 1,
+			nullptr, 0, std::bit_cast<LPNLSVERSIONINFO>(&v), nullptr, 0);
+
+		std::wstring str(size, L'\0');
+
+		LCMapStringEx(inputLang.c_str(),
+			LCMAP_UPPERCASE,
+			std::bit_cast<LPCWSTR>(&wParam), 1,
+			str.data(), size, std::bit_cast<LPNLSVERSIONINFO>(&v), nullptr, 0);
+
+		if (size == 1)
+		{
+			wParam = str.at(0);
+		}
+
+		return true;
+	}
+	bool BuiltinFilters::LowercaseOnlyFilter(UINT&, WPARAM& wParam, LPARAM&) noexcept
+	{
+		NLSVERSIONINFOEX v{ };
+		v.dwNLSVersionInfoSize = sizeof(NLSVERSIONINFO);
+		GetNLSVersionEx(COMPARE_STRING, LOCALE_NAME_USER_DEFAULT, &v);
+
+		const auto inputLang = GetCurrentInputMethodLanguage();
+		auto size = LCMapStringEx(inputLang.c_str(),
+			LCMAP_LOWERCASE,
+			std::bit_cast<LPCWSTR>(&wParam), 1,
+			nullptr, 0, std::bit_cast<LPNLSVERSIONINFO>(&v), nullptr, 0);
+
+		std::wstring str(size, L'\0');
+
+		LCMapStringEx(inputLang.c_str(),
+			LCMAP_LOWERCASE,
+			std::bit_cast<LPCWSTR>(&wParam), 1,
+			str.data(), size, std::bit_cast<LPNLSVERSIONINFO>(&v), nullptr, 0);
+
+		if (size == 1)
+		{
+			wParam = str.at(0);
+		}
+
+		return true;
+	}
 }

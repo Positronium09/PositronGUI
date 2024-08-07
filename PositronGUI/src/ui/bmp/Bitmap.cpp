@@ -2,7 +2,7 @@
 
 #include "factories/WICFactory.hpp"
 #include "ui/bmp/Palette.hpp"
-#include "core/Logger.hpp"
+#include "helpers/HelperFunctions.hpp"
 
 
 namespace PGUI::UI::Bmp

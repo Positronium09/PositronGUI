@@ -6,7 +6,6 @@
 #include <Windows.h>
 #include <winrt/windows.ui.viewmanagement.h>
 
-
 #undef RGB
 #undef CMYK
 

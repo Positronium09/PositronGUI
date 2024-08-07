@@ -16,14 +16,14 @@ namespace PGUI::UI::Controls
 		colors.unchecked.pressedForeground = RGBA{ 0x292929 };
 		colors.unchecked.pressedBackground = colors.unchecked.hoverBackground;
 
-		colors.indeterminate.foreground = RGBA{ 0x333333 };
-		colors.indeterminate.background = RGBA{ 0x151515 };
-		colors.indeterminate.hoverForeground = colors.indeterminate.foreground;
-		colors.indeterminate.hoverBackground = RGBA{ 0x1b1b1b };
-		colors.indeterminate.pressedForeground = RGBA{ 0x272727 };
-		colors.indeterminate.pressedBackground = colors.indeterminate.hoverBackground;
+		colors.checked.foreground = RGBA{ 0x333333 };
+		colors.checked.background = RGBA{ 0x151515 };
+		colors.checked.hoverForeground = colors.checked.foreground;
+		colors.checked.hoverBackground = RGBA{ 0x1b1b1b };
+		colors.checked.pressedForeground = RGBA{ 0x272727 };
+		colors.checked.pressedBackground = colors.checked.hoverBackground;
 
-		colors.checked = colors.indeterminate;
+		colors.indeterminate = colors.checked;
 
 		return colors;
 	}
@@ -31,7 +31,21 @@ namespace PGUI::UI::Controls
 	{
 		CheckBoxColors colors;
 
+		colors.unchecked.foreground = RGBA{ 0x333333 };
+		colors.unchecked.background = RGBA{ 0x1b1b1b };
+		colors.unchecked.hoverForeground = colors.unchecked.foreground;
+		colors.unchecked.hoverBackground = RGBA{ 0x202020 };
+		colors.unchecked.pressedForeground = RGBA{ 0x292929 };
+		colors.unchecked.pressedBackground = colors.unchecked.hoverBackground;
 
+		colors.checked.foreground = RGBA{ 0x1b1b1b };
+		colors.checked.background = UIColors::GetAccentColor();
+		colors.checked.hoverForeground = colors.checked.foreground;
+		colors.checked.hoverBackground = UIColors::GetAccentLight1Color();
+		colors.checked.pressedForeground = colors.checked.hoverForeground;
+		colors.checked.pressedBackground = UIColors::GetAccentDark1Color();
+
+		colors.indeterminate = colors.checked;
 
 		return colors;
 	}
@@ -48,17 +62,17 @@ namespace PGUI::UI::Controls
 
 	void CheckBox::CreateDeviceResources()
 	{
-		auto renderer = GetRenderingInterface();
+		auto g = GetGraphics();
 
 		if (!foregroundBrush)
 		{
 			SetGradientBrushRect(foregroundBrush, GetClientRect());
-			foregroundBrush.CreateBrush(renderer);
+			g.CreateBrush(foregroundBrush);
 		}
 		if (!backgroundBrush)
 		{
 			SetGradientBrushRect(backgroundBrush, GetClientRect());
-			backgroundBrush.CreateBrush(renderer);
+			g.CreateBrush(backgroundBrush);
 		}
 	}
 
@@ -147,9 +161,10 @@ namespace PGUI::UI::Controls
 	{
 		BeginDraw();
 
-		auto renderer = GetRenderingInterface();
+		auto g = GetGraphics();
 
 		auto clientRect = RoundedRect{ GetClientRect() };
+		auto clientSize = clientRect.Size();
 		
 		if (auto clipParams = GetClip().GetParameters();
 			std::holds_alternative<RoundedRectangeClipParameters>(clipParams))
@@ -163,47 +178,58 @@ namespace PGUI::UI::Controls
 		{
 			case ButtonState::Unchecked:
 			{
-				renderer->FillRoundedRectangle(clientRect, backgroundBrush->GetBrushPtr());
-				renderer->DrawRoundedRectangle(clientRect, foregroundBrush->GetBrushPtr(), 2.5f);
+				g.FillRoundedRect(clientRect, backgroundBrush);
+				g.DrawRoundedRect(clientRect, foregroundBrush, ScaleByDpi(2.5f));
 				break;
 			}
 			case ButtonState::Checked:
 			{
-				renderer->FillRoundedRectangle(clientRect, backgroundBrush->GetBrushPtr());
+				g.FillRoundedRect(clientRect, backgroundBrush);
 
-				D2D1::Matrix3x2F prevTransform{ };
-				renderer->GetTransform(&prevTransform);
+				auto prevTransform = g.GetTransform();
 
 				auto center = clientRect.Center();
-				RectF rc{ center.x - 10, center.y, center.x, center.y + 3 };
-				rc.Shift(4, 3);
-				renderer->SetTransform(D2D1::Matrix3x2F::Rotation(45, center));
-				renderer->FillRectangle(rc, foregroundBrush->GetBrushPtr());
+				auto scaleTransform = GetDpiScaleTransform() * D2D1::Matrix3x2F::Scale(clientSize / 50, center);
+				RectF rc{ center.x - ScaleByDpi(10.f),
+					center.y, center.x,
+					center.y + ScaleByDpi(3.0f) };
+				rc.Shift(ScaleByDpi(4.0f), ScaleByDpi(3.0f));
+				g.SetTransform(D2D1::Matrix3x2F::Rotation(45, center) * scaleTransform);
+				g.FillRect(rc, foregroundBrush);
 
-				rc = RectF{ center.x - 3, center.y - 17, center.x, center.y };
-				rc.Shift(4, 5);
-				renderer->SetTransform(D2D1::Matrix3x2F::Rotation(42, center));
-				renderer->FillRectangle(rc, foregroundBrush->GetBrushPtr());
+				rc = RectF{ center.x - ScaleByDpi(3.0f),
+					center.y - ScaleByDpi(17.0f),
+					center.x, center.y };
+				rc.Shift(ScaleByDpi(4.0f), ScaleByDpi(5.0f));
+				g.SetTransform(D2D1::Matrix3x2F::Rotation(42, center) * scaleTransform);
+				g.FillRect(rc, foregroundBrush);
 
-				renderer->SetTransform(prevTransform);
+				g.SetTransform(prevTransform);
 
 				break;
 			}
 			case ButtonState::Indeterminate:
 			{
-				renderer->FillRoundedRectangle(clientRect, backgroundBrush->GetBrushPtr());
+				g.Clear(backgroundBrush);
 
 				RoundedRect rect{ clientRect.Center(), SizeL{ 1, 1 } };
-				rect.Inflate(12, 3);
+				
+				rect.Inflate(12 * (clientSize.cx / 50), 3 * (clientSize.cy / 50));
 				if (clientRect.xRadius != 0)
 				{
-					rect.xRadius = 2.5f;
+					rect.xRadius = 2.5f * (clientSize.cx / 50);
 				}
 				if (clientRect.yRadius != 0)
 				{
-					rect.yRadius = 5.0f;
+					rect.yRadius = 5.0f * (clientSize.cy / 50);
 				}
-				renderer->FillRoundedRectangle(rect, foregroundBrush->GetBrushPtr());
+				auto prevTransform = g.GetTransform();
+				g.SetTransform(GetDpiScaleTransform());
+
+				g.FillRoundedRect(rect, foregroundBrush);
+
+				g.SetTransform(prevTransform);
+
 				break;
 			}
 			default:

@@ -1,7 +1,7 @@
 #include "ui/font/LocalizedFontFamilyNames.hpp"
 
 #include "core/Exceptions.hpp"
-#include "core/Logger.hpp"
+#include "helpers/HelperFunctions.hpp"
 #include "ui/font/FontFamily.hpp"
 
 
@@ -45,7 +45,7 @@ namespace PGUI::UI::Font
 
 			return localeName;
 		}
-		catch (Core::ErrorHandling::HresultException& error)
+		catch (Core::HresultException& error)
 		{
 			HR_L(error.GetErrorCode());
 			return std::nullopt;
@@ -76,7 +76,7 @@ namespace PGUI::UI::Font
 			return familyName;
 
 		}
-		catch (Core::ErrorHandling::HresultException& error)
+		catch (Core::HresultException& error)
 		{
 			HR_L(error.GetErrorCode());
 			return std::nullopt;

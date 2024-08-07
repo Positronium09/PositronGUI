@@ -9,7 +9,9 @@
 #include "ui/bmp/Bitmap.hpp"
 #include "helpers/ComPtr.hpp"
 #include "helpers/EnumFlag.hpp"
+#include "graphics/BitmapRenderTarget.hpp"
 
+#include <functional>
 #include <CommCtrl.h>
 #include <Richedit.h>
 #include <RichOle.h>
@@ -68,70 +70,59 @@ namespace PGUI::UI::Controls
 		TextChanged = CN_TEXTCHANGED
 	};
 
-	struct _edit_find_flags
+	enum class EditFindFlag : std::uint64_t
 	{
-		enum EnumValues
-		{
-			Down = FR_DOWN,
-			WholeWord = FR_WHOLEWORD,
-			CaseSensitive = FR_MATCHCASE,
-			MatchCase = FR_MATCHCASE,
-			MatchLeftHamza = FR_MATCHALEFHAMZA,
-			MatchDiac = FR_MATCHDIAC,
-			MatchKashida = FR_MATCHKASHIDA
-		};
+		Down = 0x1, // FR_DOWN
+		WholeWord = 0x2, // FR_WHOLEWORD
+		CaseSensitive = 0x4, // FR_MATCHCASE
+		MatchCase = CaseSensitive,
+		MatchLeftHamza = FR_MATCHALEFHAMZA,
+		MatchDiac = FR_MATCHDIAC,
+		MatchKashida = FR_MATCHKASHIDA
 	};
-	using EditFindFlag = EnumFlag<_edit_find_flags>;
+	EnableEnumFlag(EditFindFlag);
 
-	struct _edit_selection_flags
+	enum class EditSelectionFlag
 	{
-		enum EnumValues : std::int64_t
-		{
-			Text = SEL_TEXT,
-			Object = SEL_OBJECT,
-			MultiChar = SEL_MULTICHAR,
-			MultiObject = SEL_MULTIOBJECT
-		};
+		Text = SEL_TEXT,
+		Object = SEL_OBJECT,
+		MultiChar = SEL_MULTICHAR,
+		MultiObject = SEL_MULTIOBJECT
 	};
-	using EditSelectionFlag = EnumFlag<_edit_selection_flags>;
+	EnableEnumFlag(EditSelectionFlag);
 
-	struct _edit_options_flags
-	{
-		enum EnumValues : std::int64_t
-		{
-			AutoWordSelection = ECO_AUTOWORDSELECTION,
-			AutoVscroll = ECO_AUTOVSCROLL,
-			AutoHscroll = ECO_AUTOHSCROLL,
-			NoHidesel = ECO_NOHIDESEL,
-			Readonly = ECO_READONLY,
-			WantReturn = ECO_WANTRETURN,
-			Selectionbar = ECO_SELECTIONBAR,
-			Vertical = ECO_VERTICAL
-		};
-	};
-	using EditOptionsFlag = EnumFlag<_edit_options_flags>;
 
-	struct _edit_event_mask_flags
+	enum class EditOptionsFlag
 	{
-		enum EnumValues : DWORD
-		{
-			None = ENM_NONE,
-			Change = ENM_CHANGE,
-			Clipformat = ENM_CLIPFORMAT,
-			DragdropDone = ENM_DRAGDROPDONE,
-			DropFiles = ENM_DROPFILES,
-			Link = ENM_LINK,
-			LowFirtf = ENM_LOWFIRTF,
-			ObjectPositions = ENM_OBJECTPOSITIONS,
-			ParagraphExpanded = ENM_PARAGRAPHEXPANDED,
-			Protected = ENM_PROTECTED,
-			RequestResize = ENM_REQUESTRESIZE,
-			Scroll = ENM_SCROLL,
-			SelectionChange = ENM_SELCHANGE,
-			Update = ENM_UPDATE,
-		};
+		AutoWordSelection = ECO_AUTOWORDSELECTION,
+		AutoVscroll = ECO_AUTOVSCROLL,
+		AutoHscroll = ECO_AUTOHSCROLL,
+		NoHidesel = ECO_NOHIDESEL,
+		Readonly = ECO_READONLY,
+		WantReturn = ECO_WANTRETURN,
+		Selectionbar = ECO_SELECTIONBAR,
+		Vertical = ECO_VERTICAL
 	};
-	using EditEventMaskFlag = EnumFlag<_edit_event_mask_flags>;
+	EnableEnumFlag(EditOptionsFlag);
+
+	enum class EditEventMaskFlag
+	{
+		None = ENM_NONE,
+		Change = ENM_CHANGE,
+		Clipformat = ENM_CLIPFORMAT,
+		DragdropDone = ENM_DRAGDROPDONE,
+		DropFiles = ENM_DROPFILES,
+		Link = ENM_LINK,
+		LowFirtf = ENM_LOWFIRTF,
+		ObjectPositions = ENM_OBJECTPOSITIONS,
+		ParagraphExpanded = ENM_PARAGRAPHEXPANDED,
+		Protected = ENM_PROTECTED,
+		RequestResize = ENM_REQUESTRESIZE,
+		Scroll = ENM_SCROLL,
+		SelectionChange = ENM_SELCHANGE,
+		Update = ENM_UPDATE
+	};
+	EnableEnumFlag(EditEventMaskFlag);
 
 	class Edit : public Control
 	{
@@ -205,11 +196,16 @@ namespace PGUI::UI::Controls
 
 			private:
 			PointL caretPos;
-			ComPtr<ID2D1BitmapRenderTarget> caretRenderTarget;
+			Graphics::BitmapRenderTarget caretRenderTarget;
 			Edit* parentWindow = nullptr;
 		};
 
 		public:
+		/**
+		 * @return true if key event should be processed false otherwise
+		 */
+		using KeyFilterFunction = std::function<bool(UINT&, WPARAM&, LPARAM&)>;
+
 		struct EditParams
 		{
 			long fontSize;
@@ -236,6 +232,9 @@ namespace PGUI::UI::Controls
 		void SetText(std::wstring_view text) const noexcept;
 		[[nodiscard]] std::wstring GetText() const noexcept;
 
+		void SetKeyFilter(const KeyFilterFunction& keyFilter) noexcept;
+		void RemoveKeyFilter() noexcept;
+
 		void SetTextColor(RGBA color) noexcept;
 		void SetFontSize(long fontSize) noexcept;
 		void SetFontFace(std::wstring_view fontFace) noexcept;
@@ -245,7 +244,6 @@ namespace PGUI::UI::Controls
 		 */
 		PointL GetCaretPosition() const noexcept;
 		std::int64_t GetCaretCharIndex() const noexcept;
-
 
 		#pragma region RICH_EDIT_IMPL
 
@@ -266,7 +264,7 @@ namespace PGUI::UI::Controls
 		/**
 		 * @brief See https://learn.microsoft.com/en-us/windows/win32/Controls/em-pastespecial for more info 
 		 */
-		void PasteSpecial(UINT clipFormat, DWORD aspect = 0, HMETAFILE metaFile = 0) const noexcept;
+		void PasteSpecial(UINT clipFormat, DWORD aspect = 0, HMETAFILE metaFile = nullptr) const noexcept;
 
 		void SetUndoLimit(std::int64_t undoLimit) const noexcept;
 
@@ -276,7 +274,7 @@ namespace PGUI::UI::Controls
 		 */
 		[[nodiscard]] std::int64_t GetCharIndexFromPosition(PointL position) const noexcept;
 		/**
-		 * @param index  - 0 based index of the character
+		 * @param index - 0 based index of the character
 		 * @return Position of top left corner of the character in client coordinates
 		 */
 		[[nodiscard]] PointL GetPositionFromCharIndex(std::int64_t index) const noexcept;
@@ -290,9 +288,6 @@ namespace PGUI::UI::Controls
 
 		[[nodiscard]] bool IsReadOnly() const noexcept;
 		void SetReadOnly(bool readonly = true) noexcept;
-
-		[[nodiscard]] bool IsOnlyNumber() const noexcept;
-		void SetOnlyNumber(bool onlyNumber = true) const noexcept;
 
 		[[nodiscard]] bool IsPassword() const noexcept;
 		void SetPassword(bool password = true) noexcept;
@@ -433,6 +428,8 @@ namespace PGUI::UI::Controls
 
 		Brush backgroundBrush;
 
+		KeyFilterFunction filteringFunction;
+
 		ComPtr<ITextServices2> textServices;
 		Core::WindowPtr<ScrollBar> verticalScrollBar;
 		Core::WindowPtr<ScrollBar> horizontalScrollBar;
@@ -473,6 +470,7 @@ namespace PGUI::UI::Controls
 
 		void CaretBlinkHandler(Core::TimerId timerId);
 
+		Core::HandlerResult OnDPIChange(float dpiScale, RectI suggestedRect) override;
 		Core::HandlerResult ForwardToTextServices(UINT msg, WPARAM wParam, LPARAM lParam) const;
 		Core::HandlerResult OnCreate(UINT msg, WPARAM wParam, LPARAM lParam);
 		Core::HandlerResult OnDestroy(UINT msg, WPARAM wParam, LPARAM lParam) noexcept;
@@ -481,4 +479,11 @@ namespace PGUI::UI::Controls
 		Core::HandlerResult OnSetFocus(UINT msg, WPARAM wParam, LPARAM lParam) const noexcept;
 		Core::HandlerResult OnKillFocus(UINT msg, WPARAM wParam, LPARAM lParam) const noexcept;
 	};
+
+	namespace BuiltinFilters
+	{
+		bool NumericOnlyFilter(UINT& msg, WPARAM& wParam, LPARAM& lParam) noexcept;
+		bool UppercaseOnlyFilter(UINT& msg, WPARAM& wParam, LPARAM& lParam) noexcept;
+		bool LowercaseOnlyFilter(UINT& msg, WPARAM& wParam, LPARAM& lParam) noexcept;
+	}
 }

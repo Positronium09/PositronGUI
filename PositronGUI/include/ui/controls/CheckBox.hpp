@@ -30,7 +30,7 @@ namespace PGUI::UI::Controls
 		[[nodiscard]] static CheckBox::CheckBoxColors GetCheckBoxColors() noexcept;
 		[[nodiscard]] static CheckBox::CheckBoxColors GetCheckBoxAccentedColors() noexcept;
 
-		explicit CheckBox(const CheckBoxColors& colors = GetCheckBoxColors()) noexcept;
+		explicit CheckBox(const CheckBoxColors& colors = GetCheckBoxAccentedColors()) noexcept;
 
 		[[nodiscard]] const CheckBoxColors& GetColors() const noexcept { return colors; }
 		[[nodiscard]] CheckBoxColors& GetColors() noexcept { return colors; }

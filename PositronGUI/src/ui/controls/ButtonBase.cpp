@@ -60,7 +60,7 @@ namespace PGUI::UI::Controls
 	
 	Core::HandlerResult ButtonBase::OnMouseMove(UINT, WPARAM, LPARAM) noexcept
 	{
-		if (state & ButtonState::Pressed)
+		if (IsFlagSet(state, ButtonState::Pressed))
 		{
 			return 0;
 		}
@@ -94,7 +94,7 @@ namespace PGUI::UI::Controls
 
 	Core::HandlerResult ButtonBase::OnLButtonUp(UINT, WPARAM, LPARAM) noexcept
 	{
-		if (state & ButtonState::Pressed)
+		if (IsFlagSet(state, ButtonState::Pressed))
 		{
 			clickedEvent.Emit();
 		}

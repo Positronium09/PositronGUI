@@ -2,8 +2,6 @@
 
 #include "core/Exceptions.hpp"
 
-#undef min
-
 
 namespace PGUI::UI
 {

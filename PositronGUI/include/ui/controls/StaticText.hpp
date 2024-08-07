@@ -47,7 +47,6 @@ namespace PGUI::UI::Controls
 
 		Core::Event<std::wstring_view> textChangedEvent;
 
-
 		Core::HandlerResult OnNCCreate(UINT msg, WPARAM wParam, LPARAM lParam) noexcept;
 		Core::HandlerResult OnPaint(UINT msg, WPARAM wParam, LPARAM lParam) noexcept;
 		Core::HandlerResult OnSize(UINT msg, WPARAM wParam, LPARAM lParam) noexcept;

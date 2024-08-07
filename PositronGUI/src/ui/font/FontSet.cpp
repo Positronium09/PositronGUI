@@ -1,6 +1,6 @@
 #include "ui/font/FontSet.hpp"
 
-#include "core/Logger.hpp"
+#include "helpers/HelperFunctions.hpp"
 #include "core/Exceptions.hpp"
 #include "ui/font/FontCollection.hpp"
 
@@ -11,7 +11,7 @@ namespace PGUI::UI::Font
 	{
 		ComPtr<IDWriteFontSet1> fs;
 
-		HRESULT hr = fontCollection->GetFontSet(fs.GetAddressOf()); HR_T(hr);
+		HRESULT hr = fontCollection->GetFontSet(&fs); HR_T(hr);
 		hr = fs.As(GetHeldComPtrAddress()); HR_T(hr);
 	}
 

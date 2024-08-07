@@ -1,17 +1,13 @@
 #pragma once
 
-#include "helpers/HelperFunctions.hpp"
 #include "Exceptions.hpp"
 
-#include <format>
 #include <memory>
 #include <string>
-#include <stacktrace>
 
 #undef ERROR
 
-
-namespace PGUI::Core::ErrorHandling
+namespace PGUI::Core
 {
 	enum class LogLevel
 	{
@@ -68,31 +64,4 @@ namespace PGUI::Core::ErrorHandling
 		public:
 		void Log(LogLevel logLevel, std::wstring_view string) noexcept override;
 	};
-}
-
-namespace PGUI
-{
-	static inline void HR_L(HRESULT hr) noexcept
-	{
-		if (FAILED(hr))
-		{
-			std::stacktrace trace = std::stacktrace::current();
-
-			for (size_t i = 1; i < trace.size(); i++)
-			{
-				const auto& traceEntry = trace.at(i);
-
-				Core::ErrorHandling::Logger::Error(std::format(
-					L"Line {} in {}\n", traceEntry.source_line(), StringToWString(traceEntry.source_file())
-				));
-			}
-
-			Core::ErrorHandling::Logger::Error(GetHresultErrorMessage(hr));
-		}
-	}
-
-	static inline void HR_L(const Core::ErrorHandling::HresultException& hrException) noexcept
-	{
-		HR_L(hrException.GetErrorCode());
-	}
 }

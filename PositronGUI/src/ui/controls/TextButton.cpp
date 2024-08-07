@@ -1,11 +1,10 @@
 #include "ui/controls/TextButton.hpp"
 
 #include "ui/Colors.hpp"
+#include "helpers/ScopedTimer.hpp"
 
 #include <algorithm>
 #include <strsafe.h>
-
-#undef min
 
 
 namespace PGUI::UI::Controls
@@ -148,7 +147,7 @@ namespace PGUI::UI::Controls
 	{
 		switch (newState)
 		{
-			using enum PGUI::UI::Controls::ButtonState::EnumValues;
+			using enum PGUI::UI::Controls::ButtonState;
 
 			case Normal:
 			{
@@ -168,6 +167,8 @@ namespace PGUI::UI::Controls
 				backgroundBrush.SetParameters(colors.clickedBackground);
 				break;
 			}
+			default:
+				break;
 		}
 
 		DiscardDeviceResources();
@@ -176,17 +177,17 @@ namespace PGUI::UI::Controls
 
 	void TextButton::CreateDeviceResources()
 	{
-		auto renderer = GetRenderingInterface();
+		auto g = GetGraphics();
 
 		if (!textBrush)
 		{
 			SetGradientBrushRect(textBrush, textLayout.GetBoundingRect());
-			textBrush.CreateBrush(renderer);
+			g.CreateBrush(textBrush);
 		}
 		if (!backgroundBrush)
 		{
 			SetGradientBrushRect(backgroundBrush, GetClientRect());
-			backgroundBrush.CreateBrush(renderer);
+			g.CreateBrush(backgroundBrush);
 		}
 	}
 
@@ -209,10 +210,16 @@ namespace PGUI::UI::Controls
 	{
 		BeginDraw();
 
-		auto renderer = GetRenderingInterface();
+		auto g = GetGraphics();
 
-		renderer->FillRectangle(GetClientRect(), backgroundBrush->GetBrushPtr());
-		renderer->DrawTextLayout(PointF{ 0, 0 }, textLayout, textBrush->GetBrushPtr());
+		g.Clear(backgroundBrush);
+
+		auto prevTransform = g.GetTransform();
+		g.SetTransform(GetDpiScaleTransform(textLayout.GetBoundingRect().Center()));
+
+		g.DrawTextLayout(PointF{ 0, 0 }, textLayout, textBrush);
+
+		g.SetTransform(prevTransform);
 
 		HRESULT hr = EndDraw(); HR_L(hr);
 

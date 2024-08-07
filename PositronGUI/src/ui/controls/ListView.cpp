@@ -73,7 +73,7 @@ namespace PGUI::UI::Controls
 		selectedIndicatorBrush.SetParameters(colors.selectedIndicator);
 		textBrush.SetParameters(colors.text);
 
-		DiscardDeviceResources(nullptr);
+		DiscardDeviceResources(Graphics::Graphics{ nullptr });
 		Invalidate();
 	}
 
@@ -93,37 +93,40 @@ namespace PGUI::UI::Controls
 	{
 		InitTextLayout();
 	}
-	void ListViewTextItem::Render(ComPtr<ID2D1DeviceContext7> dc, RectF renderRect)
+	void ListViewTextItem::Render(Graphics::Graphics g, RectF renderRect)
 	{
 		ListViewItemState currentState = GetState();
 
 		switch (currentState)
 		{
-			using enum ListViewItemState::EnumValues;
+			using enum ListViewItemState;
 
 			case Normal:
 			case Selected:
 			{
-				dc->FillRectangle(renderRect, normalBrush->GetBrushPtr());
+				g.FillRect(renderRect, normalBrush);
 				break;
 			}
 			case Hover:
 			case Selected | Hover:
 			{
-				dc->FillRectangle(renderRect, hoverBrush->GetBrushPtr());
+				g.FillRect(renderRect, hoverBrush);
 				break;
 			}
 			case Pressed:
 			case Selected | Pressed:
 			{
-				dc->FillRectangle(renderRect, pressedBrush->GetBrushPtr());
+				g.FillRect(renderRect, pressedBrush);
 				break;
 			}
 			default:
 				break;
 		}
 
-		if (currentState & ListViewItemState::Selected)
+		auto prevTransform = g.GetTransform();
+		g.SetTransform(GetListViewWindow()->GetDpiScaleTransform(renderRect.Center()));
+
+		if (IsFlagSet(currentState, ListViewItemState::Selected))
 		{
 			auto selectedIndicatorRect = renderRect;
 			selectedIndicatorRect.top += 10;
@@ -131,42 +134,44 @@ namespace PGUI::UI::Controls
 			selectedIndicatorRect.left -= 5;
 			selectedIndicatorRect.right = selectedIndicatorRect.left + 10;
 
-			dc->FillRoundedRectangle(RoundedRect{ selectedIndicatorRect, 3.5f, 5 }, selectedIndicatorBrush->GetBrushPtr());
+			g.FillRoundedRect(RoundedRect{ selectedIndicatorRect, 3.5f, 5 }, selectedIndicatorBrush);
 		}
 
-		dc->DrawTextLayout(renderRect.TopLeft(), textLayout, textBrush->GetBrushPtr());
+		g.DrawTextLayout(renderRect.TopLeft(), textLayout, textBrush);
+
+		g.SetTransform(prevTransform);
 	}
-	void ListViewTextItem::CreateDeviceResources(ComPtr<ID2D1DeviceContext7> dc)
+	void ListViewTextItem::CreateDeviceResources(Graphics::Graphics g)
 	{
 		if (!normalBrush)
 		{
 			SetGradientBrushRect(normalBrush, GetListViewWindow()->GetClientRect());
-			normalBrush.CreateBrush(dc);
+			g.CreateBrush(normalBrush);
 		}
 
 		if (!hoverBrush)
 		{
 			SetGradientBrushRect(hoverBrush, GetListViewWindow()->GetClientRect());
-			hoverBrush.CreateBrush(dc);
+			g.CreateBrush(hoverBrush);
 		}
 
 		if (!pressedBrush)
 		{
 			SetGradientBrushRect(pressedBrush, GetListViewWindow()->GetClientRect());
-			pressedBrush.CreateBrush(dc);
+			g.CreateBrush(pressedBrush);
 		}
 
 		if (!textBrush)
 		{
 			SetGradientBrushRect(normalBrush, textLayout.GetBoundingRect());
-			textBrush.CreateBrush(dc);
+			g.CreateBrush(textBrush);
 		}
 		if (!selectedIndicatorBrush)
 		{
-			selectedIndicatorBrush.CreateBrush(dc);
+			g.CreateBrush(selectedIndicatorBrush);
 		}
 	}
-	void ListViewTextItem::DiscardDeviceResources(ComPtr<ID2D1DeviceContext7>)
+	void ListViewTextItem::DiscardDeviceResources(Graphics::Graphics g)
 	{
 		normalBrush.ReleaseBrush();
 		hoverBrush.ReleaseBrush();
@@ -219,16 +224,22 @@ namespace PGUI::UI::Controls
 		{
 			return;
 		}
-		if (listViewItems.at(index)->IsSelected())
+		
+		bool wasSelected = listViewItems.at(index)->IsSelected();
+
+		listViewItems.erase(std::ranges::next(listViewItems.begin(), index));
+		UpdateScrollBar();
+		
+		if (wasSelected)
 		{
 			selectionChangedEvent.Emit();
 		}
-		listViewItems.erase(std::ranges::next(listViewItems.begin(), index));
 	}
 	
 	void ListView::Clear() noexcept
 	{
 		listViewItems.clear();
+		scrollBar->Show(false);
 		selectionChangedEvent.Emit();
 	}
 	void ListView::ClearSelected() noexcept
@@ -238,6 +249,7 @@ namespace PGUI::UI::Controls
 			return item->IsSelected();
 		});
 		listViewItems.erase(ret.begin(), ret.end());
+		UpdateScrollBar();
 		selectionChangedEvent.Emit();
 	}
 	void ListView::ClearUnselected() noexcept
@@ -247,6 +259,30 @@ namespace PGUI::UI::Controls
 			return !item->IsSelected();
 		});
 		listViewItems.erase(ret.begin(), ret.end());
+		UpdateScrollBar();
+		selectionChangedEvent.Emit();
+	}
+
+	void ListView::SelectAll() noexcept
+	{
+		if (selectionMode == SelectionMode::Single)
+		{
+			Select(0);
+			return;
+		}
+
+		for (auto i : std::views::iota(0ULL, listViewItems.size()))
+		{
+			AddSelected(i);
+		}
+		selectionChangedEvent.Emit();
+	}
+	void ListView::DeselectAll() noexcept
+	{
+		for (auto i : std::views::iota(0ULL, listViewItems.size()))
+		{
+			RemoveSelected(i);
+		}
 		selectionChangedEvent.Emit();
 	}
 
@@ -295,28 +331,28 @@ namespace PGUI::UI::Controls
 	
 	void ListView::CreateDeviceResources()
 	{
-		auto renderer = GetRenderingInterface();
+		auto g = GetGraphics();
 
 		if (!backgroundBrush)
 		{
 			SetGradientBrushRect(backgroundBrush, GetClientRect());
-			backgroundBrush.CreateBrush(renderer);
+			g.CreateBrush(backgroundBrush);
 		}
 
-		std::ranges::for_each(listViewItems, [renderer](const auto& listViewItem)
+		std::ranges::for_each(listViewItems, [g](const auto& listViewItem)
 		{
-			listViewItem->CreateDeviceResources(renderer);
+			listViewItem->CreateDeviceResources(g);
 		});
 	}
 	void ListView::DiscardDeviceResources()
 	{
-		auto renderer = GetRenderingInterface();
+		auto g = GetGraphics();
 
 		backgroundBrush.ReleaseBrush();
 
-		std::ranges::for_each(listViewItems, [renderer](const auto& listViewItem)
+		std::ranges::for_each(listViewItems, [g](const auto& listViewItem)
 		{
-			listViewItem->DiscardDeviceResources(renderer);
+			listViewItem->DiscardDeviceResources(g);
 		});
 	}
 
@@ -438,7 +474,7 @@ namespace PGUI::UI::Controls
 		}
 
 		if (const auto& item = listViewItems.at(index);
-			item->GetState() & ListViewItemState::Selected)
+			IsFlagSet(item->GetState(), ListViewItemState::Selected))
 		{
 			item->SetState(ListViewItemState::Selected | state);
 		}
@@ -482,7 +518,8 @@ namespace PGUI::UI::Controls
 		}
 
 		scrollBar->SetMaxScroll(static_cast<std::int64_t>(totalItemHeight - clientSize.cy));
-		scrollBar->SetPageSize(scrollBar->GetMaxScroll() / scrollBar->GetLineCount());
+		scrollBar->SetPageSize(clientSize.cy);
+		scrollBar->SetScrollMult();
 	}
 
 	void ListView::OnScroll()
@@ -562,8 +599,7 @@ namespace PGUI::UI::Controls
 		auto clientSize = GetClientRect().Size();
 		auto totalItemHeight = GetTotalListViewItemHeight();
 		
-		ScrollBar::ScrollBarParams params{ (totalItemHeight - clientSize.cy) / 10,
-			10, totalItemHeight - clientSize.cy, 0 };
+		ScrollBar::ScrollBarParams params{ totalItemHeight - clientSize.cy, 0, totalItemHeight - clientSize.cy };
 
 		scrollBar = AddChildWindow<ScrollBar>(
 			Core::WindowCreateParams{ L"ListView_ScrollBar", PointI{ clientRect.right - 20, 0 }, SizeI{ 20, clientSize.cy }, NULL },
@@ -584,11 +620,11 @@ namespace PGUI::UI::Controls
 		long height = GetClientSize().cy;
 		auto scrollPos = scrollBar->GetScrollPos();
 
-		auto renderer = GetRenderingInterface();
+		auto g = GetGraphics();
 
-		renderer->FillRectangle(GetClientRect(), backgroundBrush->GetBrushPtr());
+		g.Clear(backgroundBrush);
 		
-		renderer->SetTransform(
+		g.SetTransform(
 			D2D1::Matrix3x2F::Translation(
 				SizeF{ 0, -static_cast<float>(scrollPos) }
 			)
@@ -613,16 +649,16 @@ namespace PGUI::UI::Controls
 				static_cast<float>(totalHeight + listViewItem->GetHeight())
 			};
 
-			renderer->PushAxisAlignedClip(itemRect, renderer->GetAntialiasMode());
+			g.PushAxisAlignedClip(itemRect, g.GetAntialiasMode());
 
-			listViewItem->Render(renderer, itemRect);
+			listViewItem->Render(g, itemRect);
 
-			renderer->PopAxisAlignedClip();
+			g.PopAxisAlignedClip();
 
 			totalHeight += listViewItem->GetHeight();
 		}
 
-		renderer->SetTransform(D2D1::IdentityMatrix());
+		g.SetTransform(D2D1::IdentityMatrix());
 
 		EndDraw();
 
@@ -668,7 +704,7 @@ namespace PGUI::UI::Controls
 		}
 		if (hoveringIndex.has_value() &&
 			hoveringIndex < listViewItems.size() &&
-			~(listViewItems.at(*hoveringIndex)->GetState() & ListViewItemState::Pressed))
+			!IsFlagSet(listViewItems.at(*hoveringIndex)->GetState(), ListViewItemState::Pressed))
 		{
 			AddStateIfSelected(*hoveringIndex, ListViewItemState::Hover);
 		}

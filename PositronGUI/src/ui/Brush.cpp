@@ -1,7 +1,7 @@
 #include "ui/Brush.hpp"
 
 #include "ui/UIComponent.hpp"
-#include "core/Logger.hpp"
+#include "helpers/HelperFunctions.hpp"
 #include "core/Exceptions.hpp"
 
 
@@ -11,7 +11,7 @@ namespace PGUI::UI
 		ComPtrHolder{ brush }
 	{ }
 
-	SolidColorBrush::SolidColorBrush(ComPtr<ID2D1DeviceContext> renderTarget, RGBA color)
+	SolidColorBrush::SolidColorBrush(ComPtr<ID2D1RenderTarget> renderTarget, RGBA color)
 	{
 		HRESULT hr = renderTarget->CreateSolidColorBrush(color, GetHeldPtrAddress()); HR_T(hr);
 	}
@@ -31,7 +31,7 @@ namespace PGUI::UI
 		ComPtrHolder{ brush }
 	{ }
 
-	LinearGradientBrush::LinearGradientBrush(ComPtr<ID2D1DeviceContext> renderTarget, LinearGradient gradient,
+	LinearGradientBrush::LinearGradientBrush(ComPtr<ID2D1RenderTarget> renderTarget, LinearGradient gradient,
 		std::optional<RectF> referenceRect)
 	{
 		if (referenceRect.has_value() && gradient.GetPositioningMode() == PositioningMode::Relative)
@@ -41,18 +41,11 @@ namespace PGUI::UI
 
 		const auto& gradientStops = gradient.GetGradientStops();
 
-		ComPtr<ID2D1GradientStopCollection1> gradientStopCollection;
+		ComPtr<ID2D1GradientStopCollection> gradientStopCollection;
 		HRESULT hr = renderTarget->CreateGradientStopCollection(
-			gradientStops.data(), static_cast<UINT32>(gradientStops.size()), 
-			D2D1_COLOR_SPACE_SRGB, D2D1_COLOR_SPACE_SRGB,
-			D2D1_BUFFER_PRECISION_32BPC_FLOAT, D2D1_EXTEND_MODE_CLAMP,
-			D2D1_COLOR_INTERPOLATION_MODE_PREMULTIPLIED,
-			gradientStopCollection.GetAddressOf()); HR_T(hr);
-
-		if (FAILED(hr))
-		{
-			return;
-		}
+			gradientStops.data(), static_cast<UINT32>(gradientStops.size()),
+			D2D1_GAMMA_1_0, D2D1_EXTEND_MODE_CLAMP,
+			&gradientStopCollection); HR_T(hr);
 		
 		renderTarget->CreateLinearGradientBrush(
 			D2D1::LinearGradientBrushProperties(gradient.Start(), gradient.End()),
@@ -76,7 +69,7 @@ namespace PGUI::UI
 		ComPtrHolder{ brush }
 	{ }
 
-	RadialGradientBrush::RadialGradientBrush(ComPtr<ID2D1DeviceContext> renderTarget, RadialGradient gradient,
+	RadialGradientBrush::RadialGradientBrush(ComPtr<ID2D1RenderTarget> renderTarget, RadialGradient gradient,
 		std::optional<RectF> referenceRect)
 	{
 		if (referenceRect.has_value() && gradient.GetPositioningMode() == PositioningMode::Relative)
@@ -90,7 +83,7 @@ namespace PGUI::UI
 
 		ComPtr<ID2D1GradientStopCollection> gradientStopCollection;
 		HRESULT hr = renderTarget->CreateGradientStopCollection(
-			gradientStops.data(), static_cast<UINT32>(gradientStops.size()), gradientStopCollection.GetAddressOf()); HR_T(hr);
+			gradientStops.data(), static_cast<UINT32>(gradientStops.size()), &gradientStopCollection); HR_T(hr);
 
 		if (FAILED(hr))
 		{
@@ -115,11 +108,11 @@ namespace PGUI::UI
 	}
 
 
-	BitmapBrush::BitmapBrush(ComPtr<ID2D1BitmapBrush1> brush) noexcept : 
+	BitmapBrush::BitmapBrush(ComPtr<ID2D1BitmapBrush> brush) noexcept : 
 		ComPtrHolder(brush)
 	{
 	}
-	BitmapBrush::BitmapBrush(ComPtr<ID2D1DeviceContext> renderTarget, ComPtr<ID2D1Bitmap> bitmap)
+	BitmapBrush::BitmapBrush(ComPtr<ID2D1RenderTarget> renderTarget, ComPtr<ID2D1Bitmap> bitmap)
 	{
 		HRESULT hr = renderTarget->CreateBitmapBrush(bitmap.Get(), GetHeldPtrAddress()); HR_T(hr);
 	}
@@ -133,10 +126,16 @@ namespace PGUI::UI
 		return GetHeldPtr();
 	}
 
-	Brush::Brush(ComPtr<ID2D1DeviceContext> renderTarget, const BrushParameters& _parameters) noexcept :
+	Brush::Brush(ComPtr<ID2D1RenderTarget> renderTarget, const BrushParameters& _parameters) noexcept :
 		parameters(_parameters)
 	{
 		CreateBrush(renderTarget);
+	}
+
+	Brush::Brush(Brush&& other) noexcept : 
+		brush{ std::move(other.brush) },
+		parameters{ other.parameters }
+	{
 	}
 
 	Brush::Brush(const BrushParameters& _parameters) noexcept :
@@ -150,13 +149,13 @@ namespace PGUI::UI
 	}
 
 	void Brush::SetParametersAndCreateBrush(
-		ComPtr<ID2D1DeviceContext> renderTarget, const BrushParameters& _parameters) noexcept
+		ComPtr<ID2D1RenderTarget> renderTarget, const BrushParameters& _parameters) noexcept
 	{
 		SetParameters(_parameters);
 		CreateBrush(renderTarget);
 	}
 
-	void Brush::CreateBrush(ComPtr<ID2D1DeviceContext> renderTarget) noexcept
+	void Brush::CreateBrush(ComPtr<ID2D1RenderTarget> renderTarget) noexcept
 	{
 		ReleaseBrush();
 

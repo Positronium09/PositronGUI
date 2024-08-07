@@ -4,7 +4,9 @@
 #include "ui/bmp/MetadataReader.hpp"
 #include "ui/bmp/Palette.hpp"
 
-#include "core/Logger.hpp"
+#include "graphics/GraphicsBitmap.hpp"
+#include "graphics/BitmapRenderTarget.hpp"
+#include "helpers/HelperFunctions.hpp"
 #include "factories/WICFactory.hpp"
 
  
@@ -21,14 +23,14 @@ namespace PGUI::UI::Controls
 	
 	void StaticImage::BitmapSourceRenderer::Render(StaticImage* img)
 	{
-		auto dc = img->GetRenderingInterface();
+		auto g = img->GetGraphics();
 
 		if (!bmp)
 		{
-			bmp = bmpSrc.ConvertToD2D1Bitmap(dc);
+			bmp = g.CreateBitmap(bmpSrc);
 		}
 
-		dc->DrawBitmap(bmp.Get(), img->GetClientRect());
+		g.DrawBitmap(Graphics::GraphicsBitmap{ bmp }, img->GetClientRect());
 	}
 
 	BmpToRender StaticImage::BitmapSourceRenderer::GetImage() const noexcept
@@ -43,9 +45,7 @@ namespace PGUI::UI::Controls
 	StaticImage::GifRenderer::GifRenderer(StaticImage* staticImage, Bmp::BitmapDecoder decoder) noexcept :
 		decoder{ decoder }
 	{
-		HRESULT hr = staticImage->GetRenderingInterface()->
-			CreateCompatibleRenderTarget(composeRenderTarget.GetAddressOf());
-		HR_T(hr);
+		composeRenderTarget = staticImage->GetGraphics().CreateCompatibleRenderTarget();
 
 		GetGlobalMetadata();
 		GetFrameData();
@@ -59,22 +59,16 @@ namespace PGUI::UI::Controls
 			return;
 		}
 
-		ComPtr<ID2D1Bitmap> frameToRender;
-		HRESULT hr = composeRenderTarget->GetBitmap(frameToRender.GetAddressOf()); HR_L(hr);
+		auto frameToRender = composeRenderTarget.GetBitmap();
 
-		if (FAILED(hr))
-		{
-			return;
-		}
-
-		auto dc = staticImage->GetRenderingInterface();
+		auto g = staticImage->GetGraphics();
 
 		auto drawRect = staticImage->GetClientRect();
 		//auto drawRect = CalculateDrawRect(staticImage);
 
-		dc->Clear(Colors::Transparent);
+		g.Clear(Colors::Transparent);
 
-		dc->DrawBitmap(frameToRender.Get(), drawRect);
+		g.DrawBitmap(Graphics::GraphicsBitmap{ frameToRender }, drawRect);
 	}
 
 	BmpToRender StaticImage::GifRenderer::GetImage() const noexcept
@@ -84,11 +78,8 @@ namespace PGUI::UI::Controls
 
 	void StaticImage::GifRenderer::OnSize(const StaticImage* staticImage)
 	{
-		composeRenderTarget = nullptr;
-		HRESULT hr = staticImage->GetRenderingInterface()->CreateCompatibleRenderTarget(
-			gifPixelSize,
-			composeRenderTarget.GetAddressOf());
-		HR_T(hr);
+		composeRenderTarget = staticImage->GetGraphics().CreateCompatibleRenderTarget(
+			gifPixelSize);
 	}
 
 	bool StaticImage::GifRenderer::IsLastFrame() const noexcept
@@ -159,13 +150,12 @@ namespace PGUI::UI::Controls
 			loopCount++;
 		}
 
-		ComPtr<ID2D1Bitmap> b;
-		composeRenderTarget->GetBitmap(b.GetAddressOf());
-		SizeU s = b->GetSize();
-		SizeU ps = b->GetPixelSize();
+		auto b = composeRenderTarget.GetBitmap();
+		auto s = b.GetSize();
+		auto ps = b.GetPixelSize();
 
-		composeRenderTarget->DrawBitmap(
-			decoder.GetFrame(static_cast<UINT>(currentFrameIndex)).ConvertToD2D1Bitmap(composeRenderTarget).Get(),
+		composeRenderTarget.DrawBitmap(
+			composeRenderTarget.CreateBitmap(decoder.GetFrame(static_cast<UINT>(currentFrameIndex))),
 			currentFrameData.framePosition);
 
 		HRESULT hr = composeRenderTarget->EndDraw(); HR_L(hr);
@@ -192,39 +182,31 @@ namespace PGUI::UI::Controls
 
 	void StaticImage::GifRenderer::SaveComposedFrame()
 	{
-		ComPtr<ID2D1Bitmap> toSave;
-
-		HRESULT hr = composeRenderTarget->GetBitmap(toSave.GetAddressOf()); HR_T(hr);
+		auto toSave = composeRenderTarget.GetBitmap();
 
 		SizeU bitmapSize = toSave->GetPixelSize();
-		D2D1_BITMAP_PROPERTIES bitmapProp;
+		D2D1_BITMAP_PROPERTIES bitmapProp{ };
 		toSave->GetDpi(&bitmapProp.dpiX, &bitmapProp.dpiY);
 		bitmapProp.pixelFormat = toSave->GetPixelFormat();
 
-		hr = composeRenderTarget->CreateBitmap(
+		savedBitmap = composeRenderTarget.CreateBitmap(
 			bitmapSize,
-			bitmapProp,
-			&savedBitmap); HR_T(hr);
+			bitmapProp);
 
-		savedBitmap->CopyFromBitmap(nullptr, toSave.Get(), nullptr);
+		savedBitmap.CopyFromBitmap(toSave);
 
 	}
 
 	void StaticImage::GifRenderer::RestoreSavedFrame() const
 	{
-		ComPtr<ID2D1Bitmap> frameToCopyTo;
-
 		if (!savedBitmap)
 		{
 			return;
 		}
 
-		HRESULT hr = composeRenderTarget->GetBitmap(frameToCopyTo.GetAddressOf()); HR_L(hr);
+		auto frameToCopyTo = composeRenderTarget.GetBitmap();
 
-		if (SUCCEEDED(hr))
-		{
-			hr = frameToCopyTo->CopyFromBitmap(nullptr, savedBitmap.Get(), nullptr); HR_L(hr);
-		}
+		frameToCopyTo.CopyFromBitmap(savedBitmap);
 	}
 
 	void StaticImage::GifRenderer::GetGlobalMetadata()
@@ -329,7 +311,7 @@ namespace PGUI::UI::Controls
 
 			backgroundColor = RGBA{ red, green, blue, alpha };
 		}
-		catch (Core::ErrorHandling::HresultException& exception)
+		catch (Core::HresultException& exception)
 		{
 			HR_L(exception);
 		}
@@ -370,7 +352,7 @@ namespace PGUI::UI::Controls
 
 				frameData.push_back(data);
 			}
-			catch (Core::ErrorHandling::HresultException& exception)
+			catch (Core::HresultException& exception)
 			{
 				HR_L(exception);
 			}
@@ -419,7 +401,7 @@ namespace PGUI::UI::Controls
 				if (auto frameCount = decoder.GetFrameCount();
 					frameCount == 0)
 				{
-					throw PGUI::Core::ErrorHandling::HresultException{ WINCODEC_ERR_FRAMEMISSING };
+					throw PGUI::Core::HresultException{ WINCODEC_ERR_FRAMEMISSING };
 				}
 				else if (frameCount == 1)
 				{

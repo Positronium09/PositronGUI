@@ -6,6 +6,8 @@
 #include "ui/bmp/BitmapDecoder.hpp"
 #include "ui/bmp/Frame.hpp"
 #include "helpers/EnumFlag.hpp"
+#include "graphics/GraphicsBitmap.hpp"
+#include "graphics/BitmapRenderTarget.hpp"
 
 #include <chrono>
 #include <variant>
@@ -13,6 +15,14 @@
 
 namespace PGUI::UI::Controls
 {
+	enum class FrameDisposal
+	{
+		UNDEFINED = 0,
+		NONE = 1,
+		BACKGROUND = 2,
+		PREVIOUS = 3
+	};
+	EnableEnumFlag(FrameDisposal);
 	using BmpToRender = std::variant<Bmp::BitmapSource, Bmp::BitmapDecoder>;
 	// TODO Add aspect ratio options
 	// TODO Extract Renderers from this class
@@ -39,18 +49,6 @@ namespace PGUI::UI::Controls
 		};
 		class GifRenderer : public IImgRenderer
 		{
-			struct _frame_disposal_values
-			{
-				enum EnumValues
-				{
-					UNDEFINED = 0,
-					NONE = 1,
-					BACKGROUND = 2,
-					PREVIOUS = 3
-				};
-			};
-			using FrameDisposal = EnumFlag<_frame_disposal_values>;
-
 			struct FrameData
 			{
 				RectF framePosition{ };
@@ -66,8 +64,8 @@ namespace PGUI::UI::Controls
 
 			private:
 			Bmp::BitmapDecoder decoder;
-			ComPtr<ID2D1Bitmap> savedBitmap;
-			ComPtr<ID2D1BitmapRenderTarget> composeRenderTarget;
+			Graphics::GraphicsBitmap savedBitmap;
+			Graphics::BitmapRenderTarget composeRenderTarget;
 
 			std::vector<FrameData> frameData;
 

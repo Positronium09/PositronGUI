@@ -65,11 +65,11 @@ namespace PGUI::UI::Dialogs
 
 	void MessageBoxDialog::CreateDeviceResources()
 	{
-		auto renderer = GetRenderingInterface();
+		auto g = GetGraphics();
 
 		if (!buttonHighlightBrush)
 		{
-			buttonHighlightBrush.CreateBrush(renderer);
+			g.CreateBrush(buttonHighlightBrush);
 		}
 	}
 
@@ -255,7 +255,7 @@ namespace PGUI::UI::Dialogs
 
 		if (icon.ComPtrHolder<IWICBitmap>::IsInitialized())
 		{
-			iconBmp = icon.ConvertToD2D1Bitmap(GetRenderingInterface());
+			iconBmp = GetGraphics().CreateBitmap(icon);
 		}
 
 		TextFormat tf = TextFormat::GetDefTextFormat();
@@ -300,11 +300,14 @@ namespace PGUI::UI::Dialogs
 
 		SizeF size = GetClientSize();
 
-		auto renderer = GetRenderingInterface();
-		renderer->Clear(RGBA{ 0x111111 });
+		auto g = GetGraphics();
+		g.Clear(RGBA{ 0x111111 });
 
-		renderer->FillRectangle(RectF{ 0, size.cy - buttonSize.cy - 40, size.cx, size.cy }, 
-			buttonHighlightBrush->GetBrushPtr());
+		auto prevTransform = g.GetTransform();
+		g.SetTransform(GetDpiScaleTransform());
+
+		g.FillRect(RectF{ 0, size.cy - buttonSize.cy - 40, size.cx, size.cy }, 
+			buttonHighlightBrush);
 
 		SizeI iconSize{ };
 		if (iconBmp)
@@ -312,7 +315,7 @@ namespace PGUI::UI::Dialogs
 			float middleY = (size.cy - buttonSize.cy - 40) / 2.f;
 
 			iconSize = icon.GetSize();
-			renderer->DrawBitmap(iconBmp.Get(), RectF{
+			g.DrawBitmap(iconBmp, RectF{
 				static_cast<float>(margin.left), 
 				middleY - static_cast<float>(iconSize.cy) / 2.f,
 				static_cast<float>(margin.left + iconSize.cx), 
@@ -320,6 +323,8 @@ namespace PGUI::UI::Dialogs
 				static_cast<float>(iconSize.cy) / 2.f
 				});
 		}
+
+		g.SetTransform(prevTransform);
 
 		EndDraw();
 

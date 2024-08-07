@@ -2,6 +2,8 @@
 
 #include "core/DirectCompositionWindow.hpp"
 #include "core/MessageLoop.hpp"
+#include "core/Exceptions.hpp"
+#include "helpers/HelperFunctions.hpp"
 
 
 namespace PGUI::UI
@@ -25,8 +27,8 @@ namespace PGUI::UI
 		explicit Dialog(const Core::WindowClass::WindowClassPtr& wndClass) noexcept;
 
 		template <std::derived_from<Dialog> T, typename ...Args>
-		static Core::WindowPtr<T> Create(const DialogCreateParams& dialogParam,
-			const Core::WindowCreateParams& createParams, Args... args)
+		static Core::WindowOwnPtr<T> Create(const DialogCreateParams& dialogParam,
+			const Core::WindowCreateParams& createParams, Args&&... args)
 		{
 			DWORD style = dialogParam.style | WS_CAPTION | WS_SYSMENU;
 			DWORD exStyle = createParams.exStyle | WS_EX_NOREDIRECTIONBITMAP;
@@ -55,7 +57,7 @@ namespace PGUI::UI
 			const auto position = dialogRect.TopLeft();
 			const auto size = dialogRect.Size();
 
-			auto window = std::make_shared<T>(args...);
+			auto window = std::make_unique<T>(std::forward<Args>(args)...);
 
 			CreateWindowExW(exStyle,
 				window->GetWindowClass()->GetClassName().data(), createParams.windowName.data(),
@@ -67,11 +69,9 @@ namespace PGUI::UI
 
 			if (window->Hwnd() == NULL)
 			{
-				Core::ErrorHandling::Logger::Error(L"CreateWindow failed in Dialog::Create");
-				auto errorCode = GetLastError();
-				Core::ErrorHandling::Logger::Error(std::format(L"Code: {}", errorCode));
-				Core::ErrorHandling::Logger::Error(GetWin32ErrorMessage(errorCode));
-				throw Core::ErrorHandling::Win32Exception{ };
+				auto errCode = GetLastError();
+				HR_L(HresultFromWin32(errCode));
+				throw Core::Win32Exception{ errCode };
 			}
 
 			SendMessageW(window->Hwnd(), WM_INITDIALOG, 

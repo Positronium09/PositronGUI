@@ -1,19 +1,19 @@
 #include "core/Logger.hpp"
+#include "helpers/HelperFunctions.hpp"
 
+#include <chrono>
 #include <stacktrace>
 #include <system_error>
 #include <Windows.h>
 
-#undef ERROR
 
-
-namespace PGUI::Core::ErrorHandling
+namespace PGUI::Core
 {
 	constexpr std::wstring GetLogLevelStr(LogLevel logLevel) noexcept
 	{
 		switch (logLevel)
 		{
-			using enum PGUI::Core::ErrorHandling::LogLevel;
+			using enum PGUI::Core::LogLevel;
 
 			case DEBUG:
 				return L"DEBUG";
@@ -95,9 +95,13 @@ namespace PGUI::Core::ErrorHandling
 
 	void DebugConsoleLogger::Log(LogLevel logLevel, std::wstring_view string) noexcept
 	{
+		std::chrono::zoned_time time{
+			std::chrono::current_zone(),
+			std::chrono::system_clock::now()
+		};
 		OutputDebugStringW(L"[");
 		OutputDebugStringW(GetLogLevelStr(logLevel).c_str());
-		OutputDebugStringW(L"] ");
+		OutputDebugStringW(std::format(L" {:%H-%M-%S - %d-%m-%Y}] ", time).c_str());
 		OutputDebugStringW(string.data());
 		OutputDebugStringW(L"\n");
 	}

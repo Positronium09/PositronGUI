@@ -19,17 +19,14 @@ namespace PGUI::UI::Controls
 		Extended
 	};
 
-	struct _listviewitem_state_flag_values
+	enum class ListViewItemState
 	{
-		enum EnumValues
-		{
-			Normal = 0x00,
-			Hover = 0x01,
-			Pressed = 0x02,
-			Selected = 0x04
-		};
+		Normal = 0x00,
+		Hover = 0x01,
+		Pressed = 0x02,
+		Selected = 0x04
 	};
-	using ListViewItemState = EnumFlag<_listviewitem_state_flag_values>;
+	EnableEnumFlag(ListViewItemState);
 
 	class ListView;
 
@@ -41,10 +38,10 @@ namespace PGUI::UI::Controls
 		virtual ~ListViewItem() = default;
 
 		virtual void Create() = 0;
-		virtual void Render(ComPtr<ID2D1DeviceContext7> dc, RectF renderRect) = 0;
 
-		virtual void CreateDeviceResources(ComPtr<ID2D1DeviceContext7> dc) = 0;
-		virtual void DiscardDeviceResources(ComPtr<ID2D1DeviceContext7> dc) = 0;
+		virtual void Render(Graphics::Graphics g, RectF renderRect) = 0;
+		virtual void CreateDeviceResources(Graphics::Graphics g) = 0;
+		virtual void DiscardDeviceResources(Graphics::Graphics g) = 0;
 
 		void SetState(ListViewItemState newState) noexcept { state = newState; stateChangedEvent.Emit(); }
 		[[nodiscard]] ListViewItemState GetState() const noexcept { return state; }
@@ -56,7 +53,7 @@ namespace PGUI::UI::Controls
 		[[nodiscard]] long GetHeight() const noexcept { return height; }
 		[[nodiscard]] long GetMinHeight() const noexcept { return minHeight; }
 
-		bool IsSelected() const noexcept { return state & ListViewItemState::Selected; }
+		bool IsSelected() const noexcept { return IsFlagSet(state, ListViewItemState::Selected); }
 
 		protected:
 		explicit ListViewItem(long height) noexcept :
@@ -111,9 +108,9 @@ namespace PGUI::UI::Controls
 
 		protected:
 		void Create() override;
-		void Render(ComPtr<ID2D1DeviceContext7> dc, RectF renderRect) override;
-		void CreateDeviceResources(ComPtr<ID2D1DeviceContext7> dc) override;
-		void DiscardDeviceResources(ComPtr<ID2D1DeviceContext7> dc) override;
+		void Render(Graphics::Graphics g, RectF renderRect) override;
+		void CreateDeviceResources(Graphics::Graphics g) override;
+		void DiscardDeviceResources(Graphics::Graphics g) override;
 
 		void OnListViewSizeChanged() override;
 
@@ -143,12 +140,16 @@ namespace PGUI::UI::Controls
 			listViewItems.at(listViewItems.size() - 1)->listView = this;
 			listViewItems.at(listViewItems.size() - 1)->Create();
 			itemsChangedEvent.Emit();
+			UpdateScrollBar();
 		}
 		void RemoveItem(std::size_t index) noexcept;
 
 		void Clear() noexcept;
 		void ClearSelected() noexcept;
 		void ClearUnselected() noexcept;
+
+		void SelectAll() noexcept;
+		void DeselectAll() noexcept;
 
 		template <std::derived_from<ListViewItem> T>
 		[[nodiscard]] T* GetItem(std::size_t index) const

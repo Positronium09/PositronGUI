@@ -5,6 +5,7 @@
 #include "ui/controls/TextButton.hpp"
 #include "ui/controls/StaticText.hpp"
 #include "ui/Colors.hpp"
+#include "graphics/GraphicsBitmap.hpp"
 
 
 namespace PGUI::UI::Dialogs
@@ -72,7 +73,7 @@ namespace PGUI::UI::Dialogs
 		MessageBoxChoice choice = MessageBoxChoice::Ok;
 
 		Bmp::Bitmap icon;
-		ComPtr<ID2D1Bitmap> iconBmp;
+		Graphics::GraphicsBitmap iconBmp;
 
 		Brush buttonHighlightBrush{ Colors::Black };
 		RGBA backgroundColor;

@@ -2,7 +2,7 @@
 
 #include "ui/bmp/Palette.hpp"
 #include "factories/WICFactory.hpp"
-#include "core/Logger.hpp"
+#include "helpers/HelperFunctions.hpp"
 
 
 namespace PGUI::UI::Bmp
@@ -68,7 +68,7 @@ namespace PGUI::UI::Bmp
 		auto wicFactory = PGUI::WICFactory::GetFactory();
 
 		ComPtr<IWICFormatConverter> converterBitmapSource;
-		HRESULT hr = wicFactory->CreateFormatConverter(converterBitmapSource.GetAddressOf());
+		HRESULT hr = wicFactory->CreateFormatConverter(&converterBitmapSource);
 
 		if (FAILED(hr))
 		{
@@ -87,7 +87,7 @@ namespace PGUI::UI::Bmp
 		}
 
 		ComPtr<ID2D1Bitmap> bmp;
-		renderTarget->CreateBitmapFromWicBitmap(converterBitmapSource.Get(), bmp.GetAddressOf());
+		renderTarget->CreateBitmapFromWicBitmap(converterBitmapSource.Get(), &bmp);
 
 		return bmp;
 	}

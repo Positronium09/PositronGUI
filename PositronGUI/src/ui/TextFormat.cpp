@@ -1,6 +1,6 @@
 #include "ui/TextFormat.hpp"
 
-#include "core/Logger.hpp"
+#include "helpers/HelperFunctions.hpp"
 #include "factories/DWriteFactory.hpp"
 #include "ui/font/FontSet.hpp"
 
@@ -51,7 +51,7 @@ namespace PGUI::UI
 		ComPtr<IDWriteFontCollection> fontCollection;
 		ComPtr<IDWriteFontCollection3> fontCollection3;
 
-		HRESULT hr = GetHeldComPtr()->GetFontCollection(fontCollection.GetAddressOf()); HR_L(hr);
+		HRESULT hr = GetHeldComPtr()->GetFontCollection(&fontCollection); HR_L(hr);
 
 		if (fontCollection)
 		{
@@ -179,7 +179,7 @@ namespace PGUI::UI
 		DWRITE_TRIMMING trimming{ };
 		ComPtr<IDWriteInlineObject> inlineObject;
 
-		HRESULT hr = GetHeldComPtr()->GetTrimming(&trimming, inlineObject.GetAddressOf()); HR_L(hr);
+		HRESULT hr = GetHeldComPtr()->GetTrimming(&trimming, &inlineObject); HR_L(hr);
 
 		return { trimming, inlineObject };
 	}

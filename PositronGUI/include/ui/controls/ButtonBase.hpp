@@ -10,20 +10,17 @@
 
 namespace PGUI::UI::Controls
 {
-	struct _button_state_flag_values
+	enum class ButtonState
 	{
-		enum EnumValues
-		{
-			Normal = 0x00,
-			Unchecked = 0x00,
-			Hover = 0x01,
-			Pressed = 0x02,
-			Selected = 0x04,
-			Checked = 0x04,
-			Indeterminate = 0x08
-		};
+		Normal = 0x00,
+		Unchecked = 0x00,
+		Hover = 0x01,
+		Pressed = 0x02,
+		Selected = 0x04,
+		Checked = 0x04,
+		Indeterminate = 0x08
 	};
-	using ButtonState = EnumFlag<_button_state_flag_values>;
+	EnableEnumFlag(ButtonState);
 
 	class ButtonBase : public Control
 	{

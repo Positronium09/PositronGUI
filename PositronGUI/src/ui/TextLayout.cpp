@@ -13,7 +13,7 @@ namespace PGUI::UI
 		auto factory = DWriteFactory::GetFactory();
 
 		HRESULT hr = factory->CreateTextLayout(text.data(), static_cast<UINT32>(text.length()), 
-			textFormat, maxSize.cx, maxSize.cy, textLayout.GetAddressOf()); HR_T(hr);
+			textFormat, maxSize.cx, maxSize.cy, &textLayout); HR_T(hr);
 		
 		if (textLayout)
 		{
@@ -99,7 +99,7 @@ namespace PGUI::UI
 		ComPtr<IDWriteFontCollection3> fontCollection3Ptr;
 
 		HRESULT hr = GetHeldComPtr()->GetFontCollection(position, 
-			fontCollectionPtr.GetAddressOf(), GetTextRangePtr(textRange)); HR_L(hr);
+			&fontCollectionPtr), GetTextRangePtr(textRange)); HR_L(hr);
 
 		fontCollectionPtr.As(&fontCollection3Ptr);
 
@@ -216,7 +216,7 @@ namespace PGUI::UI
 	{
 		ComPtr<IDWriteInlineObject> inlineObject;
 
-		HRESULT hr = GetHeldComPtr()->GetInlineObject(position, inlineObject.GetAddressOf(), GetTextRangePtr(textRange)); HR_L(hr);
+		HRESULT hr = GetHeldComPtr()->GetInlineObject(position, &inlineObject, GetTextRangePtr(textRange)); HR_L(hr);
 
 		return inlineObject;
 	}

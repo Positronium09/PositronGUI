@@ -8,7 +8,6 @@
 
 #include <optional>
 
-#undef max
 
 namespace PGUI::UI::Controls
 {
@@ -29,10 +28,10 @@ namespace PGUI::UI::Controls
 		virtual ~HeaderItem() = default;
 
 		virtual void Create() = 0;
-		virtual void Render(ComPtr<ID2D1DeviceContext7> dc, RectF renderRect) = 0;
+		virtual void Render(Graphics::Graphics g, RectF renderRect) = 0;
 
-		virtual void CreateDeviceResources(ComPtr<ID2D1DeviceContext7> dc) = 0;
-		virtual void DiscardDeviceResources(ComPtr<ID2D1DeviceContext7> dc) = 0;
+		virtual void CreateDeviceResources(Graphics::Graphics g) = 0;
+		virtual void DiscardDeviceResources(Graphics::Graphics g) = 0;
 
 		void SetState(HeaderItemState newState) noexcept { state = newState; stateChangedEvent.Emit(); }
 		[[nodiscard]] HeaderItemState GetState() const noexcept { return state; }
@@ -94,9 +93,9 @@ namespace PGUI::UI::Controls
 
 		protected:
 		void Create() override;
-		void Render(ComPtr<ID2D1DeviceContext7> dc, RectF renderRect) override;
-		void CreateDeviceResources(ComPtr<ID2D1DeviceContext7> dc) override;
-		void DiscardDeviceResources(ComPtr<ID2D1DeviceContext7>) override;
+		void Render(Graphics::Graphics g, RectF renderRect) override;
+		void CreateDeviceResources(Graphics::Graphics g) override;
+		void DiscardDeviceResources(Graphics::Graphics) override;
 
 		void OnHeaderSizeChanged() override;
 

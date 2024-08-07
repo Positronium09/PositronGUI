@@ -15,8 +15,8 @@ namespace PGUI
 				&suoParam, sizeof(suoParam));
 			succeeded == 0)
 		{
-			HR_L(HRESULT_FROM_WIN32(GetLastError()));
-			throw Core::ErrorHandling::Win32Exception{ };
+			HR_L(HresultFromWin32());
+			throw Core::Win32Exception{ };
 		}
 	}
 

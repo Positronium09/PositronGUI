@@ -1,6 +1,6 @@
 #pragma once
 
-#include "core/Exceptions.hpp"
+#include "helpers/HelperFunctions.hpp"
 #include "helpers/ComPtr.hpp"
 
 #include <d2d1_3.h>

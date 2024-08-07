@@ -1,6 +1,6 @@
 #include "ui/font/FontCollection.hpp"
 
-#include "core/Logger.hpp"
+#include "helpers/HelperFunctions.hpp"
 #include "factories/DWriteFactory.hpp"
 #include "ui/font/FontFamily.hpp"
 #include "ui/font/FontSet.hpp"
@@ -14,7 +14,7 @@ namespace PGUI::UI::Font
 
 		ComPtr<IDWriteFontCollection3> fontCollection;
 
-		HRESULT hr = factory->GetSystemFontCollection(false, DWRITE_FONT_FAMILY_MODEL_TYPOGRAPHIC, fontCollection.GetAddressOf()); HR_T(hr);
+		HRESULT hr = factory->GetSystemFontCollection(false, DWRITE_FONT_FAMILY_MODEL_TYPOGRAPHIC, &fontCollection); HR_T(hr);
 
 		return FontCollection{ fontCollection };
 	}
@@ -42,7 +42,7 @@ namespace PGUI::UI::Font
 	{
 		ComPtr<IDWriteFontFamily2> fontFamily;
 
-		HRESULT hr = GetHeldComPtr()->GetFontFamily(index, fontFamily.GetAddressOf()); HR_L(hr);
+		HRESULT hr = GetHeldComPtr()->GetFontFamily(index, &fontFamily); HR_L(hr);
 
 		return FontFamily{ fontFamily };
 	}

@@ -1,7 +1,7 @@
 #include "core/DirectCompositionWindow.hpp"
 
 #include "core/Exceptions.hpp"
-#include "core/Logger.hpp"
+#include "helpers/HelperFunctions.hpp"
 #include "factories/DXGIFactory.hpp"
 #include "factories/Direct2DFactory.hpp"
  
@@ -48,11 +48,6 @@ namespace PGUI::Core
 		/* Not pure virtual to be optional to override */
 	}
 
-	ComPtr<ID2D1DeviceContext7> DirectCompositionWindow::GetRenderingInterface() const noexcept
-	{
-		return D2D1DeviceContext();
-	}
-
 	void DirectCompositionWindow::InitD3D11Device()
 	{
 		auto dxgiFactory = DXGIFactory::GetFactory();
@@ -61,14 +56,14 @@ namespace PGUI::Core
 		GetSystemPowerStatus(&powerStatus);
 
 		DXGI_GPU_PREFERENCE gpuPreference = DXGI_GPU_PREFERENCE_HIGH_PERFORMANCE;
-		if (powerStatus.SystemStatusFlag == 1 || 
+		if (powerStatus.SystemStatusFlag == 1 ||
 			(powerStatus.BatteryFlag & (2 | 4) && ~(powerStatus.BatteryFlag & 8)))
 		{
 			gpuPreference = DXGI_GPU_PREFERENCE_MINIMUM_POWER;
 		}
 
 		ComPtr<IDXGIAdapter1> adapter;
-		HRESULT hr = dxgiFactory->EnumAdapterByGpuPreference(0, gpuPreference, 
+		HRESULT hr = dxgiFactory->EnumAdapterByGpuPreference(0, gpuPreference,
 			IID_PPV_ARGS(adapter.GetAddressOf())); HR_T(hr);
 
 		auto createDeviceFlags =
@@ -93,10 +88,10 @@ namespace PGUI::Core
 		hr = D3D11CreateDevice(adapter.Get(),
 			D3D_DRIVER_TYPE_UNKNOWN, nullptr,
 			createDeviceFlags,
-			featureLevels.data(), 
-			static_cast<UINT>(featureLevels.size()), 
+			featureLevels.data(),
+			static_cast<UINT>(featureLevels.size()),
 			D3D11_SDK_VERSION,
-			device.GetAddressOf(), nullptr, nullptr);  HR_T(hr);
+			&device, nullptr, nullptr);  HR_T(hr);
 
 		hr = device.As(&d3d11Device); HR_T(hr);
 		hr = d3d11Device.As(&dxgiDevice); HR_T(hr);
@@ -114,7 +109,7 @@ namespace PGUI::Core
 
 		hr = dxgiFactory->CreateSwapChainForComposition(dxgiDevice.Get(),
 			&description, nullptr,
-			swapChain.GetAddressOf()); HR_T(hr);
+			&swapChain); HR_T(hr);
 	}
 
 	void DirectCompositionWindow::InitD2D1Device()
@@ -122,10 +117,10 @@ namespace PGUI::Core
 		auto d2Factory = D2DFactory::GetFactory();
 
 		HRESULT hr = d2Factory->CreateDevice(dxgiDevice.Get(),
-			d2d1Device.GetAddressOf()); HR_T(hr);
+			&d2d1Device); HR_T(hr);
 
 		hr = d2d1Device->CreateDeviceContext(D2D1_DEVICE_CONTEXT_OPTIONS_NONE,
-			d2d1Dc.GetAddressOf()); HR_T(hr);
+			&d2d1Dc); HR_T(hr);
 
 		InitD2D1DeviceContextTarget();
 	}
@@ -143,7 +138,7 @@ namespace PGUI::Core
 		ComPtr<ID2D1Bitmap1> bitmap;
 		hr = d2d1Dc->CreateBitmapFromDxgiSurface(surface.Get(),
 			properties,
-			bitmap.GetAddressOf()); HR_T(hr);
+			&bitmap); HR_T(hr);
 
 		d2d1Dc->SetTarget(bitmap.Get());
 	}
@@ -153,13 +148,13 @@ namespace PGUI::Core
 		HRESULT hr = DCompositionCreateDevice(
 			dxgiDevice.Get(),
 			__uuidof(dcompDevice),
-			std::bit_cast<void**>(dcompDevice.GetAddressOf())); HR_T(hr);
+			std::bit_cast<void**>(&dcompDevice)); HR_T(hr);
 
 		hr = dcompDevice->CreateTargetForHwnd(Hwnd(), false,
-			dcompTarget.GetAddressOf()); HR_T(hr);
+			&dcompTarget); HR_T(hr);
 
 		ComPtr<IDCompositionVisual> visual;
-		hr = dcompDevice->CreateVisual(visual.GetAddressOf()); HR_T(hr);
+		hr = dcompDevice->CreateVisual(&visual); HR_T(hr);
 
 		hr = visual->SetContent(swapChain.Get()); HR_T(hr);
 		hr = dcompTarget->SetRoot(visual.Get()); HR_T(hr);
@@ -223,5 +218,10 @@ namespace PGUI::Core
 	ComPtr<ID2D1DeviceContext7> DirectCompositionWindow::D2D1DeviceContext() const noexcept
 	{
 		return d2d1Dc;
+	}
+
+	Graphics::Graphics DirectCompositionWindow::GetGraphics() const noexcept
+	{
+		return Graphics::Graphics{ D2D1DeviceContext() };
 	}
 }

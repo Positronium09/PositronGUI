@@ -3,11 +3,10 @@
 
 #include <string>
 #include <stdexcept>
-#include <stacktrace>
 #include <Windows.h>
 
 
-namespace PGUI::Core::ErrorHandling
+namespace PGUI::Core
 {
 	class PGUIException : public std::exception
 	{
@@ -18,8 +17,6 @@ namespace PGUI::Core::ErrorHandling
 
 		[[nodiscard]] HRESULT GetErrorCode() const noexcept;
 		[[nodiscard]] const std::wstring& GetErrorMessage() const noexcept;
-
-		[[nodiscard]] char const* what() const override;
 
 		private:
 		HRESULT errorCode;
@@ -38,15 +35,4 @@ namespace PGUI::Core::ErrorHandling
 		public:
 		explicit HresultException(HRESULT hResult) noexcept;
 	};
-}
-
-namespace PGUI
-{
-	static inline void HR_T(HRESULT hr) noexcept(false)
-	{
-		if (FAILED(hr))
-		{
-			throw Core::ErrorHandling::HresultException{ hr };
-		}
-	}
 }

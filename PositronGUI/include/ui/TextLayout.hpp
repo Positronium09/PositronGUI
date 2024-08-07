@@ -3,7 +3,7 @@
 #include "helpers/ComPtrHolder.hpp"
 #include "core/Size.hpp"
 #include "core/Rect.hpp"
-#include "core/Logger.hpp"
+#include "helpers/HelperFunctions.hpp"
 #include "ui/font/FontCollection.hpp"
 #include "ui/font/FontEnums.hpp"
 
@@ -67,7 +67,7 @@ namespace PGUI::UI
 			ComPtr<IUnknown> unknown;
 			ComPtr<T> ret;
 
-			HRESULT hr = GetHeldComPtr()->GetDrawingEffect(position, unknown.GetAddressOf(), GetTextRangePtr(textRange)); HR_L(hr);
+			HRESULT hr = GetHeldComPtr()->GetDrawingEffect(position, &unknown, GetTextRangePtr(textRange)); HR_L(hr);
 
 			if (unknown)
 			{

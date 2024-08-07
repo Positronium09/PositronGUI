@@ -89,16 +89,23 @@ namespace PGUI::UI
 	void UIComponent::BeginDraw()
 	{
 		DirectCompositionWindow::BeginDraw();
-		GetRenderingInterface()->Clear(Colors::Transparent);
+		auto g = GetGraphics();
 
-		GetRenderingInterface()->PushLayer(D2D1::LayerParameters1(
+		auto prevTransform = g.GetTransform();
+		g.SetTransform(GetDpiScaleTransform());
+
+		g.Clear(Colors::Transparent);
+
+		g.SetTransform(prevTransform);
+
+		g.PushLayer(D2D1::LayerParameters(
 			D2D1::InfiniteRect(), clip.Get()->GetClipGeometryPtr()
 		), nullptr);
 	}
 
 	HRESULT UIComponent::EndDraw()
 	{
-		GetRenderingInterface()->PopLayer();
+		GetGraphics().PopLayer();
 	
 		return DirectCompositionWindow::EndDraw();
 	}

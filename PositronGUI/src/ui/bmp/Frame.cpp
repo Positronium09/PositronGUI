@@ -2,7 +2,7 @@
 
 #include "ui/bmp/MetadataReader.hpp"
 #include "factories/WICFactory.hpp"
-#include "core/Logger.hpp"
+#include "helpers/HelperFunctions.hpp"
 
 
 namespace PGUI::UI::Bmp

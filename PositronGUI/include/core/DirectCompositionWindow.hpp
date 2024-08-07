@@ -2,6 +2,8 @@
 
 #include "Window.hpp"
 #include "helpers/ComPtr.hpp"
+#include "graphics/Graphics.hpp"
+#include "graphics/RenderTarget.hpp"
 
 #include <dxgi.h>
 #include <dxgi1_2.h>
@@ -21,8 +23,6 @@ namespace PGUI::Core
 		explicit DirectCompositionWindow(const WindowClass::WindowClassPtr& wndClass) noexcept;
 
 		protected:
-		[[nodiscard]] ComPtr<ID2D1DeviceContext7> GetRenderingInterface() const noexcept;
-
 		[[nodiscard]] ComPtr<ID3D11Device2> D3D11Device() const noexcept;
 		[[nodiscard]] ComPtr<IDXGIDevice4> DXGIDevice() const noexcept;
 		[[nodiscard]] ComPtr<IDXGISwapChain1> DXGISwapChain() const noexcept;
@@ -30,6 +30,8 @@ namespace PGUI::Core
 		[[nodiscard]] ComPtr<IDCompositionTarget> DCompositionTarget() const noexcept;
 		[[nodiscard]] ComPtr<ID2D1Device7> D2D1Device() const noexcept;
 		[[nodiscard]] ComPtr<ID2D1DeviceContext7> D2D1DeviceContext() const noexcept;
+
+		[[nodiscard]] Graphics::Graphics GetGraphics() const noexcept;
 
 		virtual void BeginDraw();
 		virtual HRESULT EndDraw();

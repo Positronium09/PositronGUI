@@ -2,7 +2,7 @@
 
 #include "ui/bmp/Frame.hpp"
 #include "ui/bmp/MetadataReader.hpp"
-#include "core/Logger.hpp"
+#include "helpers/HelperFunctions.hpp"
 #include "factories/WICFactory.hpp"
 
 
@@ -95,7 +95,7 @@ namespace PGUI::UI::Bmp
 	{
 		ComPtr<IWICBitmapSource> thumbnail;
 
-		HRESULT hr = GetHeldComPtr()->GetThumbnail(thumbnail.GetAddressOf());  HR_L(hr);
+		HRESULT hr = GetHeldComPtr()->GetThumbnail(&thumbnail);  HR_L(hr);
 
 		return thumbnail;
 	}

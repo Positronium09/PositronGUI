@@ -130,6 +130,13 @@ namespace PGUI::Core
 		return GetDpiForWindow(Hwnd());
 	}
 
+	D2D1_MATRIX_3X2_F Window::GetDpiScaleTransform(std::optional<PointF> center) const noexcept
+	{
+		auto dpi = static_cast<float>(GetDpi());
+		return D2D1::Matrix3x2F::Scale(dpi / DEFAULT_SCREEN_DPI, dpi / DEFAULT_SCREEN_DPI,
+				center.value_or(GetClientRect().Center()));
+	}
+
 	std::span<PointL> Window::MapPoints(HWND hWndTo, std::span<PointL> points) const noexcept
 	{
 		return PGUI::MapPoints(Hwnd(), hWndTo, points);
@@ -151,13 +158,14 @@ namespace PGUI::Core
 	}
 
 	TimerId Window::AddTimer(TimerId id, std::chrono::milliseconds delay, 
-		std::optional<TimerCallback> callback)
+		std::optional<TimerCallback> callback) noexcept
 	{
 		 if (TimerId setTimerId = 
 			 SetTimer(Hwnd(), id, static_cast<UINT>(delay.count()), nullptr); 
 			 setTimerId == 0)
 		 {
-			 Core::ErrorHandling::Logger::Error(GetWin32ErrorMessage());
+			 auto errCode = GetLastError();
+			 HR_L(HresultFromWin32(errCode));
 			 return setTimerId;
 		 }
 
@@ -169,15 +177,20 @@ namespace PGUI::Core
 		 return id;
 	}
 
-	void Window::RemoveTimer(TimerId id)
+	void Window::RemoveTimer(TimerId id) noexcept
 	{
+		if (!HasTimer(id))
+		{
+			return;
+		}
+
 		if (auto succeeded = KillTimer(Hwnd(), id);
 			succeeded == 0)
 		{
 			if (DWORD error = GetLastError();
 				error != ERROR_SUCCESS)
 			{
-				Core::ErrorHandling::Logger::Error(GetWin32ErrorMessage(error));
+				HR_L(HresultFromWin32(error));
 				return;
 			}
 		}
@@ -186,6 +199,11 @@ namespace PGUI::Core
 		{
 			timerMap.erase(id);
 		}
+	}
+
+	bool Window::HasTimer(TimerId id) const noexcept
+	{
+		return timerMap.contains(id);
 	}
 
 	void Window::Enable(bool enable) const noexcept
@@ -290,7 +308,7 @@ namespace PGUI::Core
 	{
 		MoveAndResize(suggestedRect);
 
-		ErrorHandling::Logger::Log(std::format(L"{}", dpiScale));
+		Logger::Log(std::format(L"{}", dpiScale));
 		AdjustChildWindowsForDPI(dpiScale);
 
 		return 0;
@@ -364,7 +382,7 @@ namespace PGUI::Core
 			if (auto id = wParam;
 				window->timerMap.contains(id))
 			{
-				window->timerMap.at(id)(id);
+				std::invoke(window->timerMap.at(id), id);
 				return 0;
 			}
 		}
@@ -384,14 +402,14 @@ namespace PGUI::Core
 		bool forceCurrentResult = false;
 		for (auto const& handler : window->handlerMap[msg])
 		{
-			auto [lResult, flags] = handler(msg, wParam, lParam);
-			using enum HandlerResultFlag::EnumValues;
+			auto [lResult, flags] = std::invoke(handler, msg, wParam, lParam);
+			using enum HandlerResultFlag;
 
 			if (!(flags & ReturnPrevResult))
 			{
 				result = lResult;
 			}
-			if (flags & NoFurtherHandling)
+			if ((flags & NoFurtherHandling) != Nothing)
 			{
 				break;
 			}
@@ -399,11 +417,11 @@ namespace PGUI::Core
 			{
 				continue;
 			}
-			if (flags & ForceThisResult)
+			if ((flags & ForceThisResult) != Nothing)
 			{
 				forceCurrentResult = true;
 			}
-			if (flags & PassToDefWindowProc)
+			if ((flags & PassToDefWindowProc) != Nothing)
 			{
 				passToDefWindowProc = true;
 			}

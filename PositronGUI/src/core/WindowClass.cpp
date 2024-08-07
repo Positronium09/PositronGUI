@@ -37,7 +37,7 @@ namespace PGUI::Core
 
 		if (classAtom == NULL)
 		{
-			throw ErrorHandling::Win32Exception{ };
+			throw Win32Exception{ };
 		}
 	}
 

@@ -3,7 +3,7 @@
 #include "ui/bmp/BitmapDecoder.hpp"
 #include "ui/bmp/BitmapSource.hpp"
 #include "ui/bmp/Frame.hpp"
-#include "core/Logger.hpp"
+#include "helpers/HelperFunctions.hpp"
 #include "factories/WICFactory.hpp"
 
 

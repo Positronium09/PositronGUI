@@ -2,10 +2,14 @@
 
 #include "core/Point.hpp"
 #include "core/Rect.hpp"
+#include "core/Exceptions.hpp"
+#include "core/Logger.hpp"
 #include <functional>
 #include <concepts>
 #include <string>
 #include <span>
+#include <format>
+#include <source_location>
 #include <Windows.h>
 
 
@@ -17,6 +21,7 @@ namespace PGUI
 	[[nodiscard]] HINSTANCE GetHInstance() noexcept;
 
 	[[nodiscard]] std::wstring GetUserLocaleName() noexcept;
+	[[nodiscard]] std::wstring GetCurrentInputMethodLanguage() noexcept;
 
 	void EnableDarkTitleBar(HWND hWnd) noexcept;
 
@@ -51,7 +56,7 @@ namespace PGUI
 	}
 
 	template <typename T>
-	[[nodiscard]] size_t GetTypeHash()
+	[[nodiscard]] size_t GetTypeHash() noexcept
 	{
 		return typeid(T).hash_code();
 	}
@@ -69,4 +74,21 @@ namespace PGUI
 
 	[[nodiscard]] std::span<RectL> MapRects(HWND from, HWND to, std::span<RectL> rects) noexcept;
 	[[nodiscard]] RectL MapRect(HWND from, HWND to, RectL rect) noexcept;
+
+	void HR_L(HRESULT hr,
+		std::source_location location = std::source_location::current()) noexcept;
+	void HR_L(const PGUI::Core::HresultException& hrException,
+		std::source_location location = std::source_location::current()) noexcept;
+
+	void HR_T(HRESULT hr,
+		std::source_location location = std::source_location::current()) noexcept(false);
+
+	static inline [[nodiscard]] HRESULT HresultFromWin32() noexcept
+	{
+		return HRESULT_FROM_WIN32(GetLastError());
+	}
+	static inline [[nodiscard]] HRESULT HresultFromWin32(DWORD errCode) noexcept
+	{
+		return HRESULT_FROM_WIN32(errCode);
+	}
 }

@@ -133,7 +133,7 @@ namespace PGUI::UI::Controls
 				break;
 			}
 		}
-		DiscardDeviceResources(nullptr);
+		DiscardDeviceResources(Graphics::Graphics{ nullptr });
 		Invalidate();
 	}
 
@@ -142,27 +142,32 @@ namespace PGUI::UI::Controls
 		InitTextLayout();
 		OnStateChanged();
 	}
-	void HeaderTextItem::Render(ComPtr<ID2D1DeviceContext7> dc, RectF renderRect)
+	void HeaderTextItem::Render(Graphics::Graphics g, RectF renderRect)
 	{
-		dc->FillRectangle(renderRect, backgroundBrush->GetBrushPtr());
-		dc->DrawTextLayout(renderRect.TopLeft(), textLayout, textBrush->GetBrushPtr());
+		auto prevTransform = g.GetTransform();
+		g.SetTransform(GetHeaderWindow()->GetDpiScaleTransform(renderRect.Center()));
+		
+		g.FillRect(renderRect, backgroundBrush);
+		g.DrawTextLayout(renderRect.TopLeft(), textLayout, textBrush);
+
+		g.SetTransform(prevTransform);
 	}
 
-	void HeaderTextItem::CreateDeviceResources(ComPtr<ID2D1DeviceContext7> dc)
+	void HeaderTextItem::CreateDeviceResources(Graphics::Graphics g)
 	{
 		if (!textBrush)
 		{
 			SetGradientBrushRect(textBrush, textLayout.GetBoundingRect());
-			textBrush.CreateBrush(dc);
+			g.CreateBrush(textBrush);
 		}
 		if (!backgroundBrush)
 		{
 			SetGradientBrushRect(backgroundBrush, GetHeaderWindow()->GetClientRect());
-			backgroundBrush.CreateBrush(dc);
+			g.CreateBrush(backgroundBrush);
 		}
 	}
 
-	void HeaderTextItem::DiscardDeviceResources(ComPtr<ID2D1DeviceContext7>)
+	void HeaderTextItem::DiscardDeviceResources(Graphics::Graphics)
 	{
 		textBrush.ReleaseBrush();
 		backgroundBrush.ReleaseBrush();
@@ -213,33 +218,33 @@ namespace PGUI::UI::Controls
 
 	void Header::CreateDeviceResources()
 	{
-		auto renderer = GetRenderingInterface();
+		auto g = GetGraphics();
 
 		if (!seperatorBrush)
 		{
-			seperatorBrush.CreateBrush(renderer);
+			g.CreateBrush(seperatorBrush);
 		}
 		if (!backgroundBrush)
 		{
 			SetGradientBrushRect(backgroundBrush, GetClientRect());
-			backgroundBrush.CreateBrush(renderer);
+			g.CreateBrush(backgroundBrush);
 		}
 
-		std::ranges::for_each(headerItems, [renderer](const auto& headerItem)
+		std::ranges::for_each(headerItems, [g](const auto& headerItem)
 		{
-			headerItem->CreateDeviceResources(renderer);
+			headerItem->CreateDeviceResources(g);
 		});
 	}
 	void Header::DiscardDeviceResources()
 	{
-		auto renderer = GetRenderingInterface();
+		auto g = GetGraphics();
 
 		seperatorBrush.ReleaseBrush();
 		backgroundBrush.ReleaseBrush();
 
-		std::ranges::for_each(headerItems, [renderer](const auto& headerItem)
+		std::ranges::for_each(headerItems, [g](const auto& headerItem)
 		{
-			headerItem->DiscardDeviceResources(renderer);
+			headerItem->DiscardDeviceResources(g);
 		});
 	}
 
@@ -305,9 +310,9 @@ namespace PGUI::UI::Controls
 		long width = GetClientSize().cx;
 		long height = GetClientSize().cy;
 
-		auto renderer = GetRenderingInterface();
+		auto g = GetGraphics();
 
-		renderer->FillRectangle(GetClientRect(), backgroundBrush->GetBrushPtr());
+		g.Clear(backgroundBrush);
 
 		for (const auto& headerItem : headerItems)
 		{
@@ -323,17 +328,17 @@ namespace PGUI::UI::Controls
 				static_cast<float>(height)
 			};
 
-			renderer->PushAxisAlignedClip(headerRect, renderer->GetAntialiasMode());
+			g.PushAxisAlignedClip(headerRect, g.GetAntialiasMode());
 
-			headerItem->Render(renderer, headerRect);
+			headerItem->Render(g, headerRect);
 
-			renderer->PopAxisAlignedClip();
+			g.PopAxisAlignedClip();
 
 			totalWidth += headerItem->GetWidth();
-			renderer->DrawLine(
+			g.DrawLine(
 				PointF{ static_cast<float>(totalWidth - 1), 0 }, 
 				PointF{ static_cast<float>(totalWidth - 1), static_cast<float>(height) },
-				seperatorBrush->GetBrushPtr(), 1.3f);
+				seperatorBrush, ScaleByDpi(1.3f));
 		}
 
 		EndDraw();
@@ -381,15 +386,13 @@ namespace PGUI::UI::Controls
 			return 0;
 		}
 
-		hoveringIndex = GetHoveredHeaderItemIndex(mousePos.x); 
-
 		if (prevHoveredHeaderIndex.has_value() &&
 			prevHoveredHeaderIndex < headerItems.size() && 
 			*prevHoveredHeaderIndex != *hoveringIndex)
 		{
 			headerItems.at(*prevHoveredHeaderIndex)->SetState(HeaderItemState::Normal);
 		}
-		if (hoveringIndex.value() && 
+		if (hoveringIndex.has_value() && 
 			hoveringIndex < headerItems.size() &&
 			headerItems.at(*hoveringIndex)->GetState() != HeaderItemState::Pressed)
 		{
@@ -464,7 +467,7 @@ namespace PGUI::UI::Controls
 		auto hCursor = static_cast<HCURSOR>(LoadImageW(nullptr, cursorName, IMAGE_CURSOR, NULL, NULL, LR_SHARED | LR_DEFAULTSIZE));
 		if (!hCursor)
 		{
-			HR_L(HRESULT_FROM_WIN32(GetLastError()));
+			HR_L(HresultFromWin32());
 			return 0;
 		}
 

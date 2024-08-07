@@ -18,19 +18,25 @@ namespace PGUI::Core
 
 namespace PGUI::UI
 {
-	struct _adjust_flags
+	enum class ClipType
 	{
-		enum EnumValues
-		{
-			Unknown,
-			Empty,
-			Rect,
-			RoundedRect,
-			Ellipse,
-			Path
-		};
+		Unknown,
+		Empty,
+		Rect,
+		RoundedRect,
+		Ellipse,
+		Path
 	};
-	using ClipType = EnumFlag<_adjust_flags>;
+	EnableEnumFlag(ClipType);
+
+	enum class AdjustFlags
+	{
+		AdjustNone = 0,
+		AdjustRect = 1,
+		AdjustCenter = 2,
+		AdjustRadii = 4
+	};
+	EnableEnumFlag(AdjustFlags);
 
 	class ClipBase
 	{
@@ -116,17 +122,6 @@ namespace PGUI::UI
 
 	struct RoundedRectangeClipParameters : public AdjustableToWindow
 	{
-		struct _adjust_flags
-		{
-			enum EnumValues
-			{
-				AdjustNone = 0,
-				AdjustRect = 1,
-				AdjustRadii = 2
-			};
-		};
-		using AdjustFlags = EnumFlag<_adjust_flags>;
-
 		RoundedRect roundedRect;
 		AdjustFlags flags = AdjustFlags::AdjustNone;
 
@@ -138,17 +133,6 @@ namespace PGUI::UI
 
 	struct EllipseClipParameters : public AdjustableToWindow
 	{
-		struct _adjust_flags
-		{
-			enum EnumValues
-			{
-				AdjustNone = 0,
-				AdjustCenter = 1,
-				AdjustRadii = 2
-			};
-		};
-		using AdjustFlags = EnumFlag<_adjust_flags>;
-
 		Ellipse ellipse;
 		AdjustFlags flags = AdjustFlags::AdjustNone;
 

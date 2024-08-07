@@ -21,6 +21,10 @@ namespace PGUI
 			cx{ cx_ }, cy{ cy_ }
 		{
 		}
+		constexpr Size(const T& sz) noexcept :
+			cx{ sz }, cy{ sz }
+		{
+		}
 		explicit(false) constexpr Size(const SIZE& sz) noexcept :
 			cx{ (T)sz.cx }, cy{ (T)sz.cy }
 		{

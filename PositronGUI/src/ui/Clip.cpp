@@ -1,7 +1,7 @@
 #include "ui/Clip.hpp"
 
 #include "core/Window.hpp"
-#include "core/Logger.hpp"
+#include "helpers/HelperFunctions.hpp"
 #include "factories/Direct2DFactory.hpp"
 
 

@@ -1,6 +1,6 @@
 #include "ui/bmp/MetadataReader.hpp"
 
-#include "core/Logger.hpp"
+#include "helpers/HelperFunctions.hpp"
 #include "core/Exceptions.hpp"
 
 

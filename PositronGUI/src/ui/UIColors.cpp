@@ -1,6 +1,6 @@
 #include "ui/UIColors.hpp"
 
-#include "core/Logger.hpp"
+#include "helpers/HelperFunctions.hpp"
 #include "core/Exceptions.hpp"
 
 #include <windows.foundation.h>

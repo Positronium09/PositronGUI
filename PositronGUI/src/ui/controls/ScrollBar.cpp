@@ -1,20 +1,24 @@
 ﻿#include "ui/controls/ScrollBar.hpp"
 
 #include "ui/UIColors.hpp"
+#include "helpers/ScopedTimer.hpp"
 
 #include <cfenv>
 #include <algorithm>
 
-#undef max
-#undef min
 
 namespace PGUI::UI::Controls
 {
 	ScrollBar::ScrollBar(const ScrollBarParams& params) noexcept :
 		Control{ Core::WindowClass::Create(L"ScrollBar_UIControl") },
 		direction{ params.direction },
-		pageSize{ params.pageSize }, lineCount{ params.lineCount }, 
-		maxScroll{ params.maxScroll }, minScroll{ params.minScroll }
+		pageSize{ params.pageSize }, 
+		maxScroll{ params.maxScroll }, minScroll{ params.minScroll },
+		scrollMult{ static_cast<std::int64_t>(
+			std::ceil(
+				static_cast<double>(params.maxScroll - params.minScroll) / 100.0
+			)) },
+		scrollPos{ params.minScroll }
 	{
 		RegisterMessageHandler(WM_CREATE, &ScrollBar::OnCreate);
 		RegisterMessageHandler(WM_PAINT, &ScrollBar::OnPaint);
@@ -47,11 +51,6 @@ namespace PGUI::UI::Controls
 			Invalidate();
 		}
 	}
-	void ScrollBar::SetLineCount(std::int64_t _lineCount) noexcept
-	{
-		lineCount = std::clamp(_lineCount, 1LL, _lineCount + 1LL);
-		Invalidate();
-	}
 	void ScrollBar::SetMaxScroll(std::int64_t _maxScroll) noexcept
 	{
 		maxScroll = _maxScroll;
@@ -62,9 +61,18 @@ namespace PGUI::UI::Controls
 		minScroll = _minScroll;
 		Invalidate();
 	}
+	void ScrollBar::SetScrollMult(std::int64_t _scrollMult) noexcept
+	{
+		scrollMult = std::clamp(_scrollMult, 1LL, std::numeric_limits<std::int64_t>::max());
+	}
+	void ScrollBar::SetScrollMult() noexcept
+	{
+		scrollMult = static_cast<std::int64_t>(std::ceil(static_cast<double>(GetScrollRange()) / 100.0));
+	}
 	void ScrollBar::SetScrollPos(std::int64_t _scrollPos) noexcept
 	{
 		scrollPos = std::clamp(_scrollPos, minScroll, maxScroll);
+		thumbPos = CalculateThumbPos();
 
 		Invalidate();
 		scrolledEvent.Emit();
@@ -75,7 +83,7 @@ namespace PGUI::UI::Controls
 		std::int64_t scroll = [this]() -> std::int64_t
 		{
 			UINT scrollParam = 0;
-			if (!SystemParametersInfo(SPI_GETWHEELSCROLLLINES, 0, &scrollParam, 0))
+			if (!SystemParametersInfoW(SPI_GETWHEELSCROLLLINES, 0, &scrollParam, 0))
 			{
 				return 3;
 			}
@@ -96,7 +104,7 @@ namespace PGUI::UI::Controls
 		auto lines = wheelDelta * scroll / WHEEL_DELTA;
 		
 		wheelScrollExtra = wheelDelta - lines * WHEEL_DELTA / scroll;
-		ScrollRelative(-lines * (maxScroll - minScroll) / lineCount);
+		ScrollRelative(-lines * scrollMult);
 	}
 
 	void ScrollBar::SetThumbBrush(Brush& brush)
@@ -136,74 +144,24 @@ namespace PGUI::UI::Controls
 
 	void ScrollBar::CreateDeviceResources()
 	{
-		auto renderer = GetRenderingInterface();
+		auto g = GetGraphics();
 
 		if (!thumbBrush)
 		{
 			SetGradientBrushRect(thumbBrush, CalculateThumbRect());
-			thumbBrush.CreateBrush(renderer);
+			g.CreateBrush(thumbBrush);
 		}
 
 		if (!backgroundBrush)
 		{
 			SetGradientBrushRect(backgroundBrush, GetClientRect());
-			backgroundBrush.CreateBrush(renderer);
+			g.CreateBrush(backgroundBrush);
 		}
 	}
 	void ScrollBar::DiscardDeviceResources()
 	{
 		thumbBrush.ReleaseBrush();
 		backgroundBrush.ReleaseBrush();
-	}
-
-	RectF ScrollBar::CalculateThumbRect() const noexcept
-	{
-		RectF clientRect = GetClientRect();
-		auto size = clientRect.Size();
-
-		if (direction == ScrollBarDirection::Vertical)
-		{
-			size.cy -= buttonSize * 2;
-
-			auto thumbHeight = std::clamp(
-				static_cast<float>(pageSize)
-				/ static_cast<float>(maxScroll - minScroll)
-				* size.cy, static_cast<float>(minThumbHeight), size.cy);
-
-			const auto paddingVal = size.cx * thumbPadding;
-
-			RectF thumbRect{
-				paddingVal, paddingVal,
-				size.cx * (1.0f - thumbPadding), thumbHeight - paddingVal
-			};
-
-			thumbRect.Shift(0, static_cast<float>(scrollPos)
-				/ static_cast<float>(maxScroll - minScroll)
-				* (size.cy - thumbHeight) + buttonSize);
-
-			return thumbRect;
-		}
-
-		size.cx -= buttonSize * 2;
-
-		auto thumbWidth = std::clamp(
-			static_cast<float>(pageSize)
-			/ static_cast<float>(maxScroll - minScroll)
-			* size.cx, static_cast<float>(minThumbHeight), size.cx);
-
-		const auto paddingVal = size.cy * thumbPadding;
-
-		RectF thumbRect{
-			paddingVal, paddingVal,
-			thumbWidth - paddingVal, size.cy * (1.0f - thumbPadding)
-		};
-
-		thumbRect.Shift(static_cast<float>(scrollPos)
-			/ static_cast<float>(maxScroll - minScroll)
-			* (size.cx - thumbWidth) + buttonSize,
-			0);
-
-		return thumbRect;
 	}
 
 	void ScrollBar::AdjustRect(WPARAM wParam, LPRECT rc) const noexcept
@@ -232,22 +190,93 @@ namespace PGUI::UI::Controls
 
 	void ScrollBar::OnButtonClicked(bool isUp)
 	{
-		auto line = (maxScroll - minScroll) / lineCount;
-
 		if (isUp)
 		{
-			ScrollRelative(-line);
+			ScrollRelative(-scrollMult);
 		}
 		else
 		{
-			ScrollRelative(line);
+			ScrollRelative(scrollMult);
 		}
 	}
 
-	std::int64_t ScrollBar::GetScrollPosFromPoint(PointI p) const noexcept
+	float ScrollBar::CalculateThumbSize() const noexcept
 	{
-		const SizeF size = GetClientSize();
-		PointF fp = p;
+		SizeF size = GetClientSize();
+		if (direction == ScrollBarDirection::Vertical)
+		{
+			size.cy -= static_cast<float>(buttonSize) * 2;
+
+			auto thumbHeight = std::clamp(
+				static_cast<float>(pageSize)
+				/ static_cast<float>(GetScrollRange())
+				* size.cy, static_cast<float>(minThumbHeight), size.cy);
+
+			return thumbHeight;
+		}
+
+		size.cx -= static_cast<float>(buttonSize) * 2;
+
+		auto thumbWidth = std::clamp(
+			static_cast<float>(pageSize)
+			/ static_cast<float>(GetScrollRange())
+			* size.cx, static_cast<float>(minThumbHeight), size.cx);
+
+		return thumbWidth;
+
+	}
+
+	RectF ScrollBar::CalculateThumbRect() const noexcept
+	{
+		RectF clientRect = GetClientRect();
+		auto size = clientRect.Size();
+
+		float rectShift = mouseScrolling ? instantThumbPos - thumbPosOffset : thumbPos;
+
+		if (direction == ScrollBarDirection::Vertical)
+		{
+			size.cy -= ScaleByDpi(static_cast<float>(buttonSize) * 2);
+
+			auto thumbHeight = CalculateThumbSize();
+			const auto padding = ScaleByDpi(size.cx * thumbPadding);
+
+			return RectF{
+				padding, padding,
+				size.cx - padding, thumbHeight - padding,
+			}.Shifted(0, rectShift);
+		}
+
+		size.cx -= ScaleByDpi(static_cast<float>(buttonSize) * 2);
+
+		auto thumbWidth = CalculateThumbSize();
+		const auto padding = ScaleByDpi(size.cy * thumbPadding);
+
+		return RectF{
+			padding, padding,
+			thumbWidth - padding, size.cy - padding,
+		}.Shifted(rectShift, 0);
+	}
+	float ScrollBar::CalculateThumbPos() const noexcept
+	{
+		if (direction == ScrollBarDirection::Vertical)
+		{
+			return MapToRange(static_cast<float>(scrollPos),
+				static_cast<float>(buttonSize),
+				static_cast<float>(GetClientSize().cy - buttonSize) - CalculateThumbSize(),
+				static_cast<float>(minScroll),
+				static_cast<float>(maxScroll)
+			);
+		}
+		return MapToRange(static_cast<float>(scrollPos),
+			static_cast<float>(buttonSize),
+			static_cast<float>(GetClientSize().cx - buttonSize) - CalculateThumbSize(),
+			static_cast<float>(minScroll),
+			static_cast<float>(maxScroll)
+		);
+	}
+	std::int64_t ScrollBar::CalculateScrollPosFromThumbPos(float pos) const noexcept
+	{
+		auto size = GetClientSize();
 
 		const auto prevRoundingMode = std::fegetround();
 		std::fesetround(FE_TONEAREST);
@@ -258,12 +287,12 @@ namespace PGUI::UI::Controls
 		{
 			ret = static_cast<std::int64_t>(
 				std::nearbyintf(
-					MapToRange(fp.y,
+					MapToRange(pos,
 						static_cast<float>(minScroll),
 						static_cast<float>(maxScroll),
 						static_cast<float>(buttonSize),
-						size.cy - static_cast<float>(buttonSize)
-						)
+						static_cast<float>(size.cy - buttonSize) - CalculateThumbSize()
+					)
 				)
 				);
 		}
@@ -271,11 +300,11 @@ namespace PGUI::UI::Controls
 		{
 			ret = static_cast<std::int64_t>(
 				std::nearbyintf(
-					MapToRange(fp.x,
+					MapToRange(pos,
 						static_cast<float>(minScroll),
 						static_cast<float>(maxScroll),
 						static_cast<float>(buttonSize),
-						size.cx - static_cast<float>(buttonSize)
+						static_cast<float>(size.cx - buttonSize) - CalculateThumbSize()
 					)
 				)
 				);
@@ -286,8 +315,20 @@ namespace PGUI::UI::Controls
 		return ret;
 	}
 
+	Core::HandlerResult ScrollBar::OnDPIChange(float dpiScale, RectI suggestedRect)
+	{
+		minThumbHeight = static_cast<std::int64_t>(static_cast<float>(minThumbHeight) * dpiScale);
+		thumbPos *= dpiScale;
+		instantThumbPos *= dpiScale;
+		thumbPosOffset *= dpiScale;
+
+		return Window::OnDPIChange(dpiScale, suggestedRect);
+	}
+
 	Core::HandlerResult ScrollBar::OnCreate(UINT, WPARAM, LPARAM)
 	{
+		thumbPos = CalculateThumbPos();
+
 		auto size = GetClientSize();
 
 		auto colors = TextButton::GetTextButtonColors();
@@ -303,20 +344,24 @@ namespace PGUI::UI::Controls
 		colors.normalText = thumbBrush.GetParameters();
 		colors.hoverText = thumbBrush.GetParameters();
 		colors.clickedText = thumbBrush.GetParameters();
-
-		Core::WindowCreateParams upButtonParams{ L"▲", { 0, 0 }, { size.cx, buttonSize }, NULL };
-		Core::WindowCreateParams downButtonParams{ L"▼", { 0, size.cy - buttonSize }, { size.cx, buttonSize }, NULL };
+		
+		Core::WindowCreateParams upButtonParams{ L"▲", { 0, 0 }, { size.cx, static_cast<int>(buttonSize) }, NULL };
+		Core::WindowCreateParams downButtonParams{ L"▼", 
+			{ 0, size.cy - static_cast<int>(buttonSize) }, { size.cx, static_cast<int>(buttonSize) }, NULL };
 
 		if (direction == ScrollBarDirection::Horizontal)
 		{
-			downButtonParams = Core::WindowCreateParams{ L"▶", { size.cx - buttonSize, 0 }, { buttonSize, size.cy }, NULL };
-			upButtonParams = Core::WindowCreateParams{ L"◀", { 0, 0 }, { buttonSize, size.cy }, NULL };
+			downButtonParams = Core::WindowCreateParams{ L"▶", 
+				{ size.cx - static_cast<int>(buttonSize), 0 }, { static_cast<int>(buttonSize), size.cy }, NULL };
+			upButtonParams = Core::WindowCreateParams{ L"◀", { 0, 0 }, 
+				{ static_cast<int>(buttonSize), size.cy }, NULL };
 		}
 
 		upButton = AddChildWindow<TextButton>(
 			upButtonParams,
 			colors
 		);
+
 		downButton = AddChildWindow<TextButton>(
 			downButtonParams,
 			colors
@@ -337,39 +382,96 @@ namespace PGUI::UI::Controls
 	{
 		BeginDraw();
 
-		auto renderer = GetRenderingInterface();
+		auto g = GetGraphics();
 
-		renderer->FillRectangle(GetClientRect(), backgroundBrush->GetBrushPtr());
-		renderer->FillRoundedRectangle(
-			RoundedRect{ CalculateThumbRect(), thumbXRadius, thumbYRadius }, thumbBrush->GetBrushPtr());
+		g.Clear(backgroundBrush);
+
+		auto thumbRect = CalculateThumbRect();
+
+		g.FillRoundedRect(
+			RoundedRect{ thumbRect, thumbXRadius, thumbYRadius }, thumbBrush);
 
 		EndDraw();
 		
 		return 0;
 	}
 
-	Core::HandlerResult ScrollBar::OnLButtonDown(UINT, WPARAM, LPARAM lParam)
+	Core::HandlerResult ScrollBar::OnLButtonDown(UINT, WPARAM, LPARAM lParam) noexcept
 	{
-		PointI pos = MAKEPOINTS(lParam);
+		PointF p = MAKEPOINTS(lParam);
+		if (!CalculateThumbRect().IsPointInside(p))
+		{
+			if (direction == ScrollBarDirection::Vertical)
+			{
+				SetScrollPos(CalculateScrollPosFromThumbPos(p.y - CalculateThumbSize() / 2.0f));
+			}
+			else
+			{
+				SetScrollPos(CalculateScrollPosFromThumbPos(p.x - CalculateThumbSize() / 2.0f));
+			}
+			return 0;
+		}
 
-		SetScrollPos(GetScrollPosFromPoint(pos));
 		SetCapture(Hwnd());
+
+		instantThumbPos = thumbPos;
+		if (direction == ScrollBarDirection::Vertical)
+		{
+			instantThumbPos = p.y;
+		}
+		else
+		{
+			instantThumbPos = p.x;
+		}
+		thumbPosOffset = instantThumbPos - thumbPos;
 
 		return 0;
 	}
-	Core::HandlerResult ScrollBar::OnLButtonUp(UINT, WPARAM, LPARAM) const noexcept
+	Core::HandlerResult ScrollBar::OnLButtonUp(UINT, WPARAM, LPARAM) noexcept
 	{
-		ReleaseCapture();
-		
+		if (mouseScrolling)
+		{
+			SetScrollPos(CalculateScrollPosFromThumbPos(instantThumbPos - thumbPosOffset));
+			mouseScrolling = false;
+			ReleaseCapture();
+			return 0;
+		}
+
 		return 0;
 	}
 	Core::HandlerResult ScrollBar::OnMouseMove(UINT, WPARAM wParam, LPARAM lParam)
 	{
-		PointI pos  MAKEPOINTS(lParam);
-
-		if (wParam & MK_LBUTTON)
+		if (!(wParam & MK_LBUTTON))
 		{
-			SetScrollPos(GetScrollPosFromPoint(pos));
+			return 0;
+		}
+
+		mouseScrolling = true;
+
+		PointF p = MAKEPOINTS(lParam);
+		SizeF size = GetClientSize();
+
+		if (direction == ScrollBarDirection::Vertical)
+		{
+			instantThumbPos = std::clamp(p.y, 
+				static_cast<float>(buttonSize) + thumbPosOffset, 
+				size.cy - static_cast<float>(buttonSize) - CalculateThumbSize() + thumbPosOffset);
+		}
+		else
+		{
+			instantThumbPos = std::clamp(p.x,
+				static_cast<float>(buttonSize) + thumbPosOffset,
+				size.cx - static_cast<float>(buttonSize) - CalculateThumbSize() + thumbPosOffset);
+		}
+
+		if (auto scroll = CalculateScrollPosFromThumbPos(instantThumbPos - thumbPosOffset);
+			scroll != scrollPos)
+		{
+			SetScrollPos(scroll);
+		}
+		else
+		{
+			Invalidate();
 		}
 
 		return 0;
@@ -392,7 +494,6 @@ namespace PGUI::UI::Controls
 			WheelScroll(GET_WHEEL_DELTA_WPARAM(wParam));
 		}
 
-
 		return 0;
 	}
 	
@@ -402,7 +503,7 @@ namespace PGUI::UI::Controls
 			!(winPos->flags & SWP_NOSIZE))
 		{
 			RECT rc = { 0, 0, winPos->cx, winPos->cy };
-			AdjustRect(WMSZ_BOTTOM, &rc);
+			//AdjustRect(WMSZ_BOTTOM, &rc);
 			if (direction == ScrollBarDirection::Vertical)
 			{
 				winPos->cy = rc.bottom;
@@ -417,7 +518,9 @@ namespace PGUI::UI::Controls
 	}
 	Core::HandlerResult ScrollBar::OnSizing(UINT, WPARAM wParam, LPARAM lParam) const
 	{
-		AdjustRect(wParam, std::bit_cast<LPRECT>(lParam));
+		UNREFERENCED_PARAMETER(wParam);
+		UNREFERENCED_PARAMETER(lParam);
+		//AdjustRect(wParam, std::bit_cast<LPRECT>(lParam));
 		return 0;
 	}
 	Core::HandlerResult ScrollBar::OnNCCalcSize(UINT msg, WPARAM wParam, LPARAM lParam)

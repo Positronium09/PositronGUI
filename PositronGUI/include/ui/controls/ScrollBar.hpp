@@ -20,20 +20,18 @@ namespace PGUI::UI::Controls
 		struct ScrollBarParams
 		{
 			std::int64_t pageSize;
-			std::int64_t lineCount;
-			std::int64_t maxScroll;
 			std::int64_t minScroll;
+			std::int64_t maxScroll;
 
 			ScrollBarDirection direction;
 
 			ScrollBarParams(
 				std::int64_t pageSize,
-				std::int64_t lineCount,
-				std::int64_t maxScroll,
 				std::int64_t minScroll,
+				std::int64_t maxScroll,
 				ScrollBarDirection direction = ScrollBarDirection::Vertical) noexcept :
-				pageSize{ pageSize }, lineCount{ lineCount }, 
-				maxScroll{ maxScroll }, minScroll{ minScroll },
+				pageSize{ pageSize },
+				minScroll{ minScroll }, maxScroll{ maxScroll },
 				direction{ direction }
 			{
 			}
@@ -42,15 +40,21 @@ namespace PGUI::UI::Controls
 		explicit ScrollBar(const ScrollBarParams& params) noexcept;
 
 		[[nodiscard]] std::int64_t GetPageSize() const noexcept { return pageSize; }
-		[[nodiscard]] std::int64_t GetLineCount() const noexcept { return lineCount; }
 		[[nodiscard]] std::int64_t GetMaxScroll() const noexcept { return maxScroll; }
 		[[nodiscard]] std::int64_t GetMinScroll() const noexcept { return minScroll; }
+		[[nodiscard]] std::int64_t GetScrollMult() const noexcept { return scrollMult; }
 		[[nodiscard]] std::int64_t GetScrollPos() const noexcept { return scrollPos; }
+		[[nodiscard]] std::int64_t GetScrollRange() const noexcept { return maxScroll - minScroll; }
 
 		void SetPageSize(std::int64_t pageSize) noexcept;
-		void SetLineCount(std::int64_t lineCount) noexcept;
 		void SetMaxScroll(std::int64_t maxScroll) noexcept;
 		void SetMinScroll(std::int64_t minScroll) noexcept;
+		/**
+		* @brief Auto calculates scroll multiplier (ceil(maxScroll - minScroll) / 100)
+		* so that it takes 100 "ticks" to scroll if that makes sense (idk how to explain)
+		*/
+		void SetScrollMult() noexcept;
+		void SetScrollMult(std::int64_t scrollMult) noexcept;
 		void SetScrollPos(std::int64_t scrollPos) noexcept;
 
 		void ScrollTo(std::int64_t toScroll) noexcept { SetScrollPos(toScroll); }
@@ -77,11 +81,11 @@ namespace PGUI::UI::Controls
 		void SetThumbXRadius(float yRadius) noexcept;
 
 		private:
-		inline static const std::int64_t buttonSize = 20;
-		inline static const std::int64_t minThumbHeight = 20;
+		inline static std::int64_t buttonSize = 20;
+		inline static std::int64_t minThumbHeight = 20;
 
-		Core::WindowPtr<TextButton> upButton;
-		Core::WindowPtr<TextButton> downButton;
+		Core::WindowPtr<TextButton> upButton = nullptr;
+		Core::WindowPtr<TextButton> downButton = nullptr;
 
 		Brush thumbBrush;
 		Brush backgroundBrush;
@@ -89,10 +93,15 @@ namespace PGUI::UI::Controls
 		ScrollBarDirection direction;
 
 		std::int64_t pageSize;
-		std::int64_t lineCount;
 		std::int64_t maxScroll;
 		std::int64_t minScroll;
-		std::int64_t scrollPos = 0;
+		std::int64_t scrollMult = 1;
+		std::int64_t scrollPos;
+
+		float thumbPos = 0;
+		float instantThumbPos = 0;
+		float thumbPosOffset = 0;
+		bool mouseScrolling = false;
 
 		std::int64_t wheelScrollExtra = 0;
 
@@ -105,17 +114,20 @@ namespace PGUI::UI::Controls
 		void CreateDeviceResources() override;
 		void DiscardDeviceResources() override;
 
-		[[nodiscard]] RectF CalculateThumbRect() const noexcept;
 		void AdjustRect(WPARAM wParam, LPRECT rc) const noexcept;
 
 		void OnButtonClicked(bool isUp);
 
-		[[nodiscard]] std::int64_t GetScrollPosFromPoint(PointI p) const noexcept;
+		[[nodiscard]] float CalculateThumbSize() const noexcept;
+		[[nodiscard]] RectF CalculateThumbRect() const noexcept;
+		[[nodiscard]] float CalculateThumbPos() const noexcept;
+		[[nodiscard]] std::int64_t CalculateScrollPosFromThumbPos(float thumbPos) const noexcept;
 
+		Core::HandlerResult OnDPIChange(float dpiScale, RectI suggestedRect) override;
 		Core::HandlerResult OnCreate(UINT msg, WPARAM wParam, LPARAM lParam);
 		Core::HandlerResult OnPaint(UINT msg, WPARAM wParam, LPARAM lParam);
-		Core::HandlerResult OnLButtonDown(UINT msg, WPARAM wParam, LPARAM lParam);
-		Core::HandlerResult OnLButtonUp(UINT msg, WPARAM wParam, LPARAM lParam) const noexcept;
+		Core::HandlerResult OnLButtonDown(UINT msg, WPARAM wParam, LPARAM lParam) noexcept;
+		Core::HandlerResult OnLButtonUp(UINT msg, WPARAM wParam, LPARAM lParam) noexcept;
 		Core::HandlerResult OnMouseMove(UINT msg, WPARAM wParam, LPARAM lParam);
 		Core::HandlerResult OnMouseWheel(UINT msg, WPARAM wParam, LPARAM lParam);
 		Core::HandlerResult OnWindowPosChanging(UINT msg, WPARAM wParam, LPARAM lParam) const;

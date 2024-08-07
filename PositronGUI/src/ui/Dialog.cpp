@@ -1,5 +1,5 @@
 #include "ui/Dialog.hpp"
-#include "core/Logger.hpp"
+#include "helpers/HelperFunctions.hpp"
 
 
 namespace PGUI::UI
@@ -50,9 +50,9 @@ namespace PGUI::UI
 			GetMessageW(&msg, nullptr, 0, 0);
 			if (ret == -1)
 			{
-				DWORD errorCode = GetLastError();
-				ErrorHandling::Logger::Error(GetWin32ErrorMessage(errorCode));
-				return errorCode;
+				auto errCode = GetLastError();
+				HR_L(HresultFromWin32(errCode));
+				return errCode;
 			}
 			else
 			{
@@ -103,9 +103,9 @@ namespace PGUI::UI
 		{
 			if (ret == -1)
 			{
-				DWORD errorCode = GetLastError();
-				ErrorHandling::Logger::Error(GetWin32ErrorMessage(errorCode));
-				return errorCode;
+				auto errCode = GetLastError();
+				HR_L(HresultFromWin32(errCode));
+				return errCode;
 			}
 			else
 			{

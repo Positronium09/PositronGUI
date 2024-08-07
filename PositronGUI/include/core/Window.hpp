@@ -24,18 +24,17 @@
 
 namespace PGUI::Core
 {
-	struct _handler_result_flag_values
+	constexpr UINT DEFAULT_SCREEN_DPI = USER_DEFAULT_SCREEN_DPI;
+
+	enum class HandlerResultFlag
 	{
-		enum EnumValues
-		{
-			Nothing = 0x00,
-			NoFurtherHandling = 0x01,
-			ForceThisResult = 0x02,
-			ReturnPrevResult = 0x04,
-			PassToDefWindowProc = 0x08
-		};
+		Nothing = 0x00,
+		NoFurtherHandling = 0x01,
+		ForceThisResult = 0x02,
+		ReturnPrevResult = 0x04,
+		PassToDefWindowProc = 0x08
 	};
-	using HandlerResultFlag = EnumFlag<_handler_result_flag_values>;
+	EnableEnumFlag(HandlerResultFlag);
 
 	struct HandlerResult
 	{
@@ -73,9 +72,11 @@ namespace PGUI::Core
 	concept IsWindowType = std::is_same_v<T, Window> || std::derived_from<T, Window>;
 
 	template<IsWindowType T>
-	using WindowPtr = std::shared_ptr<T>;
+	using WindowOwnPtr = std::unique_ptr<T>;
+	template<IsWindowType T>
+	using WindowPtr = T*;
 
-	using ChildWindowList = std::vector<WindowPtr<Window>>;
+	using ChildWindowList = std::vector<WindowOwnPtr<Window>>;
 
 	using TimerId = UINT_PTR;
 	using TimerCallback = std::function<void(TimerId)>;
@@ -89,9 +90,10 @@ namespace PGUI::Core
 
 		public:
 		template <std::derived_from<Window> T, typename ...Args>
-		[[nodiscard]] static WindowPtr<T> Create(const WindowCreateParams& createParams, Args... args)
+		[[nodiscard]] static WindowOwnPtr<T> Create(const WindowCreateParams& createParams, Args&&... args)
 		{
-			auto window = std::make_shared<T>(args...);
+			auto window = std::make_unique<T>(std::forward<Args>(args)...);
+			auto wnd = window.get();
 
 			CreateWindowExW(createParams.exStyle, 
 				window->windowClass->GetClassName().data(), createParams.windowName.data(),
@@ -100,15 +102,13 @@ namespace PGUI::Core
 				createParams.size.cx, 
 				createParams.size.cy,
 				NULL, NULL, GetHInstance(),
-				static_cast<LPVOID>(window.get()));
+				static_cast<LPVOID>(wnd));
 
 			if (window->hWnd == NULL)
 			{
-				ErrorHandling::Logger::Error(L"CreateWindow failed in Window::Create");
-				auto errorCode = GetLastError();
-				ErrorHandling::Logger::Error(std::format(L"Code: {}", errorCode));
-				ErrorHandling::Logger::Error(GetWin32ErrorMessage(errorCode));
-				throw ErrorHandling::Win32Exception{ };
+				auto errCode = GetLastError();
+				HR_L(HresultFromWin32(errCode));
+				throw Win32Exception{ errCode };
 			}
 			
 			const auto dpi = GetDpiForWindow(window->Hwnd());
@@ -124,9 +124,10 @@ namespace PGUI::Core
 			return window;
 		}
 		template <std::derived_from<Window> T, typename ...Args>
-		WindowPtr<T> AddChildWindow(const WindowCreateParams& createParams, Args... args)
+		WindowPtr<T> AddChildWindow(const WindowCreateParams& createParams, Args&&... args)
 		{
-			auto window = std::make_shared<T>(args...);
+			auto window = std::make_unique<T>(std::forward<Args>(args)...);
+			auto wnd = window.get();
 
 			CreateWindowExW(createParams.exStyle,
 				window->windowClass->GetClassName().data(), createParams.windowName.data(),
@@ -134,57 +135,56 @@ namespace PGUI::Core
 				createParams.position.x, createParams.position.y,
 				createParams.size.cx, createParams.size.cy,
 				Hwnd(), NULL, GetHInstance(),
-				static_cast<LPVOID>(window.get()));
+				static_cast<LPVOID>(wnd));
 
 			if (window->hWnd == NULL)
 			{
-				ErrorHandling::Logger::Error(L"CreateWindow failed in Window::AddChildWindow");
-				auto errorCode = GetLastError();
-				ErrorHandling::Logger::Error(std::format(L"Code: {}", errorCode));
-				ErrorHandling::Logger::Error(GetWin32ErrorMessage(errorCode));
-				throw ErrorHandling::Win32Exception{ };
+				auto errCode = GetLastError();
+				HR_L(HresultFromWin32(errCode));
+				throw Win32Exception{ errCode };
 			}
 		
-			childWindows.push_back(window);
+			childWindows.push_back(std::move(window));
 
+			const auto dpi = GetDpiForWindow(wnd->Hwnd());
 
-			const auto dpi = GetDpiForWindow(window->Hwnd());
-
-			auto rect = window->GetWindowRect();
-			rect = PGUI::MapRect(nullptr, Hwnd(), rect);
+			auto rect = wnd->GetWindowRect();
+			rect = ScreenToClient(rect);
 
 			rect.left = AdjustForDpi(rect.left, dpi);
 			rect.top = AdjustForDpi(rect.top, dpi);
 			rect.right = AdjustForDpi(rect.right, dpi);
 			rect.bottom = AdjustForDpi(rect.bottom, dpi);
 
-			window->MoveAndResize(rect);
+			wnd->MoveAndResize(rect);
 
-			return window;
+			return wnd;
 		}
 		template <std::derived_from<Window> T>
-		WindowPtr<T> AddChildWindow(const WindowPtr<T> window)
+		WindowPtr<T> AddChildWindow(const WindowOwnPtr<T> window)
 		{
-			auto style = GetWindowLongPtrW(window->Hwnd(), GWL_STYLE);
-			SetWindowLongPtrW(window->Hwnd(), GWL_STYLE, static_cast<LONG_PTR>(style | WS_CHILD));
+			auto wnd = window.get();
 
-			SetParent(window->Hwnd(), Hwnd());
+			auto style = GetWindowLongPtrW(wnd->Hwnd(), GWL_STYLE);
+			SetWindowLongPtrW(wnd->Hwnd(), GWL_STYLE, static_cast<LONG_PTR>(style | WS_CHILD));
 
-			childWindows.push_back(window);
+			SetParent(wnd->Hwnd(), Hwnd());
 
-			const auto dpi = GetDpiForWindow(window->Hwnd());
+			childWindows.push_back(std::move(window));
 
-			auto rect = window->GetWindowRect();
-			rect = PGUI::MapRect(nullptr, Hwnd(), rect);
+			const auto dpi = GetDpiForWindow(wnd->Hwnd());
+
+			auto rect = wnd->GetWindowRect();
+			rect = ScreenToClient(rect);
 
 			rect.left = AdjustForDpi(rect.left, dpi);
 			rect.top = AdjustForDpi(rect.top, dpi);
 			rect.right = AdjustForDpi(rect.right, dpi);
 			rect.bottom = AdjustForDpi(rect.bottom, dpi);
 
-			window->MoveAndResize(rect);
+			wnd->MoveAndResize(rect);
 
-			return window;
+			return wnd;
 		}
 
 		void RemoveChildWindow(HWND childHwnd);
@@ -210,6 +210,7 @@ namespace PGUI::Core
 		void MoveAndResize(PointL newPos, SizeL newSize) const noexcept;
 
 		[[nodiscard]] UINT GetDpi() const noexcept;
+		[[nodiscard]] D2D1_MATRIX_3X2_F GetDpiScaleTransform(std::optional<PointF> center = std::nullopt) const noexcept;
 
 		[[nodiscard]] std::span<PointL> MapPoints(HWND hWndTo, std::span<PointL> points) const noexcept;
 		[[nodiscard]] PointL MapPoint(HWND hWndTo, PointL point) const noexcept;
@@ -217,9 +218,17 @@ namespace PGUI::Core
 		[[nodiscard]] std::span<RectL> MapRects(HWND hWndTo, std::span<RectL> rects) const noexcept;
 		[[nodiscard]] RectL MapRect(HWND hWndTo, RectL rect) const noexcept;
 
+		template <typename T>
+		[[nodiscard]] T ScaleByDpi(T val) const noexcept
+		{
+			return static_cast<T>(val * 
+				static_cast<float>(GetDpi()) / Core::DEFAULT_SCREEN_DPI);
+		}
+
 		TimerId AddTimer(TimerId id, std::chrono::milliseconds delay, 
-			std::optional<TimerCallback> callback = std::nullopt);
-		void RemoveTimer(TimerId id);
+			std::optional<TimerCallback> callback = std::nullopt) noexcept;
+		void RemoveTimer(TimerId id) noexcept;
+		bool HasTimer(TimerId id) const noexcept;
 
 		void Enable(bool enable) const noexcept;
 		void AdjustForClientSize(SizeI size) const noexcept;
@@ -279,7 +288,7 @@ namespace PGUI::Core
 		HWND parenthWnd = nullptr;
 		ChildWindowList childWindows;
 
-		UINT prevDpi = USER_DEFAULT_SCREEN_DPI;
+		UINT prevDpi = DEFAULT_SCREEN_DPI;
 
 		HandlerMap handlerMap;
 		std::optional<Handler> generalHandler;

@@ -34,13 +34,13 @@ namespace PGUI
 	}
 	PropVariantType PropVariant::Type() const noexcept
 	{
-		return var.vt;
+		return static_cast<PropVariantType>(var.vt);
 	}
 	PropVariantValue PropVariant::GetValue() const noexcept
 	{
 		switch (Type())
 		{
-			using enum PropVariantType::EnumValues;
+			using enum PropVariantType;
 
 			case Empty:
 			case Null:
