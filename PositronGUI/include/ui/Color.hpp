@@ -33,13 +33,13 @@ namespace PGUI::UI
 
 		explicit(false) operator D2D1_COLOR_F() const noexcept;
 
-		[[nodiscard]] constexpr bool operator==(const RGB& other) const noexcept = default;
+		[[nodiscard]] constexpr auto operator==(const RGB& other) const noexcept -> bool = default;
 
 		void Lighten(FLOAT amount) noexcept;
 		void Darken(FLOAT amount) noexcept;
 
-		[[nodiscard]] RGB Lightened(FLOAT amount) const noexcept;
-		[[nodiscard]] RGB Darkened(FLOAT amount) const noexcept;
+		[[nodiscard]] auto Lightened(FLOAT amount) const noexcept -> RGB;
+		[[nodiscard]] auto Darkened(FLOAT amount) const noexcept -> RGB;
 
 		FLOAT r = 0.0f;
 		FLOAT g = 0.0f;
@@ -63,13 +63,13 @@ namespace PGUI::UI
 		explicit(false) operator winrt::Windows::UI::Color() const noexcept;
 		explicit(false) operator COLORREF() const noexcept;
 
-		[[nodiscard]] constexpr bool operator==(const RGBA& other) const noexcept = default;
+		[[nodiscard]] constexpr auto operator==(const RGBA& other) const noexcept -> bool = default;
 
 		void Lighten(FLOAT amount) noexcept;
 		void Darken(FLOAT amount) noexcept;
 
-		[[nodiscard]] RGBA Lightened(FLOAT amount) const noexcept;
-		[[nodiscard]] RGBA Darkened(FLOAT amount) const noexcept;
+		[[nodiscard]] auto Lightened(FLOAT amount) const noexcept -> RGBA;
+		[[nodiscard]] auto Darkened(FLOAT amount) const noexcept -> RGBA;
 
 		FLOAT r = 0.0f;
 		FLOAT g = 0.0f;
@@ -87,7 +87,7 @@ namespace PGUI::UI
 
 		explicit(false) operator RGB() const noexcept;
 
-		[[nodiscard]] constexpr bool operator==(const HSL& other) const noexcept = default;
+		[[nodiscard]] constexpr auto operator==(const HSL& other) const noexcept -> bool = default;
 
 		FLOAT h = 0.0f;
 		FLOAT s = 0.0f;
@@ -104,7 +104,7 @@ namespace PGUI::UI
 
 		explicit(false) operator RGB() const noexcept;
 
-		[[nodiscard]] constexpr bool operator==(const HSV& other) const noexcept = default;
+		[[nodiscard]] constexpr auto operator==(const HSV& other) const noexcept -> bool = default;
 
 		FLOAT h = 0.0f;
 		FLOAT s = 0.0f;
@@ -121,7 +121,7 @@ namespace PGUI::UI
 
 		explicit(false) operator RGB() const noexcept;
 
-		[[nodiscard]] constexpr bool operator==(const CMYK& other) const noexcept = default;
+		[[nodiscard]] constexpr auto operator==(const CMYK& other) const noexcept -> bool = default;
 
 		FLOAT c = 0.0f;
 		FLOAT m = 0.0f;

@@ -7,7 +7,7 @@
 
 namespace PGUI::Core
 {
-	int GetMessageLoop::Run() noexcept
+	auto GetMessageLoop::Run() noexcept -> int
 	{
 		MSG msg{ };
 
@@ -31,7 +31,7 @@ namespace PGUI::Core
 	}
 
 	//TODO Implemet
-	int PeekMessageLoop::Run()
+	auto PeekMessageLoop::Run() -> int
 	{
 		throw HresultException{ E_NOTIMPL };
 	}

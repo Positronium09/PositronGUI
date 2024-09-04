@@ -7,7 +7,7 @@
 
 namespace PGUI::UI
 {
-	TextFormat TextFormat::GetDefTextFormat(FLOAT fontSize)
+	auto TextFormat::GetDefTextFormat(FLOAT fontSize) -> TextFormat
 	{
 		auto textFormat = TextFormat{ L"Segoe UI", fontSize, GetUserLocaleName() };
 
@@ -37,7 +37,7 @@ namespace PGUI::UI
 			fontSize, localeName.data(), GetHeldPtrAddress()); HR_L(hr);
 	}
 
-	TextFormat TextFormat::AdjustFontSizeToDPI(float fontSize) const noexcept
+	auto TextFormat::AdjustFontSizeToDPI(float fontSize) const noexcept -> TextFormat
 	{
 		TextFormat newTf{ GetFontFamilyName(), fontSize, GetLocaleName(),
 			GetFontCollection(), GetFontWeight(), GetFontStyle(), GetFontStretch() };
@@ -55,7 +55,7 @@ namespace PGUI::UI
 		return newTf;
 	}
 
-	Font::FlowDirection TextFormat::GetFlowDirection() const noexcept
+	auto TextFormat::GetFlowDirection() const noexcept -> Font::FlowDirection
 	{
 		return GetHeldComPtr()->GetFlowDirection();
 	}
@@ -64,7 +64,7 @@ namespace PGUI::UI
 		HRESULT hr = GetHeldComPtr()->SetFlowDirection(flowDirection); HR_L(hr);
 	}
 
-	Font::FontCollection TextFormat::GetFontCollection() const noexcept
+	auto TextFormat::GetFontCollection() const noexcept -> Font::FontCollection
 	{
 		ComPtr<IDWriteFontCollection> fontCollection;
 		ComPtr<IDWriteFontCollection3> fontCollection3;
@@ -79,7 +79,7 @@ namespace PGUI::UI
 		return Font::FontCollection{ fontCollection3 };
 	}
 	
-	std::wstring TextFormat::GetFontFamilyName() const noexcept
+	auto TextFormat::GetFontFamilyName() const noexcept -> std::wstring
 	{
 		auto tf = GetHeldComPtr();
 
@@ -101,12 +101,12 @@ namespace PGUI::UI
 		return fontFamilyName;
 	}
 	
-	float TextFormat::GetFontSize() const noexcept
+	auto TextFormat::GetFontSize() const noexcept -> float
 	{
 		return GetHeldComPtr()->GetFontSize();
 	}
 	
-	DWRITE_LINE_SPACING TextFormat::GetLineSpacing() const noexcept
+	auto TextFormat::GetLineSpacing() const noexcept -> DWRITE_LINE_SPACING
 	{
 		DWRITE_LINE_SPACING lineSpacing{ };
 		
@@ -119,20 +119,20 @@ namespace PGUI::UI
 		HRESULT hr = GetHeldComPtr()->SetLineSpacing(&lineSpacing); HR_L(hr);
 	}
 
-	Font::FontStretch TextFormat::GetFontStretch() const noexcept
+	auto TextFormat::GetFontStretch() const noexcept -> Font::FontStretch
 	{
 		return GetHeldComPtr()->GetFontStretch();
 	}
-	Font::FontStyle TextFormat::GetFontStyle() const noexcept
+	auto TextFormat::GetFontStyle() const noexcept -> Font::FontStyle
 	{
 		return GetHeldComPtr()->GetFontStyle();
 	}
-	Font::FontWeight TextFormat::GetFontWeight() const noexcept
+	auto TextFormat::GetFontWeight() const noexcept -> Font::FontWeight
 	{
 		return GetHeldComPtr()->GetFontWeight();
 	}
 	
-	float TextFormat::GetIncrementalTabStop() const noexcept
+	auto TextFormat::GetIncrementalTabStop() const noexcept -> float
 	{
 		return GetHeldComPtr()->GetIncrementalTabStop();
 	}
@@ -142,7 +142,7 @@ namespace PGUI::UI
 		HRESULT hr = GetHeldComPtr()->SetIncrementalTabStop(incrementalTabStop); HR_L(hr);
 	}
 
-	std::wstring TextFormat::GetLocaleName() const noexcept
+	auto TextFormat::GetLocaleName() const noexcept -> std::wstring
 	{
 		auto tf = GetHeldComPtr();
 
@@ -165,7 +165,7 @@ namespace PGUI::UI
 		return localeName;
 	}
 	
-	Font::ParagraphAlignment TextFormat::GetParagraphAlignment() const noexcept
+	auto TextFormat::GetParagraphAlignment() const noexcept -> Font::ParagraphAlignment
 	{
 		return GetHeldComPtr()->GetParagraphAlignment();
 	}
@@ -174,7 +174,7 @@ namespace PGUI::UI
 		HRESULT hr = GetHeldComPtr()->SetParagraphAlignment(paragraphAlignment); HR_L(hr);
 	}
 
-	Font::ReadingDirection TextFormat::GetReadingDirection() const noexcept
+	auto TextFormat::GetReadingDirection() const noexcept -> Font::ReadingDirection
 	{
 		return GetHeldComPtr()->GetReadingDirection();
 	}
@@ -183,16 +183,16 @@ namespace PGUI::UI
 		HRESULT hr = GetHeldComPtr()->SetReadingDirection(readingDirection); HR_L(hr);
 	}
 	
-	Font::TextAlignment TextFormat::GetTextAlignment() const noexcept
+	auto TextFormat::GetTextAlignment() const noexcept -> Font::TextAlignment
 	{
-		return Font::TextAlignment();
+		return {};
 	}
 	void TextFormat::SetTextAlignment(Font::TextAlignment textAlignment) const noexcept
 	{
 		HRESULT hr = GetHeldComPtr()->SetTextAlignment(textAlignment); HR_L(hr);
 	}
 
-	std::pair<DWRITE_TRIMMING, ComPtr<IDWriteInlineObject>> TextFormat::GetTrimming() const noexcept
+	auto TextFormat::GetTrimming() const noexcept -> std::pair<DWRITE_TRIMMING, ComPtr<IDWriteInlineObject>>
 	{
 		DWRITE_TRIMMING trimming{ };
 		ComPtr<IDWriteInlineObject> inlineObject;
@@ -206,7 +206,7 @@ namespace PGUI::UI
 		HRESULT hr = GetHeldComPtr()->SetTrimming(&trimming, inlineObject.Get()); HR_L(hr);
 	}
 
-	Font::WordWrapping TextFormat::GetWordWrapping() const noexcept
+	auto TextFormat::GetWordWrapping() const noexcept -> Font::WordWrapping
 	{
 		return GetHeldComPtr()->GetWordWrapping();
 	}

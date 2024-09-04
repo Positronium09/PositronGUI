@@ -23,13 +23,13 @@ namespace PGUI::UI::Bmp
 		explicit Palette(ComPtr<IWICBitmapDecoder> bitmapDecoder);
 		explicit Palette(ComPtr<IWICBitmapSource> bitmapDecoder);
 
-		[[nodiscard]] std::vector<WICColor> GetColors() const noexcept;
-		[[nodiscard]] UINT GetColorCount() const noexcept;
+		[[nodiscard]] auto GetColors() const noexcept -> std::vector<WICColor>;
+		[[nodiscard]] auto GetColorCount() const noexcept -> UINT;
 
-		[[nodiscard]] WICBitmapPaletteType GetPaletteType() const noexcept;
+		[[nodiscard]] auto GetPaletteType() const noexcept -> WICBitmapPaletteType;
 
-		[[nodiscard]] bool IsBlackWhite() const noexcept;
-		[[nodiscard]] bool IsGrayScale() const noexcept;
-		[[nodiscard]] bool HasAlpha() const noexcept;
+		[[nodiscard]] auto IsBlackWhite() const noexcept -> bool;
+		[[nodiscard]] auto IsGrayScale() const noexcept -> bool;
+		[[nodiscard]] auto HasAlpha() const noexcept -> bool;
 	};
 }

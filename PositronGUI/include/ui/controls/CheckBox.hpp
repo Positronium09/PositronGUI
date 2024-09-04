@@ -27,16 +27,16 @@ namespace PGUI::UI::Controls
 			CheckBoxColors() = default;
 		};
 
-		[[nodiscard]] static CheckBox::CheckBoxColors GetCheckBoxColors() noexcept;
-		[[nodiscard]] static CheckBox::CheckBoxColors GetCheckBoxAccentedColors() noexcept;
+		[[nodiscard]] static auto GetCheckBoxColors() noexcept -> CheckBox::CheckBoxColors;
+		[[nodiscard]] static auto GetCheckBoxAccentedColors() noexcept -> CheckBox::CheckBoxColors;
 
-		explicit CheckBox(const CheckBoxColors& colors = GetCheckBoxAccentedColors()) noexcept;
+		explicit CheckBox(CheckBoxColors  colors = GetCheckBoxAccentedColors()) noexcept;
 
-		[[nodiscard]] const CheckBoxColors& GetColors() const noexcept { return colors; }
-		[[nodiscard]] CheckBoxColors& GetColors() noexcept { return colors; }
+		[[nodiscard]] auto GetColors() const noexcept -> const CheckBoxColors& { return colors; }
+		[[nodiscard]] auto GetColors() noexcept -> CheckBoxColors& { return colors; }
 		void SetColors(const CheckBoxColors& newColors) { colors = newColors; }
 
-		[[nodiscard]] bool IsTriState() const noexcept { return isTriState; }
+		[[nodiscard]] auto IsTriState() const noexcept -> bool { return isTriState; }
 		void SetTriState(bool triState = true) noexcept { isTriState = triState; }
 
 		private:
@@ -52,6 +52,6 @@ namespace PGUI::UI::Controls
 		void OnClicked() noexcept;
 		void OnStateChanged(ButtonState state) noexcept;
 
-		Core::HandlerResult OnPaint(UINT msg, WPARAM wParam, LPARAM lParam) noexcept;
+		auto OnPaint(UINT msg, WPARAM wParam, LPARAM lParam) noexcept -> Core::HandlerResult;
 	};
 }

@@ -5,7 +5,7 @@
 
 namespace PGUI::Core
 {
-	template<typename ...Arg> std::shared_ptr<WindowClass> static CreateWindowClassSharedPtr(Arg&&...arg)
+	template<typename ...Arg> auto static CreateWindowClassSharedPtr(Arg&&...arg) -> std::shared_ptr<WindowClass>
 	{
 		struct EnableMakeShared : public WindowClass
 		{
@@ -41,8 +41,8 @@ namespace PGUI::Core
 		}
 	}
 
-	WindowClass::WindowClassPtr WindowClass::Create(std::wstring_view className, UINT style,
-		HBRUSH backgroundBrush, HICON icon, HCURSOR cursor, HICON smIcon) noexcept
+	auto WindowClass::Create(std::wstring_view className, UINT style,
+		HBRUSH backgroundBrush, HICON icon, HCURSOR cursor, HICON smIcon) noexcept -> WindowClass::WindowClassPtr
 	{
 		WNDCLASSEXW w{ };
 		auto atom = static_cast<ATOM>(GetClassInfoExW(GetHInstance(), className.data(), &w));
@@ -70,7 +70,7 @@ namespace PGUI::Core
 		return className;
 	}
 
-	ATOM WindowClass::GetAtom() const noexcept
+	auto WindowClass::GetAtom() const noexcept -> ATOM
 	{
 		return classAtom;
 	}

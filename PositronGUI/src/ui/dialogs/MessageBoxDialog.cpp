@@ -50,7 +50,7 @@ namespace PGUI::UI::Dialogs
 		textBrush.ReleaseBrush();
 	}
 
-	MessageBoxChoice MessageBoxDialog::Display() noexcept
+	auto MessageBoxDialog::Display() noexcept -> MessageBoxChoice
 	{
 		RunModal();
 		return choice;
@@ -150,7 +150,7 @@ namespace PGUI::UI::Dialogs
 		SetRunning(false);
 	}
 
-	SizeI MessageBoxDialog::CalculateSize() const noexcept
+	auto MessageBoxDialog::CalculateSize() const noexcept -> SizeI
 	{
 		auto metrics = textLayout.GetMetrics();
 		
@@ -220,7 +220,7 @@ namespace PGUI::UI::Dialogs
 		return size;
 	}
 
-	Core::HandlerResult MessageBoxDialog::OnCreate(UINT, WPARAM, LPARAM)
+	auto MessageBoxDialog::OnCreate(UINT, WPARAM, LPARAM) -> Core::HandlerResult
 	{
 		if (UIColors::IsDarkMode())
 		{
@@ -315,7 +315,7 @@ namespace PGUI::UI::Dialogs
 		return 0;
 	}
 
-	Core::HandlerResult MessageBoxDialog::OnPaint(UINT, WPARAM, LPARAM)
+	auto MessageBoxDialog::OnPaint(UINT, WPARAM, LPARAM) -> Core::HandlerResult
 	{
 		BeginDraw();
 
@@ -352,9 +352,9 @@ namespace PGUI::UI::Dialogs
 		return 0;
 	}
 
-	MessageBoxChoice ShowMessageBox(HWND parentHwnd,
+	auto ShowMessageBox(HWND parentHwnd,
 		std::wstring_view caption, std::wstring_view text,
-		MessageBoxButtonSet buttonSet, MessageBoxIcon icon)
+		MessageBoxButtonSet buttonSet, MessageBoxIcon icon) -> MessageBoxChoice
 	{
 		auto msgBox = Dialog::Create<MessageBoxDialog>(
 			DialogCreateParams{ parentHwnd, DS_MODALFRAME },

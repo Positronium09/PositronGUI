@@ -119,7 +119,7 @@ namespace PGUI::UI::Controls
 			return charRange;
 		}
 
-		long Length() const noexcept { return max - min + 1; }
+		[[nodiscard]] auto Length() const noexcept -> long { return max - min + 1; }
 	};
 
 	struct FindTextStruct
@@ -141,61 +141,61 @@ namespace PGUI::UI::Controls
 			#pragma region ITextHost2_Impl
 
 			HRESULT STDMETHODCALLTYPE QueryInterface(REFIID riid, void** ppvObject) override;
-			ULONG STDMETHODCALLTYPE AddRef(void) override;
-			ULONG STDMETHODCALLTYPE Release(void) override;
+			ULONG STDMETHODCALLTYPE AddRef() override;
+			ULONG STDMETHODCALLTYPE Release() override;
 
-			HDC TxGetDC() override;
-			INT TxReleaseDC(HDC hdc) override;
-			BOOL TxShowScrollBar(INT fnBar, BOOL fShow) override;
-			BOOL TxEnableScrollBar(INT fuSBFlags, INT fuArrowflags) override;
-			BOOL TxSetScrollRange(INT fnBar, LONG nMinPos, INT nMaxPos, BOOL fRedraw) override;
-			BOOL TxSetScrollPos(INT fnBar, INT nPos, BOOL fRedraw) override;
+			auto TxGetDC() -> HDC override;
+			auto TxReleaseDC(HDC hdc) -> INT override;
+			auto TxShowScrollBar(INT fnBar, BOOL fShow) -> BOOL override;
+			auto TxEnableScrollBar(INT fuSBFlags, INT fuArrowflags) -> BOOL override;
+			auto TxSetScrollRange(INT fnBar, LONG nMinPos, INT nMaxPos, BOOL fRedraw) -> BOOL override;
+			auto TxSetScrollPos(INT fnBar, INT nPos, BOOL fRedraw) -> BOOL override;
 			void TxInvalidateRect(LPCRECT prc, BOOL fMode) override;
 			void TxViewChange(BOOL fUpdate) override;
-			BOOL TxCreateCaret(HBITMAP hbmp, INT xWidth, INT yHeight) override;
-			BOOL TxShowCaret(BOOL fShow) override;
-			BOOL TxSetCaretPos(INT x, INT y) override;
-			BOOL TxSetTimer(UINT idTimer, UINT uTimeout) override;
+			auto TxCreateCaret(HBITMAP hbmp, INT xWidth, INT yHeight) -> BOOL override;
+			auto TxShowCaret(BOOL fShow) -> BOOL override;
+			auto TxSetCaretPos(INT x, INT y) -> BOOL override;
+			auto TxSetTimer(UINT idTimer, UINT uTimeout) -> BOOL override;
 			void TxKillTimer(UINT idTimer) override;
 			void TxScrollWindowEx(INT dx, INT dy, LPCRECT lprcScroll, LPCRECT lprcClip, HRGN hrgnUpdate, LPRECT lprcUpdate, UINT fuScroll) override;
 			void TxSetCapture(BOOL fCapture) override;
 			void TxSetFocus() override;
 			void TxSetCursor(HCURSOR hcur, BOOL fText) override;
-			BOOL TxScreenToClient(LPPOINT lppt) override;
-			BOOL TxClientToScreen(LPPOINT lppt) override;
-			HRESULT TxActivate(LONG* plOldState) override;
-			HRESULT TxDeactivate(LONG lNewState) override;
-			HRESULT TxGetClientRect(LPRECT prc) override;
-			HRESULT TxGetViewInset(LPRECT prc) override;
-			HRESULT TxGetCharFormat(const CHARFORMATW** ppCF) override;
-			HRESULT TxGetParaFormat(const PARAFORMAT** ppPF) override;
-			COLORREF TxGetSysColor(int nIndex) override;
-			HRESULT TxGetBackStyle(TXTBACKSTYLE* pstyle) override;
-			HRESULT TxGetMaxLength(DWORD* plength) override;
-			HRESULT TxGetScrollBars(DWORD* pdwScrollBar) override;
-			HRESULT TxGetPasswordChar(TCHAR* pch) override;
-			HRESULT TxGetAcceleratorPos(LONG* pcp) override;
-			HRESULT TxGetExtent(LPSIZEL lpExtent) override;
-			HRESULT OnTxCharFormatChange(const CHARFORMATW* pCF) override;
-			HRESULT OnTxParaFormatChange(const PARAFORMAT* pPF) override;
-			HRESULT TxGetPropertyBits(DWORD dwMask, DWORD* pdwBits) override;
-			HRESULT TxNotify(DWORD iNotify, void* pv) override;
-			HIMC TxImmGetContext() override;
+			auto TxScreenToClient(LPPOINT lppt) -> BOOL override;
+			auto TxClientToScreen(LPPOINT lppt) -> BOOL override;
+			auto TxActivate(LONG* plOldState) -> HRESULT override;
+			auto TxDeactivate(LONG lNewState) -> HRESULT override;
+			auto TxGetClientRect(LPRECT prc) -> HRESULT override;
+			auto TxGetViewInset(LPRECT prc) -> HRESULT override;
+			auto TxGetCharFormat(const CHARFORMATW** ppCF) -> HRESULT override;
+			auto TxGetParaFormat(const PARAFORMAT** ppPF) -> HRESULT override;
+			auto TxGetSysColor(int nIndex) -> COLORREF override;
+			auto TxGetBackStyle(TXTBACKSTYLE* pstyle) -> HRESULT override;
+			auto TxGetMaxLength(DWORD* plength) -> HRESULT override;
+			auto TxGetScrollBars(DWORD* pdwScrollBar) -> HRESULT override;
+			auto TxGetPasswordChar(TCHAR* pch) -> HRESULT override;
+			auto TxGetAcceleratorPos(LONG* pcp) -> HRESULT override;
+			auto TxGetExtent(LPSIZEL lpExtent) -> HRESULT override;
+			auto OnTxCharFormatChange(const CHARFORMATW* pCF) -> HRESULT override;
+			auto OnTxParaFormatChange(const PARAFORMAT* pPF) -> HRESULT override;
+			auto TxGetPropertyBits(DWORD dwMask, DWORD* pdwBits) -> HRESULT override;
+			auto TxNotify(DWORD iNotify, void* pv) -> HRESULT override;
+			auto TxImmGetContext() -> HIMC override;
 			void TxImmReleaseContext(HIMC himc) override;
 
-			HRESULT TxGetSelectionBarWidth(LONG* lSelBarWidth) override;
-			BOOL TxIsDoubleClickPending() override;
-			HRESULT TxGetWindow(HWND* phwnd) override;
-			HRESULT TxSetForegroundWindow() override;
-			HPALETTE TxGetPalette() override;
-			HRESULT TxGetEastAsianFlags(LONG* pFlags) override;
-			HCURSOR TxSetCursor2(HCURSOR hcur, BOOL bText) override;
+			auto TxGetSelectionBarWidth(LONG* lSelBarWidth) -> HRESULT override;
+			auto TxIsDoubleClickPending() -> BOOL override;
+			auto TxGetWindow(HWND* phwnd) -> HRESULT override;
+			auto TxSetForegroundWindow() -> HRESULT override;
+			auto TxGetPalette() -> HPALETTE override;
+			auto TxGetEastAsianFlags(LONG* pFlags) -> HRESULT override;
+			auto TxSetCursor2(HCURSOR hcur, BOOL bText) -> HCURSOR override;
 			void TxFreeTextServicesNotification() override;
-			HRESULT TxGetEditStyle(DWORD dwItem, DWORD* pdwData) override;
-			HRESULT TxGetWindowStyles(DWORD* pdwStyle, DWORD* pdwExStyle) override;
-			HRESULT TxShowDropCaret(BOOL fShow, HDC hdc, LPCRECT prc) override;
-			HRESULT TxDestroyCaret() override;
-			HRESULT TxGetHorzExtent(LONG* plHorzExtent) override;
+			auto TxGetEditStyle(DWORD dwItem, DWORD* pdwData) -> HRESULT override;
+			auto TxGetWindowStyles(DWORD* pdwStyle, DWORD* pdwExStyle) -> HRESULT override;
+			auto TxShowDropCaret(BOOL fShow, HDC hdc, LPCRECT prc) -> HRESULT override;
+			auto TxDestroyCaret() -> HRESULT override;
+			auto TxGetHorzExtent(LONG* plHorzExtent) -> HRESULT override;
 
 			#pragma endregion
 
@@ -231,12 +231,12 @@ namespace PGUI::UI::Controls
 			}
 		};
 
-		static long PixelsToTwips(long pixels) noexcept;
+		static auto PixelsToTwips(long pixels) noexcept -> long;
 		
 		explicit Edit(const EditParams& params = EditParams{ });
 
 		void SetText(std::wstring_view text) const noexcept;
-		[[nodiscard]] std::wstring GetText() const noexcept;
+		[[nodiscard]] auto GetText() const noexcept -> std::wstring;
 
 		void SetKeyFilter(const KeyFilterFunction& keyFilter) noexcept;
 		void RemoveKeyFilter() noexcept;
@@ -248,20 +248,20 @@ namespace PGUI::UI::Controls
 		/**
 		 * @return Caret position in client coordiantes
 		 */
-		PointL GetCaretPosition() const noexcept;
-		std::int64_t GetCaretCharIndex() const noexcept;
+		[[nodiscard]] auto GetCaretPosition() const noexcept -> PointL;
+		[[nodiscard]] auto GetCaretCharIndex() const noexcept -> std::int64_t;
 
 		#pragma region RICH_EDIT_IMPL
 
 		void SetPasswordChar(wchar_t passChar) noexcept;
-		[[nodiscard]] wchar_t GetPasswordChar() const noexcept { return passwordChar; }
+		[[nodiscard]] auto GetPasswordChar() const noexcept -> wchar_t { return passwordChar; }
 
 		void SetBackgroundBrush(const Brush& bkgndBrush) noexcept;
-		[[nodiscard]] const Brush& GetTextBrush() const noexcept { return backgroundBrush; }
+		[[nodiscard]] auto GetTextBrush() const noexcept -> const Brush& { return backgroundBrush; }
 
-		[[nodiscard]] bool CanPaste() const noexcept;
-		[[nodiscard]] bool CanRedo() const noexcept;
-		[[nodiscard]] bool CanUndo() const noexcept;
+		[[nodiscard]] auto CanPaste() const noexcept -> bool;
+		[[nodiscard]] auto CanRedo() const noexcept -> bool;
+		[[nodiscard]] auto CanUndo() const noexcept -> bool;
 
 		void Clear() const noexcept;
 		void Copy() const noexcept;
@@ -278,24 +278,24 @@ namespace PGUI::UI::Controls
 		 * @param[in] position - Position in client coordiantes
 		 * @return 0 based index of the closest character
 		 */
-		[[nodiscard]] std::int64_t GetCharIndexFromPosition(PointL position) const noexcept;
+		[[nodiscard]] auto GetCharIndexFromPosition(PointL position) const noexcept -> std::int64_t;
 		/**
 		 * @param index - 0 based index of the character
 		 * @return Position of top left corner of the character in client coordinates
 		 */
-		[[nodiscard]] PointL GetPositionFromCharIndex(std::int64_t index) const noexcept;
+		[[nodiscard]] auto GetPositionFromCharIndex(std::int64_t index) const noexcept -> PointL;
 
-		BOOL DisplayBand(RectL displayRect) const noexcept;
+		[[nodiscard]] auto DisplayBand(RectL displayRect) const noexcept -> BOOL;
 
 		void EmptyUndoBuffer() const noexcept;
 
-		[[nodiscard]] bool IsModified() const noexcept;
+		[[nodiscard]] auto IsModified() const noexcept -> bool;
 		void SetModified(bool modified = true) const noexcept;
 
-		[[nodiscard]] bool IsReadOnly() const noexcept;
+		[[nodiscard]] auto IsReadOnly() const noexcept -> bool;
 		void SetReadOnly(bool readonly = true) noexcept;
 
-		[[nodiscard]] bool IsPassword() const noexcept;
+		[[nodiscard]] auto IsPassword() const noexcept -> bool;
 		void SetPassword(bool password = true) noexcept;
 
 		/**
@@ -303,8 +303,8 @@ namespace PGUI::UI::Controls
 		 * @param text - Text to be found
 		 * @return CharRange of the text in which it was found, not found if both min and max are -1
 		 */
-		[[nodiscard]] CharRange Find(EditFindFlag flags, std::wstring_view text, CharRange searchRange = CharRange{ 0, -1 }) const noexcept;
-		[[nodiscard]] std::int64_t FindWordBreak(FindWordBreakOperations op, std::int64_t startPosition) const noexcept;
+		[[nodiscard]] auto Find(EditFindFlag flags, std::wstring_view text, CharRange searchRange = CharRange{ 0, -1 }) const noexcept -> CharRange;
+		[[nodiscard]] auto FindWordBreak(FindWordBreakOperations op, std::int64_t startPosition) const noexcept -> std::int64_t;
 
 		/**
 		 * @param formatRange - Information about the output device
@@ -312,56 +312,56 @@ namespace PGUI::UI::Controls
 		 * @param display - Indicates if the text should be rendered. If false the text is just measured
 		 * @return The index of the last character that fits in the region plus 1
 		 */
-		[[nodiscard]] std::int64_t FormatRange(std::optional<FORMATRANGE> formatRange, bool display = true) const noexcept;
+		[[nodiscard]] auto FormatRange(std::optional<FORMATRANGE> formatRange, bool display = true) const noexcept -> std::int64_t;
 
-		[[nodiscard]] CHARFORMAT2W GetDefaultCharFormat() const noexcept { return charFormat; }
+		[[nodiscard]] auto GetDefaultCharFormat() const noexcept -> CHARFORMAT2W { return charFormat; }
 		void SetDefaultCharFormat(const CHARFORMAT2W& charFormat) noexcept;
 
-		[[nodiscard]] EditEventMaskFlag GetEventMask() const noexcept;
+		[[nodiscard]] auto GetEventMask() const noexcept -> EditEventMaskFlag;
 		void SetEventMask(EditEventMaskFlag eventFlags) const noexcept;
 
-		[[nodiscard]] std::int64_t GetFirstVisibleLine() const noexcept;
+		[[nodiscard]] auto GetFirstVisibleLine() const noexcept -> std::int64_t;
 
-		[[nodiscard]] std::int64_t GetTextLimit() const noexcept;
+		[[nodiscard]] auto GetTextLimit() const noexcept -> std::int64_t;
 		void SetTextLimit(std::int64_t limit) const noexcept;
 
-		[[nodiscard]] std::wstring GetLine(int line) const noexcept;
+		[[nodiscard]] auto GetLine(int line) const noexcept -> std::wstring;
 
-		[[nodiscard]] EditOptionsFlag GetOptions()  const noexcept;
+		[[nodiscard]] auto GetOptions()  const noexcept -> EditOptionsFlag;
 		void SetOptions(EditOptionsFlag options) const noexcept;
 
-		[[nodiscard]] PARAFORMAT2 GetParaFormat() const noexcept { return paraFormat; }
+		[[nodiscard]] auto GetParaFormat() const noexcept -> PARAFORMAT2 { return paraFormat; }
 		void SetParaFormat(const PARAFORMAT2& paraFormat) noexcept;
 
-		[[nodiscard]] RectL GetFormattingRect() const noexcept;
+		[[nodiscard]] auto GetFormattingRect() const noexcept -> RectL;
 		void SetFormattingRect(RectL rect) const noexcept;
 
-		[[nodiscard]] UNDONAMEID GetRedoName() const noexcept;
-		[[nodiscard]] UNDONAMEID GetUndoName() const noexcept;
+		[[nodiscard]] auto GetRedoName() const noexcept -> UNDONAMEID;
+		[[nodiscard]] auto GetUndoName() const noexcept -> UNDONAMEID;
 
 		/**
 		 * @return first is beginning and the last is ending character
 		 * If start is 0 and end is -1 all text is selected
 		 */
-		[[nodiscard]] CharRange GetSelection() const noexcept;
+		[[nodiscard]] auto GetSelection() const noexcept -> CharRange;
 		void SetSelection(CharRange charRange) const noexcept;
 
-		[[nodiscard]] CHARFORMAT2W GetSelectionCharFormat() const noexcept;
+		[[nodiscard]] auto GetSelectionCharFormat() const noexcept -> CHARFORMAT2W;
 		void SetSelectionCharFormat(const CHARFORMAT2W& charFormat) const noexcept;
 
 		void SetWordCharFormat(const CHARFORMAT2W& charFormat) const noexcept;
 
-		[[nodiscard]] EditSelectionFlag GetSelectionType() const noexcept;
+		[[nodiscard]] auto GetSelectionType() const noexcept -> EditSelectionFlag;
 
-		[[nodiscard]] std::wstring GetSelectedText() const noexcept;
+		[[nodiscard]] auto GetSelectedText() const noexcept -> std::wstring;
 
-		[[nodiscard]] std::int64_t GetTextLength(
-			std::optional<GETTEXTLENGTHEX> lengthEx = std::nullopt) const noexcept;
+		[[nodiscard]] auto GetTextLength(
+			std::optional<GETTEXTLENGTHEX> lengthEx = std::nullopt) const noexcept -> std::int64_t;
 
-		[[nodiscard]] TEXTMODE GetTextMode() const noexcept;
+		[[nodiscard]] auto GetTextMode() const noexcept -> TEXTMODE;
 		void SetTextMode(TEXTMODE textMode) const noexcept;
 
-		[[nodiscard]] std::wstring GetTextRange(CharRange charRange) const noexcept;
+		[[nodiscard]] auto GetTextRange(CharRange charRange) const noexcept -> std::wstring;
 
 		void SetTargetDevice(HDC hdc, std::int64_t lineWidth) const noexcept;
 
@@ -376,56 +376,56 @@ namespace PGUI::UI::Controls
 		 * If index is -1 then it specifies the current line (the line that contains the caret)
 		 * @return 0 based line number of the line containing the character index
 		 */
-		[[nodiscard]] std::int64_t GetLineFromCharIndex(std::int64_t index = -1) const noexcept;
+		[[nodiscard]] auto GetLineFromCharIndex(std::int64_t index = -1) const noexcept -> std::int64_t;
 		/**
 		 * @param line - 0 based line index 
 		 * If line is -1 it specifies the current line number (the line that contains the caret)
 		 * @return Character index of the line 
 		 * If it is -1 the specified line number is greater than the number of lines in the edit control
 		 */
-		[[nodiscard]] std::int64_t GetLineIndex(std::int64_t line = -1) const noexcept;
+		[[nodiscard]] auto GetLineIndex(std::int64_t line = -1) const noexcept -> std::int64_t;
 		/**
 		 * @param line - 0 based index of the character in the line
 		 * If it is -1 returns the number of unselected characters on lines containing selected characters
 		 * Look at https://learn.microsoft.com/en-us/windows/win32/Controls/em-linelength for more info
 		 * @return Number of characters in the line
 		 */
-		[[nodiscard]] std::int64_t GetLineLength(std::int64_t index = -1) const noexcept;
+		[[nodiscard]] auto GetLineLength(std::int64_t index = -1) const noexcept -> std::int64_t;
 
 		void ScrollLines(std::int64_t lines) const noexcept;
 		
 		void RequestSize() const noexcept;
 
-		[[nodiscard]] ComPtr<IRichEditOle> GetRichEditOle() const noexcept;
+		[[nodiscard]] auto GetRichEditOle() const noexcept -> ComPtr<IRichEditOle>;
 		void SetOleCallack(ComPtr<IRichEditOleCallback> callback) const noexcept;
 
 		void EnableAutoURLDetect() const noexcept;
 		void DisableAutoURLDetect() const noexcept;
 
-		std::int64_t StreamIn(int streamFormat, EDITSTREAM editStream) const noexcept;
-		std::int64_t StreamOut(int streamFormat, EDITSTREAM editStream) const noexcept;
+		[[nodiscard]] auto StreamIn(int streamFormat, EDITSTREAM editStream) const noexcept -> std::int64_t;
+		[[nodiscard]] auto StreamOut(int streamFormat, EDITSTREAM editStream) const noexcept -> std::int64_t;
 
 		#pragma endregion
 
 		#pragma region Events
 
-		auto& ChangedEvent() { return changedEvent; }
-		auto& ClipFormatEvent() { return clipFormatEvent; }
-		auto& DragDropDoneEvent() { return dragDropDoneEvent; }
-		auto& DropFilesEvent() { return dropFilesEvent; }
-		auto& LinkEvent() { return linkEvent; }
-		auto& LowFirtfEvent() { return lowFirtfEvent; }
-		auto& ObjectPositionsEvent() { return objectPositionsEvent; }
-		auto& OleOpFailedEvent() { return oleOpFailedEvent; }
-		auto& ParagraphExpandedEvent() { return paragraphExpandedEvent; }
-		auto& ProtectedEvent() { return protectedEvent; }
-		auto& RequestResizeEvent() { return requestResizeEvent; }
-		auto& ScrollEvent() { return scrollEvent; }
-		auto& SelectionChangeEvent() { return selectionChangeEvent; }
-		auto& UpdateEvent() { return updateEvent; }
-		auto& ErrSpaceEvent() { return errSpaceEvent; }
-		auto& MaxTextEvent() { return maxTextEvent; }
-		auto& CaretPositionChangedEvent() { return caretPositionChangedEvent; }
+		auto ChangedEvent() -> auto& { return changedEvent; }
+		auto ClipFormatEvent() -> auto& { return clipFormatEvent; }
+		auto DragDropDoneEvent() -> auto& { return dragDropDoneEvent; }
+		auto DropFilesEvent() -> auto& { return dropFilesEvent; }
+		auto LinkEvent() -> auto& { return linkEvent; }
+		auto LowFirtfEvent() -> auto& { return lowFirtfEvent; }
+		auto ObjectPositionsEvent() -> auto& { return objectPositionsEvent; }
+		auto OleOpFailedEvent() -> auto& { return oleOpFailedEvent; }
+		auto ParagraphExpandedEvent() -> auto& { return paragraphExpandedEvent; }
+		auto ProtectedEvent() -> auto& { return protectedEvent; }
+		auto RequestResizeEvent() -> auto& { return requestResizeEvent; }
+		auto ScrollEvent() -> auto& { return scrollEvent; }
+		auto SelectionChangeEvent() -> auto& { return selectionChangeEvent; }
+		auto UpdateEvent() -> auto& { return updateEvent; }
+		auto ErrSpaceEvent() -> auto& { return errSpaceEvent; }
+		auto MaxTextEvent() -> auto& { return maxTextEvent; }
+		auto CaretPositionChangedEvent() -> auto& { return caretPositionChangedEvent; }
 
 		#pragma endregion
 
@@ -476,20 +476,20 @@ namespace PGUI::UI::Controls
 
 		void CaretBlinkHandler(Core::TimerId timerId);
 
-		Core::HandlerResult OnDPIChange(float dpiScale, RectI suggestedRect) override;
-		Core::HandlerResult ForwardToTextServices(UINT msg, WPARAM wParam, LPARAM lParam);
-		Core::HandlerResult OnCreate(UINT msg, WPARAM wParam, LPARAM lParam);
-		Core::HandlerResult OnDestroy(UINT msg, WPARAM wParam, LPARAM lParam) noexcept;
-		Core::HandlerResult OnPaint(UINT msg, WPARAM wParam, LPARAM lParam) noexcept;
-		Core::HandlerResult OnSetCursor(UINT msg, WPARAM wParam, LPARAM lParam) const noexcept;
-		Core::HandlerResult OnSetFocus(UINT msg, WPARAM wParam, LPARAM lParam) const noexcept;
-		Core::HandlerResult OnKillFocus(UINT msg, WPARAM wParam, LPARAM lParam) const noexcept;
+		auto OnDPIChange(float dpiScale, RectI suggestedRect) -> Core::HandlerResult override;
+		auto ForwardToTextServices(UINT msg, WPARAM wParam, LPARAM lParam) -> Core::HandlerResult;
+		auto OnCreate(UINT msg, WPARAM wParam, LPARAM lParam) -> Core::HandlerResult;
+		auto OnDestroy(UINT msg, WPARAM wParam, LPARAM lParam) noexcept -> Core::HandlerResult;
+		auto OnPaint(UINT msg, WPARAM wParam, LPARAM lParam) noexcept -> Core::HandlerResult;
+		[[nodiscard]] auto OnSetCursor(UINT msg, WPARAM wParam, LPARAM lParam) const noexcept -> Core::HandlerResult;
+		[[nodiscard]] auto OnSetFocus(UINT msg, WPARAM wParam, LPARAM lParam) const noexcept -> Core::HandlerResult;
+		[[nodiscard]] auto OnKillFocus(UINT msg, WPARAM wParam, LPARAM lParam) const noexcept -> Core::HandlerResult;
 	};
 
 	namespace BuiltinFilters
 	{
-		bool NumericOnlyFilter(Core::WindowPtr<Edit> edit, UINT& msg, WPARAM& wParam, LPARAM& lParam) noexcept;
-		bool UppercaseOnlyFilter(Core::WindowPtr<Edit> edit, UINT& msg, WPARAM& wParam, LPARAM& lParam) noexcept;
-		bool LowercaseOnlyFilter(Core::WindowPtr<Edit> edit, UINT& msg, WPARAM& wParam, LPARAM& lParam) noexcept;
+		auto NumericOnlyFilter(Core::WindowPtr<Edit> edit, UINT& msg, WPARAM& wParam, LPARAM& lParam) noexcept -> bool;
+		auto UppercaseOnlyFilter(Core::WindowPtr<Edit> edit, UINT& msg, WPARAM& wParam, LPARAM& lParam) noexcept -> bool;
+		auto LowercaseOnlyFilter(Core::WindowPtr<Edit> edit, UINT& msg, WPARAM& wParam, LPARAM& lParam) noexcept -> bool;
 	}
 }

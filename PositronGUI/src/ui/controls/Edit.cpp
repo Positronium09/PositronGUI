@@ -82,7 +82,7 @@ namespace Msftedit
 
 namespace PGUI::UI::Controls
 {
-	long Edit::PixelsToTwips(long pixels) noexcept
+	auto Edit::PixelsToTwips(long pixels) noexcept -> long
 	{
 		return pixels * 15;
 	}
@@ -139,7 +139,7 @@ namespace PGUI::UI::Controls
 		Invalidate();
 	}
 
-	std::wstring Edit::GetText() const noexcept
+	auto Edit::GetText() const noexcept -> std::wstring
 	{
 		std::wstring text(GetTextLength(), L'\0');
 
@@ -177,12 +177,12 @@ namespace PGUI::UI::Controls
 		SetDefaultCharFormat(charFormat);
 	}
 
-	PointL Edit::GetCaretPosition() const noexcept
+	auto Edit::GetCaretPosition() const noexcept -> PointL
 	{
 		return textHost.caretPos;
 	}
 
-	std::int64_t Edit::GetCaretCharIndex() const noexcept
+	auto Edit::GetCaretCharIndex() const noexcept -> std::int64_t
 	{
 		return GetCharIndexFromPosition(GetCaretPosition());
 	}
@@ -200,21 +200,21 @@ namespace PGUI::UI::Controls
 		backgroundBrush.SetParameters(bkgndBrush.GetParameters());
 	}
 
-	bool Edit::CanPaste() const noexcept
+	auto Edit::CanPaste() const noexcept -> bool
 	{
 		LRESULT ret{ };
 		HRESULT hr = textServices->TxSendMessage(EM_CANPASTE, NULL, NULL, &ret); HR_L(hr);
 		
 		return ret;
 	}
-	bool Edit::CanRedo() const noexcept
+	auto Edit::CanRedo() const noexcept -> bool
 	{
 		LRESULT ret{ };
 		HRESULT hr = textServices->TxSendMessage(EM_CANREDO, NULL, NULL, &ret); HR_L(hr);
 		
 		return ret;
 	}
-	bool Edit::CanUndo() const noexcept
+	auto Edit::CanUndo() const noexcept -> bool
 	{
 		LRESULT ret{ };
 		HRESULT hr = textServices->TxSendMessage(EM_CANUNDO, NULL, NULL, &ret); HR_L(hr);
@@ -248,7 +248,7 @@ namespace PGUI::UI::Controls
 			std::bit_cast<LPARAM>(&pasteSpecial), nullptr); HR_L(hr);
 	}
 
-	std::int64_t Edit::GetCharIndexFromPosition(PointL position) const noexcept
+	auto Edit::GetCharIndexFromPosition(PointL position) const noexcept -> std::int64_t
 	{
 		LRESULT ret{ };
 		HRESULT hr = textServices->TxSendMessage(EM_CHARFROMPOS, NULL, 
@@ -256,7 +256,7 @@ namespace PGUI::UI::Controls
 
 		return ret;
 	}
-	PointL Edit::GetPositionFromCharIndex(std::int64_t index) const noexcept
+	auto Edit::GetPositionFromCharIndex(std::int64_t index) const noexcept -> PointL
 	{
 		POINT p{ };
 
@@ -267,7 +267,7 @@ namespace PGUI::UI::Controls
 		return p;
 	}
 
-	BOOL Edit::DisplayBand(RectL displayRect) const noexcept
+	auto Edit::DisplayBand(RectL displayRect) const noexcept -> BOOL
 	{
 		LRESULT ret{ };
 		HRESULT hr = textServices->TxSendMessage(EM_DISPLAYBAND, NULL,
@@ -283,7 +283,7 @@ namespace PGUI::UI::Controls
 		HR_L(hr);
 	}
 
-	bool Edit::IsModified() const noexcept
+	auto Edit::IsModified() const noexcept -> bool
 	{
 		LRESULT ret{ };
 		HRESULT hr = textServices->TxSendMessage(EM_GETMODIFY, NULL,
@@ -299,7 +299,7 @@ namespace PGUI::UI::Controls
 		HR_L(hr);
 	}
 
-	bool Edit::IsReadOnly() const noexcept
+	auto Edit::IsReadOnly() const noexcept -> bool
 	{
 		return propertyBits & TXTBIT_READONLY;
 	}
@@ -318,7 +318,7 @@ namespace PGUI::UI::Controls
 		textServices->OnTxPropertyBitsChange(propertyBits, propertyBits);
 	}
 
-	bool Edit::IsPassword() const noexcept
+	auto Edit::IsPassword() const noexcept -> bool
 	{
 		return propertyBits & TXTBIT_USEPASSWORD;
 	}
@@ -337,7 +337,7 @@ namespace PGUI::UI::Controls
 		textServices->OnTxPropertyBitsChange(propertyBits, propertyBits);
 	}
 
-	CharRange Edit::Find(EditFindFlag flags, std::wstring_view text, CharRange searchRange) const noexcept
+	auto Edit::Find(EditFindFlag flags, std::wstring_view text, CharRange searchRange) const noexcept -> CharRange
 	{
 		FINDTEXTEXW ft{ };
 		ft.chrg = searchRange;
@@ -351,7 +351,7 @@ namespace PGUI::UI::Controls
 		return ft.chrgText;
 	}
 
-	std::int64_t Edit::FindWordBreak(FindWordBreakOperations op, std::int64_t startPosition) const noexcept
+	auto Edit::FindWordBreak(FindWordBreakOperations op, std::int64_t startPosition) const noexcept -> std::int64_t
 	{
 		LRESULT ret{ };
 		
@@ -363,7 +363,7 @@ namespace PGUI::UI::Controls
 		return ret;
 	}
 
-	std::int64_t Edit::FormatRange(std::optional<FORMATRANGE> formatRange, bool display) const noexcept
+	auto Edit::FormatRange(std::optional<FORMATRANGE> formatRange, bool display) const noexcept -> std::int64_t
 	{
 		const FORMATRANGE* formatRangePtr = nullptr;
 
@@ -380,7 +380,7 @@ namespace PGUI::UI::Controls
 		return ret;
 	}
 
-	EditEventMaskFlag Edit::GetEventMask() const noexcept
+	auto Edit::GetEventMask() const noexcept -> EditEventMaskFlag
 	{
 		LRESULT ret{ };
 		HRESULT hr =
@@ -397,7 +397,7 @@ namespace PGUI::UI::Controls
 		HR_L(hr);
 	}
 
-	std::int64_t Edit::GetFirstVisibleLine() const noexcept
+	auto Edit::GetFirstVisibleLine() const noexcept -> std::int64_t
 	{
 		LRESULT ret{ };
 		HRESULT hr =
@@ -407,7 +407,7 @@ namespace PGUI::UI::Controls
 		return ret;
 	}
 
-	ComPtr<IRichEditOle> Edit::GetRichEditOle() const noexcept
+	auto Edit::GetRichEditOle() const noexcept -> ComPtr<IRichEditOle>
 	{
 		ComPtr<IRichEditOle> ole;
 
@@ -419,7 +419,7 @@ namespace PGUI::UI::Controls
 		return ole;
 	}
 
-	std::int64_t Edit::GetTextLimit() const noexcept
+	auto Edit::GetTextLimit() const noexcept -> std::int64_t
 	{
 		LRESULT ret{ };
 		HRESULT hr =
@@ -430,7 +430,7 @@ namespace PGUI::UI::Controls
 		return ret;
 	}
 
-	EditOptionsFlag Edit::GetOptions() const noexcept
+	auto Edit::GetOptions() const noexcept -> EditOptionsFlag
 	{
 		LRESULT ret{ };
 		HRESULT hr =
@@ -458,7 +458,7 @@ namespace PGUI::UI::Controls
 		HR_L(hr);
 	}
 
-	RectL Edit::GetFormattingRect() const noexcept
+	auto Edit::GetFormattingRect() const noexcept -> RectL
 	{
 		RECT rc{ };
 		HRESULT hr =
@@ -477,7 +477,7 @@ namespace PGUI::UI::Controls
 		HR_L(hr);
 	}
 
-	UNDONAMEID Edit::GetRedoName() const noexcept
+	auto Edit::GetRedoName() const noexcept -> UNDONAMEID
 	{
 		LRESULT ret{ };
 		HRESULT hr =
@@ -487,7 +487,7 @@ namespace PGUI::UI::Controls
 
 		return static_cast<UNDONAMEID>(ret);
 	}
-	UNDONAMEID Edit::GetUndoName() const noexcept
+	auto Edit::GetUndoName() const noexcept -> UNDONAMEID
 	{
 		LRESULT ret{ };
 		HRESULT hr =
@@ -498,7 +498,7 @@ namespace PGUI::UI::Controls
 		return static_cast<UNDONAMEID>(ret);
 	}
 
-	CharRange Edit::GetSelection() const noexcept
+	auto Edit::GetSelection() const noexcept -> CharRange
 	{
 		CharRange charRange{ };
 		HRESULT hr =
@@ -516,7 +516,7 @@ namespace PGUI::UI::Controls
 		HR_L(hr);
 	}
 
-	CHARFORMAT2W Edit::GetSelectionCharFormat() const noexcept
+	auto Edit::GetSelectionCharFormat() const noexcept -> CHARFORMAT2W
 	{
 		CHARFORMAT2W cf{ };
 		cf.cbSize = sizeof(CHARFORMAT2W);
@@ -545,7 +545,7 @@ namespace PGUI::UI::Controls
 		HR_L(hr);
 	}
 
-	EditSelectionFlag Edit::GetSelectionType() const noexcept
+	auto Edit::GetSelectionType() const noexcept -> EditSelectionFlag
 	{
 		LRESULT ret{ };
 		HRESULT hr =
@@ -556,7 +556,7 @@ namespace PGUI::UI::Controls
 		return static_cast<EditSelectionFlag>(ret);
 	}
 
-	std::wstring Edit::GetSelectedText() const noexcept
+	auto Edit::GetSelectedText() const noexcept -> std::wstring
 	{
 		auto selectionSize = GetSelection().Length() + 1;
 
@@ -570,7 +570,7 @@ namespace PGUI::UI::Controls
 		return selectedText;
 	}
 
-	std::int64_t Edit::GetTextLength(std::optional<GETTEXTLENGTHEX> lengthEx) const noexcept
+	auto Edit::GetTextLength(std::optional<GETTEXTLENGTHEX> lengthEx) const noexcept -> std::int64_t
 	{
 		if (!lengthEx.has_value())
 		{
@@ -591,7 +591,7 @@ namespace PGUI::UI::Controls
 		return ret;
 	}
 
-	TEXTMODE Edit::GetTextMode() const noexcept
+	auto Edit::GetTextMode() const noexcept -> TEXTMODE
 	{
 		LRESULT ret{ };
 		HRESULT hr =
@@ -609,7 +609,7 @@ namespace PGUI::UI::Controls
 		HR_L(hr);
 	}
 
-	std::wstring Edit::GetTextRange(CharRange charRange) const noexcept
+	auto Edit::GetTextRange(CharRange charRange) const noexcept -> std::wstring
 	{
 		std::wstring text(charRange.Length(), L'\0');
 
@@ -672,7 +672,7 @@ namespace PGUI::UI::Controls
 		HR_L(hr);
 	}
 
-	std::wstring Edit::GetLine(int line) const noexcept
+	auto Edit::GetLine(int line) const noexcept -> std::wstring
 	{
 		auto length = GetLineLength(GetLineIndex(line));
 
@@ -694,7 +694,7 @@ namespace PGUI::UI::Controls
 		HR_L(hr);
 	}
 
-	std::int64_t Edit::GetLineFromCharIndex(std::int64_t index) const noexcept
+	auto Edit::GetLineFromCharIndex(std::int64_t index) const noexcept -> std::int64_t
 	{
 		LRESULT ret{ };
 		HRESULT hr =
@@ -705,7 +705,7 @@ namespace PGUI::UI::Controls
 		return ret;
 	}
 
-	std::int64_t Edit::GetLineIndex(std::int64_t line) const noexcept
+	auto Edit::GetLineIndex(std::int64_t line) const noexcept -> std::int64_t
 	{
 		LRESULT ret{ };
 		HRESULT hr =
@@ -716,7 +716,7 @@ namespace PGUI::UI::Controls
 		return ret;
 	}
 
-	std::int64_t Edit::GetLineLength(std::int64_t index) const noexcept
+	auto Edit::GetLineLength(std::int64_t index) const noexcept -> std::int64_t
 	{
 		LRESULT ret{ };
 		HRESULT hr =
@@ -766,7 +766,7 @@ namespace PGUI::UI::Controls
 		HR_L(hr);
 	}
 
-	std::int64_t Edit::StreamIn(int streamFormat, EDITSTREAM editStream) const noexcept
+	auto Edit::StreamIn(int streamFormat, EDITSTREAM editStream) const noexcept -> std::int64_t
 	{
 		LRESULT ret{ };
 		HRESULT hr =
@@ -776,7 +776,7 @@ namespace PGUI::UI::Controls
 
 		return ret;
 	}
-	std::int64_t Edit::StreamOut(int streamFormat, EDITSTREAM editStream) const noexcept
+	auto Edit::StreamOut(int streamFormat, EDITSTREAM editStream) const noexcept -> std::int64_t
 	{
 		LRESULT ret{ };
 		HRESULT hr =
@@ -820,14 +820,14 @@ namespace PGUI::UI::Controls
 		Invalidate();
 	}
 
-	Core::HandlerResult Edit::OnDPIChange(float dpiScale, RectI suggestedRect)
+	auto Edit::OnDPIChange(float dpiScale, RectI suggestedRect) -> Core::HandlerResult
 	{
 		textServices->TxSendMessage(EM_SETZOOM, GetDPI(), PGUI::Core::DEFAULT_SCREEN_DPI, nullptr);
 
 		return Window::OnDPIChange(dpiScale, suggestedRect);
 	}
 
-	Core::HandlerResult Edit::ForwardToTextServices(UINT msg, WPARAM wParam, LPARAM lParam)
+	auto Edit::ForwardToTextServices(UINT msg, WPARAM wParam, LPARAM lParam) -> Core::HandlerResult
 	{
 		if (!textServices)
 		{
@@ -862,7 +862,7 @@ namespace PGUI::UI::Controls
 		return result;
 	}
 
-	Core::HandlerResult Edit::OnCreate(UINT, WPARAM, LPARAM lParam)
+	auto Edit::OnCreate(UINT, WPARAM, LPARAM lParam) -> Core::HandlerResult
 	{
 		const auto clientRect = GetClientRect();
 		const auto clientSize = clientRect.Size();
@@ -907,14 +907,14 @@ namespace PGUI::UI::Controls
 		return 0;
 	}
 
-	Core::HandlerResult Edit::OnDestroy(UINT, WPARAM, LPARAM) noexcept
+	auto Edit::OnDestroy(UINT, WPARAM, LPARAM) noexcept -> Core::HandlerResult
 	{
 		HRESULT hr = Msftedit::shutdownTextServices(textServices.Get()); HR_L(hr);
 		textServices.Detach();
 		return 0;
 	}
 
-	Core::HandlerResult Edit::OnPaint(UINT, WPARAM, LPARAM) noexcept
+	auto Edit::OnPaint(UINT, WPARAM, LPARAM) noexcept -> Core::HandlerResult
 	{
 		BeginDraw();
 
@@ -941,7 +941,7 @@ namespace PGUI::UI::Controls
 		return 0;
 	}
 
-	Core::HandlerResult Edit::OnSetCursor(UINT, WPARAM, LPARAM) const noexcept
+	auto Edit::OnSetCursor(UINT, WPARAM, LPARAM) const noexcept -> Core::HandlerResult
 	{
 		POINT position{};
 		GetCursorPos(&position);
@@ -964,7 +964,7 @@ namespace PGUI::UI::Controls
 		return TRUE;
 	}
 
-	Core::HandlerResult Edit::OnSetFocus(UINT msg, WPARAM wParam, LPARAM lParam) const noexcept
+	auto Edit::OnSetFocus(UINT msg, WPARAM wParam, LPARAM lParam) const noexcept -> Core::HandlerResult
 	{
 		textServices->OnTxInPlaceActivate(nullptr);
 
@@ -973,7 +973,7 @@ namespace PGUI::UI::Controls
 
 		return res;
 	}
-	Core::HandlerResult Edit::OnKillFocus(UINT msg, WPARAM wParam, LPARAM lParam) const noexcept
+	auto Edit::OnKillFocus(UINT msg, WPARAM wParam, LPARAM lParam) const noexcept -> Core::HandlerResult
 	{
 		textServices->OnTxUIDeactivate();
 
@@ -1006,25 +1006,25 @@ namespace PGUI::UI::Controls
 
 		return E_NOINTERFACE;
 	}
-	ULONG __stdcall Edit::TextHost::AddRef(void)
+	ULONG __stdcall Edit::TextHost::AddRef()
 	{
 		return 1;
 	}
-	ULONG __stdcall Edit::TextHost::Release(void)
+	ULONG __stdcall Edit::TextHost::Release()
 	{
 		return 1;
 	}
 
-	HDC Edit::TextHost::TxGetDC()
+	auto Edit::TextHost::TxGetDC() -> HDC
 	{
 		return GetDC(parentWindow->Hwnd());
 	}
-	INT Edit::TextHost::TxReleaseDC(HDC hdc)
+	auto Edit::TextHost::TxReleaseDC(HDC hdc) -> INT
 	{
 		return ReleaseDC(parentWindow->Hwnd(), hdc);
 	}
 
-	BOOL Edit::TextHost::TxShowScrollBar(INT bars, BOOL show)
+	auto Edit::TextHost::TxShowScrollBar(INT bars, BOOL show) -> BOOL
 	{
 		INT showFlag = show ? SW_SHOW : SW_HIDE;
 
@@ -1039,12 +1039,12 @@ namespace PGUI::UI::Controls
 
 		return TRUE;
 	}
-	BOOL Edit::TextHost::TxEnableScrollBar(INT, INT)
+	auto Edit::TextHost::TxEnableScrollBar(INT, INT) -> BOOL
 	{
 		//ScrollBar doesnt support enabling or disabling buttons :[
 		return TRUE;
 	}
-	BOOL Edit::TextHost::TxSetScrollRange(INT bar, LONG minPos, INT maxPos, BOOL)
+	auto Edit::TextHost::TxSetScrollRange(INT bar, LONG minPos, INT maxPos, BOOL) -> BOOL
 	{
 		const auto& scrollBar = bar == SB_HORZ ? 
 			parentWindow->horizontalScrollBar : parentWindow->verticalScrollBar;
@@ -1054,7 +1054,7 @@ namespace PGUI::UI::Controls
 
 		return TRUE;
 	}
-	BOOL Edit::TextHost::TxSetScrollPos(INT bar, INT pos, BOOL)
+	auto Edit::TextHost::TxSetScrollPos(INT bar, INT pos, BOOL) -> BOOL
 	{
 		const auto& scrollBar = bar == SB_HORZ ? 
 			parentWindow->horizontalScrollBar : parentWindow->verticalScrollBar;
@@ -1074,7 +1074,7 @@ namespace PGUI::UI::Controls
 			UpdateWindow(parentWindow->Hwnd());
 		}
 	}
-	BOOL Edit::TextHost::TxCreateCaret(HBITMAP, INT width, INT height)
+	auto Edit::TextHost::TxCreateCaret(HBITMAP, INT width, INT height) -> BOOL
 	{
 		auto g = parentWindow->GetGraphics();
 
@@ -1092,7 +1092,7 @@ namespace PGUI::UI::Controls
 
 		return TRUE;
 	}
-	BOOL Edit::TextHost::TxShowCaret(BOOL show)
+	auto Edit::TextHost::TxShowCaret(BOOL show) -> BOOL
 	{
 		parentWindow->showCaret = show;
 
@@ -1118,7 +1118,7 @@ namespace PGUI::UI::Controls
 
 		return TRUE;
 	}
-	BOOL Edit::TextHost::TxSetCaretPos(INT x, INT y)
+	auto Edit::TextHost::TxSetCaretPos(INT x, INT y) -> BOOL
 	{
 		caretPos.x = static_cast<int>(static_cast<float>(x) * 
 			(static_cast<float>(PGUI::Core::DEFAULT_SCREEN_DPI) / 
@@ -1132,7 +1132,7 @@ namespace PGUI::UI::Controls
 		
 		return TRUE;
 	}
-	BOOL Edit::TextHost::TxSetTimer(UINT idTimer, UINT timeout)
+	auto Edit::TextHost::TxSetTimer(UINT idTimer, UINT timeout) -> BOOL
 	{
 		return static_cast<BOOL>(
 			parentWindow->AddTimer(idTimer, std::chrono::milliseconds{ timeout }));
@@ -1165,37 +1165,37 @@ namespace PGUI::UI::Controls
 	{
 		SetCursor(cursorHandle);
 	}
-	BOOL Edit::TextHost::TxScreenToClient(LPPOINT lppt)
+	auto Edit::TextHost::TxScreenToClient(LPPOINT lppt) -> BOOL
 	{
 		*lppt = parentWindow->ScreenToClient(*lppt);
 
 		return TRUE;
 	}
-	BOOL Edit::TextHost::TxClientToScreen(LPPOINT lppt)
+	auto Edit::TextHost::TxClientToScreen(LPPOINT lppt) -> BOOL
 	{
 		*lppt = parentWindow->ClientToScreen(*lppt);
 
 		return TRUE;
 	}
-	HRESULT Edit::TextHost::TxActivate(LONG* oldState)
+	auto Edit::TextHost::TxActivate(LONG* oldState) -> HRESULT
 	{
 		*oldState = HandleToLong(SetActiveWindow(parentWindow->Hwnd()));
 
 		return (*oldState ? S_OK : E_FAIL);
 	}
-	HRESULT Edit::TextHost::TxDeactivate(LONG newState)
+	auto Edit::TextHost::TxDeactivate(LONG newState) -> HRESULT
 	{
 		HWND ret = SetActiveWindow(std::bit_cast<HWND>(LongToHandle(newState)));
 
 		return (ret ? S_OK : E_FAIL);
 	}
-	HRESULT Edit::TextHost::TxGetClientRect(LPRECT prc)
+	auto Edit::TextHost::TxGetClientRect(LPRECT prc) -> HRESULT
 	{
 		*prc = parentWindow->GetClientRect();
 
 		return S_OK;
 	}
-	HRESULT Edit::TextHost::TxGetViewInset(LPRECT prc)
+	auto Edit::TextHost::TxGetViewInset(LPRECT prc) -> HRESULT
 	{
 		prc->top = 0;
 		prc->left = 0;
@@ -1204,53 +1204,53 @@ namespace PGUI::UI::Controls
 
 		return S_OK;
 	}
-	HRESULT Edit::TextHost::TxGetCharFormat(const CHARFORMATW** ppCF)
+	auto Edit::TextHost::TxGetCharFormat(const CHARFORMATW** ppCF) -> HRESULT
 	{
 		*ppCF = &parentWindow->charFormat;
 
 		return S_OK;
 	}
-	HRESULT Edit::TextHost::TxGetParaFormat(const PARAFORMAT** ppPF)
+	auto Edit::TextHost::TxGetParaFormat(const PARAFORMAT** ppPF) -> HRESULT
 	{
 		*ppPF = &parentWindow->paraFormat;
 
 		return S_OK;
 	}
-	COLORREF Edit::TextHost::TxGetSysColor(int index)
+	auto Edit::TextHost::TxGetSysColor(int index) -> COLORREF
 	{
 		return GetSysColor(index);
 	}
-	HRESULT Edit::TextHost::TxGetBackStyle(TXTBACKSTYLE* pstyle)
+	auto Edit::TextHost::TxGetBackStyle(TXTBACKSTYLE* pstyle) -> HRESULT
 	{
 		*pstyle = TXTBACK_TRANSPARENT;
 
 		return S_OK;
 	}
-	HRESULT Edit::TextHost::TxGetMaxLength(DWORD* plength)
+	auto Edit::TextHost::TxGetMaxLength(DWORD* plength) -> HRESULT
 	{
 		*plength = DWORD_MAX;
 
 		return S_OK;
 	}
-	HRESULT Edit::TextHost::TxGetScrollBars(DWORD* pdwScrollBar)
+	auto Edit::TextHost::TxGetScrollBars(DWORD* pdwScrollBar) -> HRESULT
 	{
 		*pdwScrollBar = ES_AUTOVSCROLL | ES_AUTOHSCROLL;
 
 		return S_OK;
 	}
-	HRESULT Edit::TextHost::TxGetPasswordChar(TCHAR* pch)
+	auto Edit::TextHost::TxGetPasswordChar(TCHAR* pch) -> HRESULT
 	{
 		*pch = parentWindow->passwordChar;
 
 		return S_OK;
 	}
-	HRESULT Edit::TextHost::TxGetAcceleratorPos(LONG* pcp)
+	auto Edit::TextHost::TxGetAcceleratorPos(LONG* pcp) -> HRESULT
 	{
 		*pcp = -1;
 
 		return S_OK;
 	}
-	HRESULT Edit::TextHost::TxGetExtent(LPSIZEL lpExtent)
+	auto Edit::TextHost::TxGetExtent(LPSIZEL lpExtent) -> HRESULT
 	{
 		const auto size = parentWindow->GetClientSize();
 		lpExtent->cx = size.cx * 2540 / 96;
@@ -1258,21 +1258,21 @@ namespace PGUI::UI::Controls
 
 		return S_OK;
 	} 
-	HRESULT Edit::TextHost::OnTxCharFormatChange(const CHARFORMATW*)
+	auto Edit::TextHost::OnTxCharFormatChange(const CHARFORMATW*) -> HRESULT
 	{
 		return S_OK;
 	}
-	HRESULT Edit::TextHost::OnTxParaFormatChange(const PARAFORMAT*)
+	auto Edit::TextHost::OnTxParaFormatChange(const PARAFORMAT*) -> HRESULT
 	{
 		return S_OK;
 	}
-	HRESULT Edit::TextHost::TxGetPropertyBits(DWORD, DWORD* pdwBits)
+	auto Edit::TextHost::TxGetPropertyBits(DWORD, DWORD* pdwBits) -> HRESULT
 	{
 		*pdwBits = parentWindow->propertyBits;
 
 		return S_OK;
 	}
-	HRESULT Edit::TextHost::TxNotify(DWORD notifyCode, void* data)
+	auto Edit::TextHost::TxNotify(DWORD notifyCode, void* data) -> HRESULT
 	{
 		switch (notifyCode)
 		{
@@ -1406,7 +1406,7 @@ namespace PGUI::UI::Controls
 
 		return S_OK;
 	}
-	HIMC Edit::TextHost::TxImmGetContext()
+	auto Edit::TextHost::TxImmGetContext() -> HIMC
 	{
 		return ImmGetContext(parentWindow->Hwnd());
 	}
@@ -1415,24 +1415,24 @@ namespace PGUI::UI::Controls
 		ImmReleaseContext(parentWindow->Hwnd(), himc);
 	}
 
-	HRESULT Edit::TextHost::TxGetSelectionBarWidth(LONG* selBarWidth)
+	auto Edit::TextHost::TxGetSelectionBarWidth(LONG* selBarWidth) -> HRESULT
 	{
 		*selBarWidth = 0;
 
 		return S_OK;
 	}
-	BOOL Edit::TextHost::TxIsDoubleClickPending()
+	auto Edit::TextHost::TxIsDoubleClickPending() -> BOOL
 	{
 		MSG msg;
 		return PeekMessageW(&msg, nullptr, WM_LBUTTONDBLCLK - 1, WM_LBUTTONDBLCLK + 1, PM_NOREMOVE | PM_NOYIELD);
 	}
-	HRESULT Edit::TextHost::TxGetWindow(HWND* phwnd)
+	auto Edit::TextHost::TxGetWindow(HWND* phwnd) -> HRESULT
 	{
 		*phwnd = parentWindow->Hwnd();
 
 		return S_OK;
 	}
-	HRESULT Edit::TextHost::TxSetForegroundWindow()
+	auto Edit::TextHost::TxSetForegroundWindow() -> HRESULT
 	{
 		if (auto ret = SetForegroundWindow(parentWindow->Hwnd());
 			ret)
@@ -1441,17 +1441,17 @@ namespace PGUI::UI::Controls
 		}
 		return HresultFromWin32();
 	}
-	HPALETTE Edit::TextHost::TxGetPalette()
+	auto Edit::TextHost::TxGetPalette() -> HPALETTE
 	{
 		return nullptr;
 	}
-	HRESULT Edit::TextHost::TxGetEastAsianFlags(LONG* pFlags)
+	auto Edit::TextHost::TxGetEastAsianFlags(LONG* pFlags) -> HRESULT
 	{
 		*pFlags = ES_SELFIME;
 
 		return S_OK;
 	}
-	HCURSOR Edit::TextHost::TxSetCursor2(HCURSOR cursorHandle, BOOL)
+	auto Edit::TextHost::TxSetCursor2(HCURSOR cursorHandle, BOOL) -> HCURSOR
 	{
 		return SetCursor(cursorHandle);
 	}
@@ -1459,30 +1459,30 @@ namespace PGUI::UI::Controls
 	{
 		// E_NOTIMPL
 	}
-	HRESULT Edit::TextHost::TxGetEditStyle(DWORD, DWORD* pdwData)
+	auto Edit::TextHost::TxGetEditStyle(DWORD, DWORD* pdwData) -> HRESULT
 	{
 		*pdwData = 0;
 
 		return S_OK;
 	}
-	HRESULT Edit::TextHost::TxGetWindowStyles(DWORD* pdwStyle, DWORD* pdwExStyle)
+	auto Edit::TextHost::TxGetWindowStyles(DWORD* pdwStyle, DWORD* pdwExStyle) -> HRESULT
 	{
 		*pdwStyle = static_cast<DWORD>(GetWindowLongPtrW(parentWindow->Hwnd(), GWL_STYLE));
 		*pdwExStyle = static_cast<DWORD>(GetWindowLongPtrW(parentWindow->Hwnd(), GWL_EXSTYLE));
 
 		return S_OK;
 	}
-	HRESULT Edit::TextHost::TxShowDropCaret(BOOL, HDC, LPCRECT)
+	auto Edit::TextHost::TxShowDropCaret(BOOL, HDC, LPCRECT) -> HRESULT
 	{
 		return E_NOTIMPL;
 	}
-	HRESULT Edit::TextHost::TxDestroyCaret()
+	auto Edit::TextHost::TxDestroyCaret() -> HRESULT
 	{
 		caretRenderTarget.Reset();
 
 		return S_OK;
 	}
-	HRESULT Edit::TextHost::TxGetHorzExtent(LONG* plHorzExtent)
+	auto Edit::TextHost::TxGetHorzExtent(LONG* plHorzExtent) -> HRESULT
 	{
 		*plHorzExtent = parentWindow->GetClientSize().cx;
 
@@ -1491,7 +1491,7 @@ namespace PGUI::UI::Controls
 
 	#pragma endregion
 
-	bool BuiltinFilters::NumericOnlyFilter(Core::WindowPtr<Edit> edit, UINT& msg, WPARAM& wParam, LPARAM&) noexcept
+	auto BuiltinFilters::NumericOnlyFilter(Core::WindowPtr<Edit> edit, UINT& msg, WPARAM& wParam, LPARAM&) noexcept -> bool
 	{
 		if (msg == WM_KEYDOWN || msg == WM_KEYUP)
 		{
@@ -1525,7 +1525,7 @@ namespace PGUI::UI::Controls
 		}
 		return false;
 	}
-	bool BuiltinFilters::UppercaseOnlyFilter(Core::WindowPtr<Edit>, UINT&, WPARAM& wParam, LPARAM&) noexcept
+	auto BuiltinFilters::UppercaseOnlyFilter(Core::WindowPtr<Edit>, UINT&, WPARAM& wParam, LPARAM&) noexcept -> bool
 	{
 		NLSVERSIONINFOEX v{ };
 		v.dwNLSVersionInfoSize = sizeof(NLSVERSIONINFO);
@@ -1551,7 +1551,7 @@ namespace PGUI::UI::Controls
 
 		return true;
 	}
-	bool BuiltinFilters::LowercaseOnlyFilter(Core::WindowPtr<Edit>, UINT&, WPARAM& wParam, LPARAM&) noexcept
+	auto BuiltinFilters::LowercaseOnlyFilter(Core::WindowPtr<Edit>, UINT&, WPARAM& wParam, LPARAM&) noexcept -> bool
 	{
 		NLSVERSIONINFOEX v{ };
 		v.dwNLSVersionInfoSize = sizeof(NLSVERSIONINFO);

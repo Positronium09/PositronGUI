@@ -15,6 +15,6 @@ namespace PGUI::UI::Font
 		FontFamily() = default;
 		explicit FontFamily(ComPtr<IDWriteFontFamily2> fontFamily);
 
-		[[nodiscard]] LocalizedFontFamilyNames GetLocalizedFontFamilyNames() const noexcept;
+		[[nodiscard]] auto GetLocalizedFontFamilyNames() const noexcept -> LocalizedFontFamilyNames;
 	};
 }

@@ -46,8 +46,8 @@ namespace PGUI::UI
 		public:
 		virtual ~ClipBase() noexcept = default;
 
-		[[nodiscard]] virtual ComPtr<ID2D1Geometry> GetClipGeometry() = 0;
-		[[nodiscard]] virtual ID2D1Geometry* GetClipGeometryPtr() = 0;
+		[[nodiscard]] virtual auto GetClipGeometry() -> ComPtr<ID2D1Geometry> = 0;
+		[[nodiscard]] virtual auto GetClipGeometryPtr() -> ID2D1Geometry* = 0;
 	};
 
 	class EmptyClip : public ClipBase
@@ -55,8 +55,8 @@ namespace PGUI::UI
 		public:
 		EmptyClip() noexcept = default;
 
-		[[nodiscard]] ComPtr<ID2D1Geometry> GetClipGeometry() override;
-		[[nodiscard]] ID2D1Geometry* GetClipGeometryPtr() override;
+		[[nodiscard]] auto GetClipGeometry() -> ComPtr<ID2D1Geometry> override;
+		[[nodiscard]] auto GetClipGeometryPtr() -> ID2D1Geometry* override;
 	};
 
 	class RectangleClip : public ClipBase, public ComPtrHolder<ID2D1RectangleGeometry>
@@ -66,8 +66,8 @@ namespace PGUI::UI
 		explicit RectangleClip(ComPtr<ID2D1RectangleGeometry> geometry) noexcept;
 		explicit RectangleClip(RectF rect);
 
-		ComPtr<ID2D1Geometry> GetClipGeometry() override;
-		ID2D1Geometry* GetClipGeometryPtr() override;
+		auto GetClipGeometry() -> ComPtr<ID2D1Geometry> override;
+		auto GetClipGeometryPtr() -> ID2D1Geometry* override;
 	};
 
 	class RoundedRectangleClip : public ClipBase, public ComPtrHolder<ID2D1RoundedRectangleGeometry>
@@ -77,8 +77,8 @@ namespace PGUI::UI
 		explicit RoundedRectangleClip(ComPtr<ID2D1RoundedRectangleGeometry> geometry) noexcept;
 		explicit RoundedRectangleClip(RoundedRect rect);
 
-		ComPtr<ID2D1Geometry> GetClipGeometry() override;
-		ID2D1Geometry* GetClipGeometryPtr() override;
+		auto GetClipGeometry() -> ComPtr<ID2D1Geometry> override;
+		auto GetClipGeometryPtr() -> ID2D1Geometry* override;
 	};
 
 	class EllipseClip : public ClipBase, public ComPtrHolder<ID2D1EllipseGeometry>
@@ -88,8 +88,8 @@ namespace PGUI::UI
 		explicit EllipseClip(ComPtr<ID2D1EllipseGeometry> geometry) noexcept;
 		explicit EllipseClip(PGUI::Ellipse ellipse);
 
-		ComPtr<ID2D1Geometry> GetClipGeometry() override;
-		ID2D1Geometry* GetClipGeometryPtr() override;
+		auto GetClipGeometry() -> ComPtr<ID2D1Geometry> override;
+		auto GetClipGeometryPtr() -> ID2D1Geometry* override;
 	};
 
 	class PathClip : public ClipBase, public ComPtrHolder<ID2D1PathGeometry1>
@@ -97,8 +97,8 @@ namespace PGUI::UI
 		PathClip() noexcept = default;
 		explicit PathClip(ComPtr<ID2D1PathGeometry1> geometry) noexcept;
 
-		ComPtr<ID2D1Geometry> GetClipGeometry() override;
-		ID2D1Geometry* GetClipGeometryPtr() override;
+		auto GetClipGeometry() -> ComPtr<ID2D1Geometry> override;
+		auto GetClipGeometryPtr() -> ID2D1Geometry* override;
 	};
 
 	struct EmptyClipParameters
@@ -160,19 +160,19 @@ namespace PGUI::UI
 	class Clip final
 	{
 		public:
-		explicit(false) Clip(const ClipParameters& parameters = EmptyClipParameters{ }) noexcept;
+		explicit(false) Clip(ClipParameters  parameters = EmptyClipParameters{ }) noexcept;
 
-		[[nodiscard]] ClipBase* Get() const noexcept;
+		[[nodiscard]] auto Get() const noexcept -> ClipBase*;
 
 		void CreateClip() noexcept;
 		void ReleaseClip() noexcept;
 
-		[[nodiscard]] ClipParameters GetParameters() const noexcept;
-		[[nodiscard]] ClipParameters& GetParameters() noexcept;
+		[[nodiscard]] auto GetParameters() const noexcept -> ClipParameters;
+		[[nodiscard]] auto GetParameters() noexcept -> ClipParameters&;
 		void SetParameters(const ClipParameters& parameters) noexcept;
 
 		void operator=(const ClipParameters& _parameters) noexcept { parameters = _parameters; }
-		[[nodiscard]] ClipBase* operator->() const noexcept { return clip.get(); }
+		[[nodiscard]] auto operator->() const noexcept -> ClipBase* { return clip.get(); }
 		[[nodiscard]] explicit(false) operator ClipBase* () const noexcept { return clip.get(); }
 		[[nodiscard]] explicit operator bool() const noexcept { return (bool)clip; }
 

@@ -29,19 +29,19 @@ namespace PGUI::Graphics
 		RectF rect{ PointF{}, GetSize() };
 		FillRect(rect, brush);
 	}
-	GraphicsBitmap Graphics::CreateBitmap(SizeU size, const D2D1_BITMAP_PROPERTIES& props) const
+	auto Graphics::CreateBitmap(SizeU size, const D2D1_BITMAP_PROPERTIES& props) const -> GraphicsBitmap
 	{
 		ComPtr<ID2D1Bitmap> bmp;
 		HRESULT hr = GetHeldComPtr()->CreateBitmap(size, props, &bmp); HR_T(hr);
 		return GraphicsBitmap{ bmp };
 	}
-	GraphicsBitmap Graphics::CreateBitmap(SizeU size, const void* srcData, UINT32 pitch, const D2D1_BITMAP_PROPERTIES& bitmapProperties) const
+	auto Graphics::CreateBitmap(SizeU size, const void* srcData, UINT32 pitch, const D2D1_BITMAP_PROPERTIES& bitmapProperties) const -> GraphicsBitmap
 	{
 		ComPtr<ID2D1Bitmap> bmp;
 		HRESULT hr = GetHeldComPtr()->CreateBitmap(size, srcData, pitch, bitmapProperties, &bmp); HR_T(hr);
 		return GraphicsBitmap{ bmp };
 	}
-	GraphicsBitmap Graphics::CreateBitmap(const PGUI::UI::Bmp::BitmapSource& bmpSrc, std::optional<D2D1_BITMAP_PROPERTIES> props) const
+	auto Graphics::CreateBitmap(const PGUI::UI::Bmp::BitmapSource& bmpSrc, std::optional<D2D1_BITMAP_PROPERTIES> props) const -> GraphicsBitmap
 	{
 		ComPtr<ID2D1Bitmap> bmp;
 		auto wicFactory = PGUI::WICFactory::GetFactory();
@@ -63,42 +63,42 @@ namespace PGUI::Graphics
 			converterBitmapSource.Get(), &bmp); HR_T(hr);
 		return GraphicsBitmap{ bmp };
 	}
-	BitmapRenderTarget Graphics::CreateCompatibleRenderTarget(SizeF size, SizeU pixelSize,
-		PixelFormat pixelFormat, D2D1_COMPATIBLE_RENDER_TARGET_OPTIONS options) const
+	auto Graphics::CreateCompatibleRenderTarget(SizeF size, SizeU pixelSize,
+		PixelFormat pixelFormat, D2D1_COMPATIBLE_RENDER_TARGET_OPTIONS options) const -> BitmapRenderTarget
 	{
 		ComPtr<ID2D1BitmapRenderTarget> brt;
 		HRESULT hr = GetHeldComPtr()->CreateCompatibleRenderTarget(
 			size, pixelSize, pixelFormat, options, &brt); HR_T(hr);
 		return BitmapRenderTarget{ brt };
 	}
-	BitmapRenderTarget Graphics::CreateCompatibleRenderTarget(SizeF size, SizeU pixelSize, PixelFormat pixelFormat) const
+	auto Graphics::CreateCompatibleRenderTarget(SizeF size, SizeU pixelSize, PixelFormat pixelFormat) const -> BitmapRenderTarget
 	{
 		ComPtr<ID2D1BitmapRenderTarget> brt;
 		HRESULT hr = GetHeldComPtr()->CreateCompatibleRenderTarget(
 			size, pixelSize, pixelFormat, &brt); HR_T(hr);
 		return BitmapRenderTarget{ brt };
 	}
-	BitmapRenderTarget Graphics::CreateCompatibleRenderTarget(SizeF size, SizeU pixelSize) const
+	auto Graphics::CreateCompatibleRenderTarget(SizeF size, SizeU pixelSize) const -> BitmapRenderTarget
 	{
 		ComPtr<ID2D1BitmapRenderTarget> brt;
 		HRESULT hr = GetHeldComPtr()->CreateCompatibleRenderTarget(
 			size, pixelSize, &brt); HR_T(hr);
 		return BitmapRenderTarget{ brt };
 	}
-	BitmapRenderTarget Graphics::CreateCompatibleRenderTarget(SizeF size) const
+	auto Graphics::CreateCompatibleRenderTarget(SizeF size) const -> BitmapRenderTarget
 	{
 		ComPtr<ID2D1BitmapRenderTarget> brt;
 		HRESULT hr = GetHeldComPtr()->CreateCompatibleRenderTarget(
 			size, &brt); HR_T(hr);
 		return BitmapRenderTarget{ brt };
 	}
-	BitmapRenderTarget Graphics::CreateCompatibleRenderTarget() const
+	auto Graphics::CreateCompatibleRenderTarget() const -> BitmapRenderTarget
 	{
 		ComPtr<ID2D1BitmapRenderTarget> brt;
 		HRESULT hr = GetHeldComPtr()->CreateCompatibleRenderTarget(&brt); HR_T(hr);
 		return BitmapRenderTarget{ brt };
 	}
-	GraphicsBitmap Graphics::CreateSharedBitmap(const IID& riid, void* data, std::optional<D2D1_BITMAP_PROPERTIES> bitmapProperties) const
+	auto Graphics::CreateSharedBitmap(const IID& riid, void* data, std::optional<D2D1_BITMAP_PROPERTIES> bitmapProperties) const -> GraphicsBitmap
 	{
 		ComPtr<ID2D1Bitmap> bmp;
 		const D2D1_BITMAP_PROPERTIES* props = nullptr;
@@ -109,11 +109,11 @@ namespace PGUI::Graphics
 		HRESULT hr = GetHeldComPtr()->CreateSharedBitmap(riid, data, props, &bmp); HR_T(hr);
 		return GraphicsBitmap{ bmp };
 	}
-	ComPtr<ID2D1Mesh> Graphics::CreateMesh() const
+	auto Graphics::CreateMesh() const -> ComPtr<ID2D1Mesh>
 	{
-		return ComPtr<ID2D1Mesh>();
+		return {};
 	}
-	Brush Graphics::CreateBrush(CBrushParametersRef brushParameters) const
+	auto Graphics::CreateBrush(CBrushParametersRef brushParameters) const -> Brush
 	{
 		Brush brush = brushParameters;
 		brush.CreateBrush(GetHeldComPtr());
@@ -197,31 +197,31 @@ namespace PGUI::Graphics
 	{
 		GetHeldComPtr()->FillRoundedRectangle(rect, brush);
 	}
-	SizeF Graphics::GetDPI() const noexcept
+	auto Graphics::GetDPI() const noexcept -> SizeF
 	{
 		SizeF dpi{ };
 		GetHeldComPtr()->GetDpi(&dpi.cx, &dpi.cy);
 		return dpi;
 	}
-	std::pair<D2D1_TAG, D2D1_TAG> Graphics::GetTags() const noexcept
+	auto Graphics::GetTags() const noexcept -> std::pair<D2D1_TAG, D2D1_TAG>
 	{
 		std::pair<D2D1_TAG, D2D1_TAG> tags;
 		GetHeldComPtr()->GetTags(&tags.first, &tags.second);
 		return tags;
 	}
-	ComPtr<IDWriteRenderingParams> Graphics::GetTextRenderingParams() const noexcept
+	auto Graphics::GetTextRenderingParams() const noexcept -> ComPtr<IDWriteRenderingParams>
 	{
 		ComPtr<IDWriteRenderingParams> params;
 		GetHeldComPtr()->GetTextRenderingParams(&params);
 		return params;
 	}
-	D2D1_MATRIX_3X2_F Graphics::GetTransform() const noexcept
+	auto Graphics::GetTransform() const noexcept -> D2D1_MATRIX_3X2_F
 	{
 		D2D1_MATRIX_3X2_F transform;
 		GetHeldComPtr()->GetTransform(&transform);
 		return transform;
 	}
-	ComPtr<ID2D1DrawingStateBlock> Graphics::SaveDrawingState() const noexcept
+	auto Graphics::SaveDrawingState() const noexcept -> ComPtr<ID2D1DrawingStateBlock>
 	{
 		ComPtr<ID2D1DrawingStateBlock> drawingState;
 		auto factory = D2DFactory::GetFactory();

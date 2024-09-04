@@ -15,7 +15,7 @@ namespace PGUI::UI
 	class TextFormat : public ComPtrHolder<IDWriteTextFormat3>
 	{
 		public:
-		[[nodiscard]] static TextFormat GetDefTextFormat(FLOAT fontSize = 16);
+		[[nodiscard]] static auto GetDefTextFormat(FLOAT fontSize = 16) -> TextFormat;
 
 		TextFormat() noexcept = default;
 		TextFormat(std::wstring_view fontFamilyName, 
@@ -25,42 +25,42 @@ namespace PGUI::UI
 			Font::FontStyle fontStyle = Font::FontStyles::Normal,
 			Font::FontStretch fontStretch = Font::FontStretches::Normal) noexcept;
 
-		[[nodiscard]] TextFormat AdjustFontSizeToDPI(float fontSize) const noexcept;
+		[[nodiscard]] auto AdjustFontSizeToDPI(float fontSize) const noexcept -> TextFormat;
 
-		[[nodiscard]] Font::FlowDirection GetFlowDirection() const noexcept;
+		[[nodiscard]] auto GetFlowDirection() const noexcept -> Font::FlowDirection;
 		void SetFlowDirection(Font::FlowDirection flowDirection) const noexcept;
 		
-		[[nodiscard]] Font::FontCollection GetFontCollection() const noexcept;
-		[[nodiscard]] std::wstring GetFontFamilyName() const noexcept;
+		[[nodiscard]] auto GetFontCollection() const noexcept -> Font::FontCollection;
+		[[nodiscard]] auto GetFontFamilyName() const noexcept -> std::wstring;
 		
-		[[nodiscard]] float GetFontSize() const noexcept;
+		[[nodiscard]] auto GetFontSize() const noexcept -> float;
 
-		[[nodiscard]] DWRITE_LINE_SPACING GetLineSpacing() const noexcept;
+		[[nodiscard]] auto GetLineSpacing() const noexcept -> DWRITE_LINE_SPACING;
 		void SetLineSpacing(const DWRITE_LINE_SPACING& lineSpacing) const noexcept;
 		
-		[[nodiscard]] Font::FontStretch GetFontStretch() const noexcept;
-		[[nodiscard]] Font::FontStyle GetFontStyle() const noexcept;
-		[[nodiscard]] Font::FontWeight GetFontWeight() const noexcept;
+		[[nodiscard]] auto GetFontStretch() const noexcept -> Font::FontStretch;
+		[[nodiscard]] auto GetFontStyle() const noexcept -> Font::FontStyle;
+		[[nodiscard]] auto GetFontWeight() const noexcept -> Font::FontWeight;
 
-		[[nodiscard]] float GetIncrementalTabStop() const noexcept;
+		[[nodiscard]] auto GetIncrementalTabStop() const noexcept -> float;
 		void SetIncrementalTabStop(float incrementalTabStop) const noexcept;
 
-		[[nodiscard]] std::wstring GetLocaleName() const noexcept;
+		[[nodiscard]] auto GetLocaleName() const noexcept -> std::wstring;
 
-		[[nodiscard]] Font::ParagraphAlignment GetParagraphAlignment() const noexcept;
+		[[nodiscard]] auto GetParagraphAlignment() const noexcept -> Font::ParagraphAlignment;
 		void SetParagraphAlignment(Font::ParagraphAlignment paragraphAlignment) const noexcept;
 
-		[[nodiscard]] Font::ReadingDirection GetReadingDirection() const noexcept;
+		[[nodiscard]] auto GetReadingDirection() const noexcept -> Font::ReadingDirection;
 		void SetReadingDirection(Font::ReadingDirection readingDirection) const noexcept;
 
-		[[nodiscard]] Font::TextAlignment GetTextAlignment() const noexcept;
+		[[nodiscard]] auto GetTextAlignment() const noexcept -> Font::TextAlignment;
 		void SetTextAlignment(Font::TextAlignment textAlignment) const noexcept;
 
-		[[nodiscard]] std::pair<DWRITE_TRIMMING, ComPtr<IDWriteInlineObject>>
-			GetTrimming() const noexcept;
+		[[nodiscard]] auto
+			GetTrimming() const noexcept -> std::pair<DWRITE_TRIMMING, ComPtr<IDWriteInlineObject>>;
 		void SetTrimming(const DWRITE_TRIMMING& trimming, ComPtr<IDWriteInlineObject> inlineObject) const noexcept;
 
-		[[nodiscard]] Font::WordWrapping GetWordWrapping() const noexcept;
+		[[nodiscard]] auto GetWordWrapping() const noexcept -> Font::WordWrapping;
 		void SetWordWrapping(Font::WordWrapping wordWrapping) const noexcept;
 	};
 }

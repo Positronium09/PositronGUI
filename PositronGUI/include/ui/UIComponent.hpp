@@ -14,16 +14,16 @@ namespace PGUI::UI
 
 		void SetClip(const ClipParameters& params) noexcept;
 		void ClearClip() noexcept;
-		[[nodiscard]] const Clip& GetClip() const noexcept { return clip; }
+		[[nodiscard]] auto GetClip() const noexcept -> const Clip& { return clip; }
 		void HitTestClipGeometry(bool enable) noexcept;
 
 		void EnableInput() const noexcept;
 		void DisableInput() const noexcept;
-		[[nodiscard]] bool IsInputEnabled() const noexcept;
+		[[nodiscard]] auto IsInputEnabled() const noexcept -> bool;
 
 		protected:
 		void BeginDraw() override;
-		HRESULT EndDraw() override;
+		auto EndDraw() -> HRESULT override;
 
 		virtual void OnClipChanged() { /* */ }
 
@@ -31,8 +31,8 @@ namespace PGUI::UI
 		Clip clip;
 		bool hitTestClipGeometry = true;
 
-		Core::HandlerResult OnCreate(UINT msg, WPARAM wParam, LPARAM lParam) const noexcept;
-		Core::HandlerResult OnNcHitTest(UINT msg, WPARAM wParam, LPARAM lParam) const noexcept;
-		Core::HandlerResult OnSize(UINT msg, WPARAM wParam, LPARAM lParam) noexcept;
+		[[nodiscard]] auto OnCreate(UINT msg, WPARAM wParam, LPARAM lParam) const noexcept -> Core::HandlerResult;
+		[[nodiscard]] auto OnNcHitTest(UINT msg, WPARAM wParam, LPARAM lParam) const noexcept -> Core::HandlerResult;
+		auto OnSize(UINT msg, WPARAM wParam, LPARAM lParam) noexcept -> Core::HandlerResult;
 	};
 }

@@ -7,15 +7,15 @@
 #include <winrt/windows.globalization.h>
 
 #include <bit>
-#include <system_error>
-#include <string.h>
-#include <shlwapi.h>
+#include <cstring>
 #include <dwmapi.h>
+#include <shlwapi.h>
+#include <system_error>
 
 
 namespace PGUI
 {
-	std::wstring PGUI::StringToWString(std::string_view string) noexcept
+	auto PGUI::StringToWString(std::string_view string) noexcept -> std::wstring
 	{
 		if (string.empty())
 		{
@@ -30,7 +30,7 @@ namespace PGUI
 		return converted;
 	}
 
-	std::string WStringToString(std::wstring_view string) noexcept
+	auto WStringToString(std::wstring_view string) noexcept -> std::string
 	{
 		if (string.empty())
 		{
@@ -45,12 +45,12 @@ namespace PGUI
 		return converted;
 	}
 
-	HINSTANCE GetHInstance() noexcept
+	auto GetHInstance() noexcept -> HINSTANCE
 	{
 		return GetModuleHandleW(nullptr);
 	}
 
-	std::wstring GetUserLocaleName() noexcept
+	auto GetUserLocaleName() noexcept -> std::wstring
 	{
 		std::wstring localeName(LOCALE_NAME_MAX_LENGTH, '\0');
 
@@ -61,7 +61,7 @@ namespace PGUI
 		return localeName;
 	}
 
-	std::wstring GetCurrentInputMethodLanguage() noexcept
+	auto GetCurrentInputMethodLanguage() noexcept -> std::wstring
 	{
 		using winrt::Windows::Globalization::Language;
 
@@ -84,21 +84,21 @@ namespace PGUI
 		hr = DwmSetWindowAttribute(hWnd, 19, &val, sizeof(BOOL)); HR_L(hr);
 	}
 
-	std::wstring GetHresultErrorMessage(HRESULT hResult) noexcept
+	auto GetHresultErrorMessage(HRESULT hResult) noexcept -> std::wstring
 	{
 		return StringToWString(std::system_category().message(hResult));
 	}
 
-	std::wstring GetWin32ErrorMessage() noexcept
+	auto GetWin32ErrorMessage() noexcept -> std::wstring
 	{
 		return StringToWString(std::system_category().message(HresultFromWin32()));
 	}
-	std::wstring GetWin32ErrorMessage(DWORD errorCode) noexcept
+	auto GetWin32ErrorMessage(DWORD errorCode) noexcept -> std::wstring
 	{
 		return StringToWString(std::system_category().message(HRESULT_FROM_WIN32(errorCode)));
 	}
 
-	std::span<PointL> MapPoints(HWND from, HWND to, std::span<PointL> points) noexcept
+	auto MapPoints(HWND from, HWND to, std::span<PointL> points) noexcept -> std::span<PointL>
 	{
 		MapWindowPoints(from, to,
 			std::bit_cast<LPPOINT>(points.data()),
@@ -107,7 +107,7 @@ namespace PGUI
 		return points;
 	}
 
-	PointL MapPoint(HWND from, HWND to, PointL point) noexcept
+	auto MapPoint(HWND from, HWND to, PointL point) noexcept -> PointL
 	{
 		MapWindowPoints(from, to,
 			std::bit_cast<LPPOINT>(&point), 1U);
@@ -115,7 +115,7 @@ namespace PGUI
 		return point;
 	}
 
-	std::span<RectL> MapRects(HWND from, HWND to, std::span<RectL> rects) noexcept
+	auto MapRects(HWND from, HWND to, std::span<RectL> rects) noexcept -> std::span<RectL>
 	{
 		MapWindowPoints(from, to,
 			std::bit_cast<LPPOINT>(rects.data()),
@@ -124,7 +124,7 @@ namespace PGUI
 		return rects;
 	}
 
-	RectL MapRect(HWND from, HWND to, RectL rect) noexcept
+	auto MapRect(HWND from, HWND to, RectL rect) noexcept -> RectL
 	{
 		MapWindowPoints(from, to,
 			std::bit_cast<LPPOINT>(&rect), 2U);

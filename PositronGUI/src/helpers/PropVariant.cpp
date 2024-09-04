@@ -18,7 +18,7 @@ namespace PGUI
 		PropVariantClear(&var);
 	}
 
-	PROPVARIANT* PropVariant::operator&() noexcept
+	auto PropVariant::operator&() noexcept -> PROPVARIANT*
 	{
 		PropVariantClear(&var);
 
@@ -32,11 +32,11 @@ namespace PGUI
 	{
 		return GetValue();
 	}
-	PropVariantType PropVariant::Type() const noexcept
+	auto PropVariant::Type() const noexcept -> PropVariantType
 	{
 		return static_cast<PropVariantType>(var.vt);
 	}
-	PropVariantValue PropVariant::GetValue() const noexcept
+	auto PropVariant::GetValue() const noexcept -> PropVariantValue
 	{
 		switch (Type())
 		{

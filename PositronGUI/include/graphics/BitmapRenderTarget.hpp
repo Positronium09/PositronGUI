@@ -15,6 +15,6 @@ namespace PGUI::Graphics
 		BitmapRenderTarget() noexcept;
 		explicit BitmapRenderTarget(ComPtr<ID2D1BitmapRenderTarget> brt) noexcept;
 
-		GraphicsBitmap GetBitmap() const;
+		[[nodiscard]] auto GetBitmap() const -> GraphicsBitmap;
 	};
 }

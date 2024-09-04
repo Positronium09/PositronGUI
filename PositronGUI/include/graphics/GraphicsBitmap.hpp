@@ -31,9 +31,9 @@ namespace PGUI::Graphics
 			std::optional<PointU> destPoint = std::nullopt,
 			std::optional<RectU> srcRect = std::nullopt) const;
 
-		[[nodiscard]] SizeF GetDPI() const noexcept;
-		[[nodiscard]] PixelFormat GetPixelFormat() const noexcept { return GetHeldPtr()->GetPixelFormat(); }
-		[[nodiscard]] SizeU GetPixelSize() const noexcept { return GetHeldPtr()->GetPixelSize(); }
-		[[nodiscard]] SizeF GetSize() const noexcept { return GetHeldPtr()->GetSize(); }
+		[[nodiscard]] auto GetDPI() const noexcept -> SizeF;
+		[[nodiscard]] auto GetPixelFormat() const noexcept -> PixelFormat { return GetHeldPtr()->GetPixelFormat(); }
+		[[nodiscard]] auto GetPixelSize() const noexcept -> SizeU { return GetHeldPtr()->GetPixelSize(); }
+		[[nodiscard]] auto GetSize() const noexcept -> SizeF { return GetHeldPtr()->GetSize(); }
 	};
 }

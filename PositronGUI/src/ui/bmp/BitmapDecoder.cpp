@@ -59,12 +59,12 @@ namespace PGUI::UI::Bmp
 	{
 	}
 
-	Frame BitmapDecoder::GetFrame(UINT frameIndex) const noexcept
+	auto BitmapDecoder::GetFrame(UINT frameIndex) const noexcept -> Frame
 	{
 		return Frame{ *this, frameIndex };
 	}
 
-	std::vector<Frame> BitmapDecoder::GetFrames() const noexcept
+	auto BitmapDecoder::GetFrames() const noexcept -> std::vector<Frame>
 	{
 		auto frameCount = GetFrameCount();
 		std::vector<Frame> frames(frameCount);
@@ -77,7 +77,7 @@ namespace PGUI::UI::Bmp
 		return frames;
 	}
 
-	UINT BitmapDecoder::GetFrameCount() const noexcept
+	auto BitmapDecoder::GetFrameCount() const noexcept -> UINT
 	{
 		UINT count = 0;
 
@@ -86,12 +86,12 @@ namespace PGUI::UI::Bmp
 		return count;
 	}
 
-	MetadataReader BitmapDecoder::GetMetadata() const noexcept
+	auto BitmapDecoder::GetMetadata() const noexcept -> MetadataReader
 	{
 		return MetadataReader{ *this };
 	}
 
-	ComPtr<IWICBitmapSource> BitmapDecoder::GetThumbnail() const noexcept
+	auto BitmapDecoder::GetThumbnail() const noexcept -> ComPtr<IWICBitmapSource>
 	{
 		ComPtr<IWICBitmapSource> thumbnail;
 

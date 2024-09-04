@@ -1,3 +1,5 @@
+#include <utility>
+
 #include "ui/controls/CheckBox.hpp"
 
 #include "ui/Colors.hpp"
@@ -5,7 +7,7 @@
 
 namespace PGUI::UI::Controls
 {
-	CheckBox::CheckBoxColors CheckBox::GetCheckBoxColors() noexcept
+	auto CheckBox::GetCheckBoxColors() noexcept -> CheckBox::CheckBoxColors
 	{
 		CheckBoxColors colors;
 
@@ -48,7 +50,7 @@ namespace PGUI::UI::Controls
 
 		return colors;
 	}
-	CheckBox::CheckBoxColors CheckBox::GetCheckBoxAccentedColors() noexcept
+	auto CheckBox::GetCheckBoxAccentedColors() noexcept -> CheckBox::CheckBoxColors
 	{
 		CheckBoxColors colors;
 
@@ -92,8 +94,8 @@ namespace PGUI::UI::Controls
 		return colors;
 	}
 
-	CheckBox::CheckBox(const CheckBoxColors& colors) noexcept :
-		colors{ colors }
+	CheckBox::CheckBox(CheckBoxColors  colors) noexcept :
+		colors{std::move( colors )}
 	{
 		RegisterMessageHandler(WM_PAINT, &CheckBox::OnPaint);
 
@@ -199,7 +201,7 @@ namespace PGUI::UI::Controls
 		Invalidate();
 	}
 
-	Core::HandlerResult CheckBox::OnPaint(UINT, WPARAM, LPARAM) noexcept
+	auto CheckBox::OnPaint(UINT, WPARAM, LPARAM) noexcept -> Core::HandlerResult
 	{
 		BeginDraw();
 

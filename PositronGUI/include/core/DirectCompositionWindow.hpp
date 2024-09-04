@@ -30,18 +30,18 @@ namespace PGUI::Core
 		explicit DirectCompositionWindow(const WindowClass::WindowClassPtr& wndClass) noexcept;
 
 		protected:
-		[[nodiscard]] static ComPtr<ID3D11Device2> D3D11Device() noexcept;
-		[[nodiscard]] static ComPtr<IDXGIDevice4> DXGIDevice() noexcept;
-		[[nodiscard]] static ComPtr<IDCompositionDevice> DCompositionDevice() noexcept;
-		[[nodiscard]] static ComPtr<ID2D1Device7> D2D1Device() noexcept;
-		[[nodiscard]] ComPtr<IDXGISwapChain1> DXGISwapChain() const noexcept;
-		[[nodiscard]] ComPtr<IDCompositionTarget> DCompositionTarget() const noexcept;
-		[[nodiscard]] ComPtr<ID2D1DeviceContext7> D2D1DeviceContext() const noexcept;
+		[[nodiscard]] static auto D3D11Device() noexcept -> ComPtr<ID3D11Device2>;
+		[[nodiscard]] static auto DXGIDevice() noexcept -> ComPtr<IDXGIDevice4>;
+		[[nodiscard]] static auto DCompositionDevice() noexcept -> ComPtr<IDCompositionDevice>;
+		[[nodiscard]] static auto D2D1Device() noexcept -> ComPtr<ID2D1Device7>;
+		[[nodiscard]] auto DXGISwapChain() const noexcept -> ComPtr<IDXGISwapChain1>;
+		[[nodiscard]] auto DCompositionTarget() const noexcept -> ComPtr<IDCompositionTarget>;
+		[[nodiscard]] auto D2D1DeviceContext() const noexcept -> ComPtr<ID2D1DeviceContext7>;
 
-		[[nodiscard]] Graphics::Graphics GetGraphics() const noexcept;
+		[[nodiscard]] auto GetGraphics() const noexcept -> Graphics::Graphics;
 
 		virtual void BeginDraw();
-		virtual HRESULT EndDraw();
+		virtual auto EndDraw() -> HRESULT;
 
 		virtual void CreateDeviceResources();
 		virtual void DiscardDeviceResources();
@@ -62,7 +62,7 @@ namespace PGUI::Core
 		void InitD2D1DeviceContext();
 		void InitDirectComposition();
 
-		Core::HandlerResult OnNCCreate(UINT msg, WPARAM wParam, LPARAM lParam);
-		Core::HandlerResult OnSize(UINT msg, WPARAM wParam, LPARAM lParam);
+		auto OnNCCreate(UINT msg, WPARAM wParam, LPARAM lParam) -> Core::HandlerResult;
+		auto OnSize(UINT msg, WPARAM wParam, LPARAM lParam) -> Core::HandlerResult;
 	};
 }

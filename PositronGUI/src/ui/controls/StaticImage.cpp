@@ -1,3 +1,5 @@
+#include <utility>
+
 #include "ui/controls/StaticImage.hpp"
 
 #include "ui/Color.hpp"
@@ -17,7 +19,7 @@ namespace PGUI::UI::Controls
 	#pragma region BitmapSourceRenderer
 
 	StaticImage::BitmapSourceRenderer::BitmapSourceRenderer(Bmp::BitmapSource bmpSrc) noexcept :
-		bmpSrc{ bmpSrc }
+		bmpSrc{std::move( bmpSrc )}
 	{
 	}
 	
@@ -33,7 +35,7 @@ namespace PGUI::UI::Controls
 		g.DrawBitmap(Graphics::GraphicsBitmap{ bmp }, img->GetClientRect());
 	}
 
-	BmpToRender StaticImage::BitmapSourceRenderer::GetImage() const noexcept
+	auto StaticImage::BitmapSourceRenderer::GetImage() const noexcept -> BmpToRender
 	{
 		return bmpSrc;
 	}
@@ -43,7 +45,7 @@ namespace PGUI::UI::Controls
 	#pragma region GifRenderer
 
 	StaticImage::GifRenderer::GifRenderer(StaticImage* staticImage, Bmp::BitmapDecoder decoder) noexcept :
-		decoder{ decoder }
+		decoder{std::move( decoder )}
 	{
 		composeRenderTarget = staticImage->GetGraphics().CreateCompatibleRenderTarget();
 
@@ -71,7 +73,7 @@ namespace PGUI::UI::Controls
 		g.DrawBitmap(Graphics::GraphicsBitmap{ frameToRender }, drawRect);
 	}
 
-	BmpToRender StaticImage::GifRenderer::GetImage() const noexcept
+	auto StaticImage::GifRenderer::GetImage() const noexcept -> BmpToRender
 	{
 		return decoder;
 	}
@@ -82,11 +84,11 @@ namespace PGUI::UI::Controls
 			gifPixelSize);
 	}
 
-	bool StaticImage::GifRenderer::IsLastFrame() const noexcept
+	auto StaticImage::GifRenderer::IsLastFrame() const noexcept -> bool
 	{
 		return nextFrameIndex == 0;
 	}
-	bool StaticImage::GifRenderer::EndOfAnimation() const noexcept
+	auto StaticImage::GifRenderer::EndOfAnimation() const noexcept -> bool
 	{
 		return loop && IsLastFrame() && totalLoopCount == loopCount;
 	}
@@ -376,7 +378,7 @@ namespace PGUI::UI::Controls
 		RegisterMessageHandler(WM_PAINT, &StaticImage::OnPaint);
 	}
 
-	BmpToRender StaticImage::GetImage() const noexcept
+	auto StaticImage::GetImage() const noexcept -> BmpToRender
 	{
 		return renderer->GetImage();
 	}
@@ -415,14 +417,14 @@ namespace PGUI::UI::Controls
 		}, bmp);
 	}
 
-	Core::HandlerResult StaticImage::OnCreate(BmpToRender bmp, UINT, WPARAM, LPARAM) noexcept
+	auto StaticImage::OnCreate(BmpToRender bmp, UINT, WPARAM, LPARAM) noexcept -> Core::HandlerResult
 	{
 		CreateRenderer(bmp);
 
 		return 0;
 	}
 
-	Core::HandlerResult StaticImage::OnPaint(UINT, WPARAM, LPARAM) noexcept
+	auto StaticImage::OnPaint(UINT, WPARAM, LPARAM) noexcept -> Core::HandlerResult
 	{
 		BeginDraw();
 
@@ -433,7 +435,7 @@ namespace PGUI::UI::Controls
 		return 0;
 	}
 
-	Core::HandlerResult StaticImage::OnSize(UINT, WPARAM, LPARAM) const noexcept
+	auto StaticImage::OnSize(UINT, WPARAM, LPARAM) const noexcept -> Core::HandlerResult
 	{
 		if (auto gifRenderer = dynamic_cast<GifRenderer*>(renderer.get()))
 		{

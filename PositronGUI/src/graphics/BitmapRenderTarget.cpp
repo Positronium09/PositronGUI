@@ -12,7 +12,7 @@ namespace PGUI::Graphics
 	{
 	}
 
-	GraphicsBitmap BitmapRenderTarget::GetBitmap() const
+	auto BitmapRenderTarget::GetBitmap() const -> GraphicsBitmap
 	{
 		ComPtr<ID2D1BitmapRenderTarget> brt;
 		GetHeldComPtr().As(&brt);

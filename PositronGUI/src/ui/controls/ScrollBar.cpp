@@ -173,8 +173,8 @@ namespace PGUI::UI::Controls
 	void ScrollBar::AdjustRect(WPARAM wParam, LPRECT rc) const noexcept
 	{
 		RECT rect;
-		int cyClient;
-		int cyAdjust;
+		int cyClient = 0;
+		int cyAdjust = 0;
 		SetRectEmpty(&rect);
 		::AdjustWindowRect(&rect, 
 			static_cast<DWORD>(GetWindowLongPtrW(Hwnd(), GWL_STYLE)), FALSE);
@@ -206,7 +206,7 @@ namespace PGUI::UI::Controls
 		}
 	}
 
-	float ScrollBar::CalculateThumbSize() const noexcept
+	auto ScrollBar::CalculateThumbSize() const noexcept -> float
 	{
 		SizeF size = GetClientSize();
 		if (direction == ScrollBarDirection::Vertical)
@@ -240,7 +240,7 @@ namespace PGUI::UI::Controls
 
 	}
 
-	RectF ScrollBar::CalculateThumbRect() const noexcept
+	auto ScrollBar::CalculateThumbRect() const noexcept -> RectF
 	{
 		RectF clientRect = GetClientRect();
 		auto size = clientRect.Size();
@@ -270,7 +270,7 @@ namespace PGUI::UI::Controls
 			thumbWidth - padding, size.cy - padding,
 		}.Shifted(rectShift, 0);
 	}
-	float ScrollBar::CalculateThumbPos() const noexcept
+	auto ScrollBar::CalculateThumbPos() const noexcept -> float
 	{
 		if (direction == ScrollBarDirection::Vertical)
 		{
@@ -288,7 +288,7 @@ namespace PGUI::UI::Controls
 			static_cast<float>(maxScroll)
 		);
 	}
-	std::int64_t ScrollBar::CalculateScrollPosFromThumbPos(float pos) const noexcept
+	auto ScrollBar::CalculateScrollPosFromThumbPos(float pos) const noexcept -> std::int64_t
 	{
 		auto size = GetClientSize();
 
@@ -329,7 +329,7 @@ namespace PGUI::UI::Controls
 		return ret;
 	}
 
-	Core::HandlerResult ScrollBar::OnDPIChange(float dpiScale, RectI suggestedRect)
+	auto ScrollBar::OnDPIChange(float dpiScale, RectI suggestedRect) -> Core::HandlerResult
 	{
 		minThumbHeight = static_cast<std::int64_t>(static_cast<float>(minThumbHeight) * dpiScale);
 		thumbPos *= dpiScale;
@@ -339,7 +339,7 @@ namespace PGUI::UI::Controls
 		return Window::OnDPIChange(dpiScale, suggestedRect);
 	}
 
-	Core::HandlerResult ScrollBar::OnCreate(UINT, WPARAM, LPARAM)
+	auto ScrollBar::OnCreate(UINT, WPARAM, LPARAM) -> Core::HandlerResult
 	{
 		thumbPos = CalculateThumbPos();
 
@@ -392,7 +392,7 @@ namespace PGUI::UI::Controls
 		return 0;
 	}
 
-	Core::HandlerResult ScrollBar::OnPaint(UINT, WPARAM, LPARAM)
+	auto ScrollBar::OnPaint(UINT, WPARAM, LPARAM) -> Core::HandlerResult
 	{
 		BeginDraw();
 
@@ -410,7 +410,7 @@ namespace PGUI::UI::Controls
 		return 0;
 	}
 
-	Core::HandlerResult ScrollBar::OnLButtonDown(UINT, WPARAM, LPARAM lParam) noexcept
+	auto ScrollBar::OnLButtonDown(UINT, WPARAM, LPARAM lParam) noexcept -> Core::HandlerResult
 	{
 		PointF p = MAKEPOINTS(lParam);
 		if (!CalculateThumbRect().IsPointInside(p))
@@ -441,7 +441,7 @@ namespace PGUI::UI::Controls
 
 		return 0;
 	}
-	Core::HandlerResult ScrollBar::OnLButtonUp(UINT, WPARAM, LPARAM) noexcept
+	auto ScrollBar::OnLButtonUp(UINT, WPARAM, LPARAM) noexcept -> Core::HandlerResult
 	{
 		if (mouseScrolling)
 		{
@@ -453,7 +453,7 @@ namespace PGUI::UI::Controls
 
 		return 0;
 	}
-	Core::HandlerResult ScrollBar::OnMouseMove(UINT, WPARAM wParam, LPARAM lParam)
+	auto ScrollBar::OnMouseMove(UINT, WPARAM wParam, LPARAM lParam) -> Core::HandlerResult
 	{
 		if (!(wParam & MK_LBUTTON) || GetCapture() != Hwnd())
 		{
@@ -491,7 +491,7 @@ namespace PGUI::UI::Controls
 		return 0;
 	}
 
-	Core::HandlerResult ScrollBar::OnMouseWheel(UINT msg, WPARAM wParam, LPARAM)
+	auto ScrollBar::OnMouseWheel(UINT msg, WPARAM wParam, LPARAM) -> Core::HandlerResult
 	{
 		const bool shouldScrollVertical = 
 			msg == WM_MOUSEWHEEL && 
@@ -511,7 +511,7 @@ namespace PGUI::UI::Controls
 		return 0;
 	}
 	
-	Core::HandlerResult ScrollBar::OnWindowPosChanging(UINT, WPARAM, LPARAM lParam) const
+	auto ScrollBar::OnWindowPosChanging(UINT, WPARAM, LPARAM lParam) const -> Core::HandlerResult
 	{
 		if (auto winPos = std::bit_cast<LPWINDOWPOS>(lParam); 
 			!(winPos->flags & SWP_NOSIZE))
@@ -530,14 +530,14 @@ namespace PGUI::UI::Controls
 
 		return 0;
 	}
-	Core::HandlerResult ScrollBar::OnSizing(UINT, WPARAM wParam, LPARAM lParam) const
+	auto ScrollBar::OnSizing(UINT, WPARAM wParam, LPARAM lParam) const -> Core::HandlerResult
 	{
 		UNREFERENCED_PARAMETER(wParam);
 		UNREFERENCED_PARAMETER(lParam);
 		//AdjustRect(wParam, std::bit_cast<LPRECT>(lParam));
 		return 0;
 	}
-	Core::HandlerResult ScrollBar::OnNCCalcSize(UINT msg, WPARAM wParam, LPARAM lParam)
+	auto ScrollBar::OnNCCalcSize(UINT msg, WPARAM wParam, LPARAM lParam) -> Core::HandlerResult
 	{
 		auto ret = DefWindowProcW(Hwnd(), msg, wParam, lParam);
 

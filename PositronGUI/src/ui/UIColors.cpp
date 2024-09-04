@@ -12,48 +12,48 @@ namespace PGUI::UI
 {
 	using enum winrt::Windows::UI::ViewManagement::UIColorType;
 
-	RGBA UIColors::GetForegroundColor() noexcept
+	auto UIColors::GetForegroundColor() noexcept -> RGBA
 	{
 		return uiSettings.GetColorValue(Foreground);
 	}
-	RGBA UIColors::GetBackgroundColor() noexcept
+	auto UIColors::GetBackgroundColor() noexcept -> RGBA
 	{
 		return uiSettings.GetColorValue(Background);
 	}
-	RGBA UIColors::GetAccentColor() noexcept
+	auto UIColors::GetAccentColor() noexcept -> RGBA
 	{	
 		return uiSettings.GetColorValue(Accent);
 	}
-	RGBA UIColors::GetAccentDark1Color() noexcept
+	auto UIColors::GetAccentDark1Color() noexcept -> RGBA
 	{	
 		return uiSettings.GetColorValue(AccentDark1);
 	}
-	RGBA UIColors::GetAccentDark2Color() noexcept
+	auto UIColors::GetAccentDark2Color() noexcept -> RGBA
 	{	
 		return uiSettings.GetColorValue(AccentDark2);
 	}
-	RGBA UIColors::GetAccentDark3Color() noexcept
+	auto UIColors::GetAccentDark3Color() noexcept -> RGBA
 	{
 		return uiSettings.GetColorValue(AccentDark3);
 	}
-	RGBA UIColors::GetAccentLight1Color() noexcept
+	auto UIColors::GetAccentLight1Color() noexcept -> RGBA
 	{
 		return uiSettings.GetColorValue(AccentLight1);
 	}
-	RGBA UIColors::GetAccentLight2Color() noexcept
+	auto UIColors::GetAccentLight2Color() noexcept -> RGBA
 	{
 		return uiSettings.GetColorValue(AccentLight2);
 	}
-	RGBA UIColors::GetAccentLight3Color() noexcept
+	auto UIColors::GetAccentLight3Color() noexcept -> RGBA
 	{
 		return uiSettings.GetColorValue(AccentLight3);
 	}
 
-	bool UIColors::IsDarkMode() noexcept
+	auto UIColors::IsDarkMode() noexcept -> bool
 	{
 		return !IsLightMode();
 	}
-	bool UIColors::IsLightMode() noexcept
+	auto UIColors::IsLightMode() noexcept -> bool
 	{
 		DWORD value = 1;
 		DWORD size = sizeof(value);

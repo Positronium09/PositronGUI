@@ -154,14 +154,14 @@ namespace PGUI::UI
 		b = std::clamp(b - amount, 0.0f, 1.0f);
 	}
 
-	RGB RGB::Lightened(FLOAT amount) const noexcept
+	auto RGB::Lightened(FLOAT amount) const noexcept -> RGB
 	{
 		auto color = *this;
 		color.Lighten(amount);
 		return color;
 	}
 
-	RGB RGB::Darkened(FLOAT amount) const noexcept
+	auto RGB::Darkened(FLOAT amount) const noexcept -> RGB
 	{
 		auto color = *this;
 		color.Darken(amount);
@@ -243,14 +243,14 @@ namespace PGUI::UI
 		b = std::clamp(b - amount, 0.0f, 1.0f);
 	}
 
-	RGBA RGBA::Lightened(FLOAT amount) const noexcept
+	auto RGBA::Lightened(FLOAT amount) const noexcept -> RGBA
 	{
 		auto color = *this;
 		color.Lighten(amount);
 		return color;
 	}
 
-	RGBA RGBA::Darkened(FLOAT amount) const noexcept
+	auto RGBA::Darkened(FLOAT amount) const noexcept -> RGBA
 	{
 		auto color = *this;
 		color.Darken(amount);

@@ -5,11 +5,12 @@
 
 #include <algorithm>
 #include <strsafe.h>
+#include <utility>
 
 
 namespace PGUI::UI::Controls
 {
-	TextButton::TextButtonColors TextButton::GetTextButtonColors() noexcept
+	auto TextButton::GetTextButtonColors() noexcept -> TextButton::TextButtonColors
 	{
 		TextButton::TextButtonColors colors;
 
@@ -39,7 +40,7 @@ namespace PGUI::UI::Controls
 
 		return colors;
 	}
-	TextButton::TextButtonColors TextButton::GetTextButtonAccentedColors() noexcept
+	auto TextButton::GetTextButtonAccentedColors() noexcept -> TextButton::TextButtonColors
 	{
 		TextButton::TextButtonColors colors;
 
@@ -70,9 +71,9 @@ namespace PGUI::UI::Controls
 		return colors;
 	}
 
-	TextButton::TextButton(const TextButtonColors& _colors, TextFormat _textFormat) noexcept :
+	TextButton::TextButton(TextButtonColors  _colors, TextFormat _textFormat) noexcept :
 		ButtonBase{ PGUI::Core::WindowClass::Create(L"TextButton_UIControl") },
-		colors(_colors), textFormat(_textFormat)
+		colors(std::move(_colors)), textFormat(std::move(_textFormat))
 	{
 		RegisterMessageHandler(WM_NCCREATE, &TextButton::OnNCCreate);
 		RegisterMessageHandler(WM_PAINT, &TextButton::OnPaint);
@@ -86,7 +87,7 @@ namespace PGUI::UI::Controls
 		OnStateChanged(GetState());
 	}
 
-	TextLayout TextButton::GetTextLayout() const noexcept
+	auto TextButton::GetTextLayout() const noexcept -> TextLayout
 	{
 		return textLayout;
 	}
@@ -119,21 +120,21 @@ namespace PGUI::UI::Controls
 		textChangedEvent.Emit(text);
 	}
 
-	const std::wstring& TextButton::GetText() const noexcept
+	auto TextButton::GetText() const noexcept -> const std::wstring&
 	{
 		return text;
 	}
 
-	const TextButton::TextButtonColors& TextButton::GetColors() const noexcept
+	auto TextButton::GetColors() const noexcept -> const TextButton::TextButtonColors&
 	{
 		return colors;
 	}
-	TextButton::TextButtonColors& TextButton::GetColors() noexcept
+	auto TextButton::GetColors() noexcept -> TextButton::TextButtonColors&
 	{
 		return colors;
 	}
 
-	Core::Event<std::wstring_view>& TextButton::TextChangedEvent() noexcept
+	auto TextButton::TextChangedEvent() noexcept -> Core::Event<std::wstring_view>&
 	{
 		return textChangedEvent;
 	}
@@ -192,14 +193,14 @@ namespace PGUI::UI::Controls
 		backgroundBrush.ReleaseBrush();
 	}
 
-	Core::HandlerResult TextButton::OnDPIChange(float dpiScale, RectI suggestedRect) noexcept
+	auto TextButton::OnDPIChange(float dpiScale, RectI suggestedRect) noexcept -> Core::HandlerResult
 	{
 		SetTextFormat(textFormat.AdjustFontSizeToDPI(textFormat.GetFontSize() * dpiScale));
 
 		return Window::OnDPIChange(dpiScale, suggestedRect);
 	}
 
-	Core::HandlerResult TextButton::OnNCCreate(UINT, WPARAM, LPARAM lParam) noexcept
+	auto TextButton::OnNCCreate(UINT, WPARAM, LPARAM lParam) noexcept -> Core::HandlerResult
 	{
 		auto createStruct = std::bit_cast<LPCREATESTRUCTW>(lParam);
 
@@ -212,7 +213,7 @@ namespace PGUI::UI::Controls
 		return 1;
 	}
 
-	Core::HandlerResult TextButton::OnPaint(UINT, WPARAM, LPARAM) noexcept
+	auto TextButton::OnPaint(UINT, WPARAM, LPARAM) noexcept -> Core::HandlerResult
 	{
 		BeginDraw();
 
@@ -232,14 +233,14 @@ namespace PGUI::UI::Controls
 		return 0;
 	}
 
-	Core::HandlerResult TextButton::OnSize(UINT, WPARAM, LPARAM) noexcept
+	auto TextButton::OnSize(UINT, WPARAM, LPARAM) noexcept -> Core::HandlerResult
 	{
 		InitTextLayout();
 
 		return 0;
 	}
 
-	Core::HandlerResult TextButton::OnSetText(UINT, WPARAM, LPARAM lParam) noexcept
+	auto TextButton::OnSetText(UINT, WPARAM, LPARAM lParam) noexcept -> Core::HandlerResult
 	{
 		if (auto newText = std::bit_cast<wchar_t*>(lParam);
 			text.data() != newText)
@@ -251,7 +252,7 @@ namespace PGUI::UI::Controls
 
 		return { 1, Core::HandlerResultFlag::PassToDefWindowProc };
 	}
-	Core::HandlerResult TextButton::OnGetText(UINT, WPARAM wParam, LPARAM lParam) noexcept
+	auto TextButton::OnGetText(UINT, WPARAM wParam, LPARAM lParam) noexcept -> Core::HandlerResult
 	{
 		auto minSize = std::min(text.size() + 1, wParam);
 
@@ -259,7 +260,7 @@ namespace PGUI::UI::Controls
 
 		return minSize;
 	}
-	Core::HandlerResult TextButton::OnGetTextLength(UINT, WPARAM, LPARAM) const noexcept
+	auto TextButton::OnGetTextLength(UINT, WPARAM, LPARAM) const noexcept -> Core::HandlerResult
 	{
 		return text.size();
 	}

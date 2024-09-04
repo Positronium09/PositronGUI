@@ -1,3 +1,5 @@
+#include <utility>
+
 #include "ui/Gradient.hpp"
 
 #include "helpers/HelperFunctions.hpp"
@@ -5,20 +7,20 @@
 
 namespace PGUI::UI
 {
-	Gradient::Gradient(const GradientStops& _stops) noexcept :
-		stops(_stops)
+	Gradient::Gradient(GradientStops  _stops) noexcept :
+		stops(std::move(_stops))
 	{ }
 
-	const GradientStops& Gradient::GetGradientStops() const noexcept
+	auto Gradient::GetGradientStops() const noexcept -> const GradientStops&
 	{
 		return stops;
 	}
-	GradientStops& Gradient::GetGradientStops() noexcept
+	auto Gradient::GetGradientStops() noexcept -> GradientStops&
 	{
 		return stops;
 	}
 
-	PositioningMode Gradient::GetPositioningMode() const noexcept
+	auto Gradient::GetPositioningMode() const noexcept -> PositioningMode
 	{
 		return mode;
 	}
@@ -32,7 +34,7 @@ namespace PGUI::UI
 		Gradient{ stops }, start(_start), end(_end)
 	{ }
 	
-	PointF LinearGradient::Start() const noexcept
+	auto LinearGradient::Start() const noexcept -> PointF
 	{
 		return start;
 	}
@@ -41,7 +43,7 @@ namespace PGUI::UI
 		start = _start;
 	}
 	
-	PointF LinearGradient::End() const noexcept
+	auto LinearGradient::End() const noexcept -> PointF
 	{
 		return end;
 	}
@@ -59,7 +61,7 @@ namespace PGUI::UI
 		end.y = MapToRange(end.y, rect.top, rect.bottom);
 	}
 
-	LinearGradient LinearGradient::ReferenceRectApplied(RectF rect) const noexcept
+	auto LinearGradient::ReferenceRectApplied(RectF rect) const noexcept -> LinearGradient
 	{
 		auto gradient = *this;
 		gradient.ApplyReferenceRect(rect);
@@ -71,12 +73,12 @@ namespace PGUI::UI
 		Gradient{ stops }, ellipse(_ellipse), offset(_offset)
 	{ }
 
-	Ellipse RadialGradient::GetEllipse() const noexcept
+	auto RadialGradient::GetEllipse() const noexcept -> Ellipse
 	{
 		return ellipse;
 	}
 
-	Ellipse& RadialGradient::GetEllipse() noexcept
+	auto RadialGradient::GetEllipse() noexcept -> Ellipse&
 	{
 		return ellipse;
 	}
@@ -86,7 +88,7 @@ namespace PGUI::UI
 		ellipse = _ellipse;
 	}
 
-	PointF RadialGradient::Offset() const noexcept
+	auto RadialGradient::Offset() const noexcept -> PointF
 	{
 		return offset;
 	}
@@ -109,7 +111,7 @@ namespace PGUI::UI
 		ellipse.yRadius = MapToRange(ellipse.yRadius, 0.0f, size.cy);
 	}
 
-	RadialGradient RadialGradient::ReferenceRectApplied(RectF rect) const noexcept
+	auto RadialGradient::ReferenceRectApplied(RectF rect) const noexcept -> RadialGradient
 	{
 		auto gradient = *this;
 		gradient.ApplyReferenceRect(rect);

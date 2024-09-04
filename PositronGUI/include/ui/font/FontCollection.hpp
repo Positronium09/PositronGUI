@@ -14,14 +14,14 @@ namespace PGUI::UI::Font
 	class FontCollection : public ComPtrHolder<IDWriteFontCollection3>
 	{
 		public:
-		[[nodiscard]] static FontCollection GetSystemFontCollection();
-		[[nodiscard]] static FontCollection LoadFontFile(std::wstring_view filePath);
+		[[nodiscard]] static auto GetSystemFontCollection() -> FontCollection;
+		[[nodiscard]] static auto LoadFontFile(std::wstring_view filePath) -> FontCollection;
 
 		FontCollection() noexcept;
 		explicit FontCollection(ComPtr<IDWriteFontCollection3> fontCollection) noexcept;
 
-		[[nodiscard]] FontSet GetFontSet() const noexcept;
-		[[nodiscard]] FontFamily GetFontFamily(UINT32 index) const noexcept;
-		[[nodiscard]] UINT32 GetFontFamilyCount() const noexcept;
+		[[nodiscard]] auto GetFontSet() const noexcept -> FontSet;
+		[[nodiscard]] auto GetFontFamily(UINT32 index) const noexcept -> FontFamily;
+		[[nodiscard]] auto GetFontFamilyCount() const noexcept -> UINT32;
 	};
 }

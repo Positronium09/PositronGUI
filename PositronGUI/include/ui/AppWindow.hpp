@@ -10,26 +10,26 @@ namespace PGUI::UI
 		public:
 		AppWindow() noexcept;
 
-		[[nodiscard]] bool IsFullScreen() const noexcept;
+		[[nodiscard]] auto IsFullScreen() const noexcept -> bool;
 		void EnterFullScreenMode() noexcept;
 		void ExitFullScreenMode() noexcept;
 
-		[[nodiscard]] SizeI GetMinimumSize() const noexcept;
+		[[nodiscard]] auto GetMinimumSize() const noexcept -> SizeI;
 		void SetMinimumSize(SizeI size) noexcept;
 
 		void SetTitle(std::wstring_view title) const noexcept;
-		[[nodiscard]] const std::wstring& GetTitle() const noexcept;
+		[[nodiscard]] auto GetTitle() const noexcept -> const std::wstring&;
 
-		[[nodiscard]] bool IsMaximizable() const noexcept;
+		[[nodiscard]] auto IsMaximizable() const noexcept -> bool;
 		void SetMaximizable(bool isMaximizable) const noexcept;
 
-		[[nodiscard]] bool IsMinimizable() const noexcept;
+		[[nodiscard]] auto IsMinimizable() const noexcept -> bool;
 		void SetMinimizable(bool isMinimizable) const noexcept;
 		
-		[[nodiscard]] bool IsAlwaysOnTop() const noexcept;
+		[[nodiscard]] auto IsAlwaysOnTop() const noexcept -> bool;
 		void SetAlwaysOnTop(bool isAlwaysOnTop) const noexcept;
 
-		[[nodiscard]] bool IsResizable() const noexcept;
+		[[nodiscard]] auto IsResizable() const noexcept -> bool;
 		void SetResizeable(bool isResizable) const noexcept;
 
 		private:
@@ -38,11 +38,11 @@ namespace PGUI::UI
 		bool isFullScreen = false;
 		SizeI minSize = SizeI{ 300, 300 };
 
-		Core::HandlerResult OnNCCreate(UINT msg, WPARAM wParam, LPARAM lParam) noexcept;
-		Core::HandlerResult OnSetText(UINT msg, WPARAM wParam, LPARAM lParam) noexcept;
-		Core::HandlerResult OnGetText(UINT msg, WPARAM wParam, LPARAM lParam) const noexcept;
-		Core::HandlerResult OnGetTextLength(UINT msg, WPARAM wParam, LPARAM lParam) const noexcept;
-		Core::HandlerResult OnGetMinMaxInfo(UINT msg, WPARAM wParam, LPARAM lParam) const noexcept;
-		Core::HandlerResult OnLButtonDown(UINT msg, WPARAM wParam, LPARAM lParam) const noexcept;
+		auto OnNCCreate(UINT msg, WPARAM wParam, LPARAM lParam) noexcept -> Core::HandlerResult;
+		auto OnSetText(UINT msg, WPARAM wParam, LPARAM lParam) noexcept -> Core::HandlerResult;
+		[[nodiscard]] auto OnGetText(UINT msg, WPARAM wParam, LPARAM lParam) const noexcept -> Core::HandlerResult;
+		[[nodiscard]] auto OnGetTextLength(UINT msg, WPARAM wParam, LPARAM lParam) const noexcept -> Core::HandlerResult;
+		[[nodiscard]] auto OnGetMinMaxInfo(UINT msg, WPARAM wParam, LPARAM lParam) const noexcept -> Core::HandlerResult;
+		[[nodiscard]] auto OnLButtonDown(UINT msg, WPARAM wParam, LPARAM lParam) const noexcept -> Core::HandlerResult;
 	};
 }

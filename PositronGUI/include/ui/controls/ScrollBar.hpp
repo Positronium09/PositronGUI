@@ -39,12 +39,12 @@ namespace PGUI::UI::Controls
 
 		explicit ScrollBar(const ScrollBarParams& params) noexcept;
 
-		[[nodiscard]] std::int64_t GetPageSize() const noexcept { return pageSize; }
-		[[nodiscard]] std::int64_t GetMaxScroll() const noexcept { return maxScroll; }
-		[[nodiscard]] std::int64_t GetMinScroll() const noexcept { return minScroll; }
-		[[nodiscard]] std::int64_t GetScrollMult() const noexcept { return scrollMult; }
-		[[nodiscard]] std::int64_t GetScrollPos() const noexcept { return scrollPos; }
-		[[nodiscard]] std::int64_t GetScrollRange() const noexcept { return maxScroll - minScroll; }
+		[[nodiscard]] auto GetPageSize() const noexcept -> std::int64_t { return pageSize; }
+		[[nodiscard]] auto GetMaxScroll() const noexcept -> std::int64_t { return maxScroll; }
+		[[nodiscard]] auto GetMinScroll() const noexcept -> std::int64_t { return minScroll; }
+		[[nodiscard]] auto GetScrollMult() const noexcept -> std::int64_t { return scrollMult; }
+		[[nodiscard]] auto GetScrollPos() const noexcept -> std::int64_t { return scrollPos; }
+		[[nodiscard]] auto GetScrollRange() const noexcept -> std::int64_t { return maxScroll - minScroll; }
 
 		void SetPageSize(std::int64_t pageSize) noexcept;
 		void SetMaxScroll(std::int64_t maxScroll) noexcept;
@@ -62,18 +62,18 @@ namespace PGUI::UI::Controls
 
 		void WheelScroll(std::int64_t wheelDelta) noexcept;
 
-		[[nodiscard]] Core::Event<void>& ScrolledEvent() noexcept { return scrolledEvent; }
+		[[nodiscard]] auto ScrolledEvent() noexcept -> Core::Event<void>& { return scrolledEvent; }
 
 		void SetThumbBrush(Brush&  brush);
 		void SetBackgroundBrush(Brush& brush);
 		
-		[[nodiscard]] const Brush& GetThumbBrush() const noexcept { return thumbBrush; }
-		[[nodiscard]] const Brush& GetBackgroundBrush() const noexcept { return backgroundBrush; }
+		[[nodiscard]] auto GetThumbBrush() const noexcept -> const Brush& { return thumbBrush; }
+		[[nodiscard]] auto GetBackgroundBrush() const noexcept -> const Brush& { return backgroundBrush; }
 
-		[[nodiscard]] float GetThumbPadding() const noexcept { return thumbPadding; }
-		[[nodiscard]] std::pair<float, float> GetThumbRadii() const noexcept { return { thumbXRadius, thumbYRadius }; }
+		[[nodiscard]] auto GetThumbPadding() const noexcept -> float { return thumbPadding; }
+		[[nodiscard]] auto GetThumbRadii() const noexcept -> std::pair<float, float> { return { thumbXRadius, thumbYRadius }; }
 
-		[[nodiscard]] ScrollBarDirection GetDirection() const noexcept { return direction; }
+		[[nodiscard]] auto GetDirection() const noexcept -> ScrollBarDirection { return direction; }
 
 		void SetThumbPadding(float padding) noexcept;
 		void SetThumbRadii(std::pair<float, float> radii) noexcept;
@@ -120,20 +120,20 @@ namespace PGUI::UI::Controls
 
 		void OnButtonClicked(bool isUp);
 
-		[[nodiscard]] float CalculateThumbSize() const noexcept;
-		[[nodiscard]] RectF CalculateThumbRect() const noexcept;
-		[[nodiscard]] float CalculateThumbPos() const noexcept;
-		[[nodiscard]] std::int64_t CalculateScrollPosFromThumbPos(float thumbPos) const noexcept;
+		[[nodiscard]] auto CalculateThumbSize() const noexcept -> float;
+		[[nodiscard]] auto CalculateThumbRect() const noexcept -> RectF;
+		[[nodiscard]] auto CalculateThumbPos() const noexcept -> float;
+		[[nodiscard]] auto CalculateScrollPosFromThumbPos(float thumbPos) const noexcept -> std::int64_t;
 
-		Core::HandlerResult OnDPIChange(float dpiScale, RectI suggestedRect) override;
-		Core::HandlerResult OnCreate(UINT msg, WPARAM wParam, LPARAM lParam);
-		Core::HandlerResult OnPaint(UINT msg, WPARAM wParam, LPARAM lParam);
-		Core::HandlerResult OnLButtonDown(UINT msg, WPARAM wParam, LPARAM lParam) noexcept;
-		Core::HandlerResult OnLButtonUp(UINT msg, WPARAM wParam, LPARAM lParam) noexcept;
-		Core::HandlerResult OnMouseMove(UINT msg, WPARAM wParam, LPARAM lParam);
-		Core::HandlerResult OnMouseWheel(UINT msg, WPARAM wParam, LPARAM lParam);
-		Core::HandlerResult OnWindowPosChanging(UINT msg, WPARAM wParam, LPARAM lParam) const;
-		Core::HandlerResult OnSizing(UINT msg, WPARAM wParam, LPARAM lParam) const;
-		Core::HandlerResult OnNCCalcSize(UINT msg, WPARAM wParam, LPARAM lParam);
+		auto OnDPIChange(float dpiScale, RectI suggestedRect) -> Core::HandlerResult override;
+		auto OnCreate(UINT msg, WPARAM wParam, LPARAM lParam) -> Core::HandlerResult;
+		auto OnPaint(UINT msg, WPARAM wParam, LPARAM lParam) -> Core::HandlerResult;
+		auto OnLButtonDown(UINT msg, WPARAM wParam, LPARAM lParam) noexcept -> Core::HandlerResult;
+		auto OnLButtonUp(UINT msg, WPARAM wParam, LPARAM lParam) noexcept -> Core::HandlerResult;
+		auto OnMouseMove(UINT msg, WPARAM wParam, LPARAM lParam) -> Core::HandlerResult;
+		auto OnMouseWheel(UINT msg, WPARAM wParam, LPARAM lParam) -> Core::HandlerResult;
+		[[nodiscard]] auto OnWindowPosChanging(UINT msg, WPARAM wParam, LPARAM lParam) const -> Core::HandlerResult;
+		[[nodiscard]] auto OnSizing(UINT msg, WPARAM wParam, LPARAM lParam) const -> Core::HandlerResult;
+		auto OnNCCalcSize(UINT msg, WPARAM wParam, LPARAM lParam) -> Core::HandlerResult;
 	};
 }

@@ -21,7 +21,7 @@ namespace PGUI::UI::Bmp
 	{
 	}
 
-	PropVariant MetadataReader::GetMetadata(std::wstring_view name) const noexcept
+	auto MetadataReader::GetMetadata(std::wstring_view name) const noexcept -> PropVariant
 	{
 		PropVariant variant;
 
@@ -29,7 +29,7 @@ namespace PGUI::UI::Bmp
 
 		return variant;
 	}
-	std::wstring MetadataReader::Location() const noexcept
+	auto MetadataReader::Location() const noexcept -> std::wstring
 	{
 		auto ptr = GetHeldComPtr();
 
@@ -46,7 +46,7 @@ namespace PGUI::UI::Bmp
 
 		return location;
 	}
-	PropVariant MetadataReader::operator[](std::wstring_view name) const noexcept
+	auto MetadataReader::operator[](std::wstring_view name) const noexcept -> PropVariant
 	{
 		return GetMetadata(name);
 	}

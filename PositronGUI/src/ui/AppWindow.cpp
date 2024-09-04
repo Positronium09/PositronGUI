@@ -16,7 +16,7 @@ namespace PGUI::UI
 		RegisterMessageHandler(WM_LBUTTONDOWN, &AppWindow::OnLButtonDown);
 	}
 
-	bool AppWindow::IsFullScreen() const noexcept
+	auto AppWindow::IsFullScreen() const noexcept -> bool
 	{
 		return isFullScreen;
 	}
@@ -61,7 +61,7 @@ namespace PGUI::UI
 		isFullScreen = false;
 	}
 
-	SizeI AppWindow::GetMinimumSize() const noexcept
+	auto AppWindow::GetMinimumSize() const noexcept -> SizeI
 	{
 		return minSize;
 	}
@@ -74,12 +74,12 @@ namespace PGUI::UI
 	{
 		SendMessage(Hwnd(), WM_SETTEXT, NULL, std::bit_cast<LPARAM>(title.data()));
 	}
-	const std::wstring& AppWindow::GetTitle() const noexcept
+	auto AppWindow::GetTitle() const noexcept -> const std::wstring&
 	{
 		return titleText;
 	}
 
-	bool AppWindow::IsResizable() const noexcept
+	auto AppWindow::IsResizable() const noexcept -> bool
 	{
 		return GetWindowLongPtrW(Hwnd(), GWL_STYLE) & WS_SIZEBOX;
 	}
@@ -97,7 +97,7 @@ namespace PGUI::UI
 		SetWindowLongPtrW(Hwnd(), GWL_STYLE, style);
 	}
 
-	bool AppWindow::IsMaximizable() const noexcept
+	auto AppWindow::IsMaximizable() const noexcept -> bool
 	{
 		return GetWindowLongPtrW(Hwnd(), GWL_STYLE) & WS_MAXIMIZEBOX;
 	}
@@ -115,7 +115,7 @@ namespace PGUI::UI
 		SetWindowLongPtrW(Hwnd(), GWL_STYLE, style);
 	}
 
-	bool AppWindow::IsMinimizable() const noexcept
+	auto AppWindow::IsMinimizable() const noexcept -> bool
 	{
 		return GetWindowLongPtrW(Hwnd(), GWL_STYLE) & WS_MINIMIZEBOX;
 	}
@@ -133,7 +133,7 @@ namespace PGUI::UI
 		SetWindowLongPtrW(Hwnd(), GWL_STYLE, style);
 	}
 
-	bool AppWindow::IsAlwaysOnTop() const noexcept
+	auto AppWindow::IsAlwaysOnTop() const noexcept -> bool
 	{
 		return GetWindowLongPtrW(Hwnd(), GWL_EXSTYLE) & WS_EX_TOPMOST;
 	}
@@ -151,7 +151,7 @@ namespace PGUI::UI
 		SetWindowLongPtrW(Hwnd(), GWL_EXSTYLE, style);
 	}
 
-	Core::HandlerResult AppWindow::OnNCCreate(UINT, WPARAM, LPARAM lParam) noexcept
+	auto AppWindow::OnNCCreate(UINT, WPARAM, LPARAM lParam) noexcept -> Core::HandlerResult
 	{
 		auto createStruct = std::bit_cast<LPCREATESTRUCTW>(lParam);
 
@@ -161,23 +161,23 @@ namespace PGUI::UI
 		return { 1, Core::HandlerResultFlag::PassToDefWindowProc };
 	}
 
-	Core::HandlerResult AppWindow::OnSetText(UINT, WPARAM, LPARAM lParam) noexcept
+	auto AppWindow::OnSetText(UINT, WPARAM, LPARAM lParam) noexcept -> Core::HandlerResult
 	{
 		titleText = std::bit_cast<wchar_t*>(lParam);
 
 		return { 1, Core::HandlerResultFlag::PassToDefWindowProc };
 	}
-	Core::HandlerResult AppWindow::OnGetText(UINT, WPARAM wParam, LPARAM lParam) const noexcept
+	auto AppWindow::OnGetText(UINT, WPARAM wParam, LPARAM lParam) const noexcept -> Core::HandlerResult
 	{
 		auto size = std::min(titleText.size() + 1, wParam);
 		wcsncpy_s(std::bit_cast<wchar_t*>(lParam), wParam, titleText.data(), size);
 		return size;
 	}
-	Core::HandlerResult AppWindow::OnGetTextLength(UINT, WPARAM, LPARAM) const noexcept
+	auto AppWindow::OnGetTextLength(UINT, WPARAM, LPARAM) const noexcept -> Core::HandlerResult
 	{
 		return titleText.length();
 	}
-	Core::HandlerResult AppWindow::OnGetMinMaxInfo(UINT, WPARAM, LPARAM lParam) const noexcept
+	auto AppWindow::OnGetMinMaxInfo(UINT, WPARAM, LPARAM lParam) const noexcept -> Core::HandlerResult
 	{
 		auto minMaxInfo = std::bit_cast<LPMINMAXINFO>(lParam);
 
@@ -190,7 +190,7 @@ namespace PGUI::UI
 
 		return 0;
 	}
-	Core::HandlerResult AppWindow::OnLButtonDown(UINT, WPARAM, LPARAM) const noexcept
+	auto AppWindow::OnLButtonDown(UINT, WPARAM, LPARAM) const noexcept -> Core::HandlerResult
 	{
 		SetFocus(Hwnd());
 

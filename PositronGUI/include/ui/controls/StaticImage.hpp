@@ -37,7 +37,7 @@ namespace PGUI::UI::Controls
 			public:
 			virtual ~IImgRenderer() = default;
 			virtual void Render(StaticImage* img) = 0;
-			virtual BmpToRender GetImage() const noexcept = 0;
+			[[nodiscard]] virtual auto GetImage() const noexcept -> BmpToRender = 0;
 		};
 
 		class BitmapSourceRenderer : public IImgRenderer
@@ -45,7 +45,7 @@ namespace PGUI::UI::Controls
 			public:
 			explicit BitmapSourceRenderer(Bmp::BitmapSource bmpSrc) noexcept;
 			void Render(StaticImage* img) override;
-			BmpToRender GetImage() const noexcept override;
+			[[nodiscard]] auto GetImage() const noexcept -> BmpToRender override;
 
 			private:
 			ComPtr<ID2D1Bitmap> bmp;
@@ -63,7 +63,7 @@ namespace PGUI::UI::Controls
 			public:
 			explicit GifRenderer(StaticImage* staticImage, Bmp::BitmapDecoder decoder) noexcept;
 			void Render(StaticImage* staticImage) noexcept override;
-			BmpToRender GetImage() const noexcept override;
+			[[nodiscard]] auto GetImage() const noexcept -> BmpToRender override;
 			void OnSize(const StaticImage* staticImage);
 
 			private:
@@ -86,10 +86,10 @@ namespace PGUI::UI::Controls
 			std::size_t currentFrameIndex = 0;
 			std::size_t nextFrameIndex = 1;
 
-			bool IsLastFrame() const noexcept;
-			bool EndOfAnimation() const noexcept;
+			[[nodiscard]] auto IsLastFrame() const noexcept -> bool;
+			[[nodiscard]] auto EndOfAnimation() const noexcept -> bool;
 
-			[[nodiscard]] RectF CalculateDrawRect(const StaticImage* staticImage) const;
+			[[nodiscard]] auto CalculateDrawRect(const StaticImage* staticImage) const -> RectF;
 
 			void ComposeFrame(StaticImage* staticImage);
 			void DisposeFrame();
@@ -107,15 +107,15 @@ namespace PGUI::UI::Controls
 		explicit StaticImage(std::wstring_view fileName);
 		explicit StaticImage(BmpToRender bmp);
 
-		[[nodiscard]] BmpToRender GetImage() const noexcept;
+		[[nodiscard]] auto GetImage() const noexcept -> BmpToRender;
 		void SetImage(BmpToRender bmp) noexcept;
 
 		private:
 		void CreateRenderer(BmpToRender bmp) noexcept;
 		std::unique_ptr<IImgRenderer> renderer;
 
-		Core::HandlerResult OnCreate(BmpToRender bmp, UINT msg, WPARAM wParam, LPARAM lParam) noexcept;
-		Core::HandlerResult OnPaint(UINT msg, WPARAM wParam, LPARAM lParam) noexcept;
-		Core::HandlerResult OnSize(UINT msg, WPARAM wParam, LPARAM lParam) const noexcept;
+		auto OnCreate(BmpToRender bmp, UINT msg, WPARAM wParam, LPARAM lParam) noexcept -> Core::HandlerResult;
+		auto OnPaint(UINT msg, WPARAM wParam, LPARAM lParam) noexcept -> Core::HandlerResult;
+		[[nodiscard]] auto OnSize(UINT msg, WPARAM wParam, LPARAM lParam) const noexcept -> Core::HandlerResult;
 	};
 }

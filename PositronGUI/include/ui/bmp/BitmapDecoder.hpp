@@ -22,11 +22,11 @@ namespace PGUI::UI::Bmp
 			std::optional<GUID> vendorGUID = std::nullopt) noexcept;
 		BitmapDecoder() noexcept;
 
-		[[nodiscard]] Frame GetFrame(UINT frameIndex = 0) const noexcept;
-		[[nodiscard]] std::vector<Frame> GetFrames() const noexcept;
-		[[nodiscard]] UINT GetFrameCount() const noexcept;
-		[[nodiscard]] MetadataReader GetMetadata() const noexcept;
+		[[nodiscard]] auto GetFrame(UINT frameIndex = 0) const noexcept -> Frame;
+		[[nodiscard]] auto GetFrames() const noexcept -> std::vector<Frame>;
+		[[nodiscard]] auto GetFrameCount() const noexcept -> UINT;
+		[[nodiscard]] auto GetMetadata() const noexcept -> MetadataReader;
 
-		[[nodiscard]] ComPtr<IWICBitmapSource> GetThumbnail() const noexcept;
+		[[nodiscard]] auto GetThumbnail() const noexcept -> ComPtr<IWICBitmapSource>;
 	};
 }

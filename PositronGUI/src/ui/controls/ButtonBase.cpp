@@ -20,11 +20,11 @@ namespace PGUI::UI::Controls
 		RegisterMessageHandler(WM_LBUTTONUP, &ButtonBase::OnLButtonUp);
 	}
 
-	Core::Event<void>& Controls::ButtonBase::ClickedEvent() noexcept
+	auto Controls::ButtonBase::ClickedEvent() noexcept -> Core::Event<void>&
 	{
 		return clickedEvent;
 	}
-	Core::Event<ButtonState>& Controls::ButtonBase::StateChangedEvent() noexcept
+	auto Controls::ButtonBase::StateChangedEvent() noexcept -> Core::Event<ButtonState>&
 	{
 		return stateChangedEvent;
 	}
@@ -45,20 +45,20 @@ namespace PGUI::UI::Controls
 		stateChangedEvent.Emit(state);
 	}
 
-	ButtonState Controls::ButtonBase::GetState() const noexcept
+	auto Controls::ButtonBase::GetState() const noexcept -> ButtonState
 	{
 		return state;
 	}
-	ButtonState ButtonBase::GetMouseState() const noexcept
+	auto ButtonBase::GetMouseState() const noexcept -> ButtonState
 	{
 		return (state & ButtonState::Normal) | (state & ButtonState::Hover) | (state & ButtonState::Pressed);
 	}
-	ButtonState ButtonBase::GetSelectionState() const noexcept
+	auto ButtonBase::GetSelectionState() const noexcept -> ButtonState
 	{
 		return (state & ButtonState::Unchecked) | (state & ButtonState::Checked) | (state & ButtonState::Indeterminate);
 	}
 	
-	Core::HandlerResult ButtonBase::OnMouseMove(UINT, WPARAM, LPARAM) noexcept
+	auto ButtonBase::OnMouseMove(UINT, WPARAM, LPARAM) noexcept -> Core::HandlerResult
 	{
 		if (IsFlagSet(state, ButtonState::Pressed))
 		{
@@ -78,21 +78,21 @@ namespace PGUI::UI::Controls
 		return 0;
 	}
 
-	Core::HandlerResult Controls::ButtonBase::OnMouseLeave(UINT, WPARAM, LPARAM) noexcept
+	auto Controls::ButtonBase::OnMouseLeave(UINT, WPARAM, LPARAM) noexcept -> Core::HandlerResult
 	{
 		SetMouseState(ButtonState::Normal);
 
 		return 0;
 	}
 
-	Core::HandlerResult Controls::ButtonBase::OnLButtonDown(UINT, WPARAM, LPARAM) noexcept
+	auto Controls::ButtonBase::OnLButtonDown(UINT, WPARAM, LPARAM) noexcept -> Core::HandlerResult
 	{
 		SetMouseState(ButtonState::Pressed);
 
 		return 0;
 	}
 
-	Core::HandlerResult ButtonBase::OnLButtonUp(UINT, WPARAM, LPARAM) noexcept
+	auto ButtonBase::OnLButtonUp(UINT, WPARAM, LPARAM) noexcept -> Core::HandlerResult
 	{
 		if (IsFlagSet(state, ButtonState::Pressed))
 		{

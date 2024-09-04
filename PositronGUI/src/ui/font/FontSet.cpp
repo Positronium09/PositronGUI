@@ -15,8 +15,8 @@ namespace PGUI::UI::Font
 		hr = fs.As(GetHeldComPtrAddress()); HR_T(hr);
 	}
 
-	std::array<DWRITE_FONT_AXIS_VALUE, 5> FontSet::ConvertWeightStretchStyleToAxisValues(
-		FontWeight fontWeight, FontStretch fontStretch, FontStyle fontStyle, float fontSize) const noexcept
+	auto FontSet::ConvertWeightStretchStyleToAxisValues(
+		FontWeight fontWeight, FontStretch fontStretch, FontStyle fontStyle, float fontSize) const noexcept -> std::array<DWRITE_FONT_AXIS_VALUE, 5>
 	{
 		std::array<DWRITE_FONT_AXIS_VALUE, 5> axisValues{ };
 		GetHeldComPtr()->ConvertWeightStretchStyleToFontAxisValues(

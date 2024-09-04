@@ -34,14 +34,14 @@ namespace PGUI::UI::Controls
 		virtual void DiscardDeviceResources(Graphics::Graphics g) = 0;
 
 		void SetState(HeaderItemState newState) noexcept { state = newState; stateChangedEvent.Emit(); }
-		[[nodiscard]] HeaderItemState GetState() const noexcept { return state; }
+		[[nodiscard]] auto GetState() const noexcept -> HeaderItemState { return state; }
 
-		[[nodiscard]] Core::Event<void>& StateChangedEvent() noexcept { return stateChangedEvent; }
-		[[nodiscard]] Core::Event<void>& WidthChangedEvent() noexcept { return widthChangedEvent; }
+		[[nodiscard]] auto StateChangedEvent() noexcept -> Core::Event<void>& { return stateChangedEvent; }
+		[[nodiscard]] auto WidthChangedEvent() noexcept -> Core::Event<void>& { return widthChangedEvent; }
 
 		void SetWidth(long _width) noexcept { width = _width; widthChangedEvent.Emit(); }
-		[[nodiscard]] long GetWidth() const noexcept { return width; }
-		[[nodiscard]] long GetMinWidth() const noexcept { return minWidth; }
+		[[nodiscard]] auto GetWidth() const noexcept -> long { return width; }
+		[[nodiscard]] auto GetMinWidth() const noexcept -> long { return minWidth; }
 
 		protected:
 		explicit HeaderItem(long width) noexcept :
@@ -49,7 +49,7 @@ namespace PGUI::UI::Controls
 		{
 		}
 
-		[[nodiscard]] Header* GetHeaderWindow() const noexcept { return header; }
+		[[nodiscard]] auto GetHeaderWindow() const noexcept -> Header* { return header; }
 		void Invalidate() const noexcept;
 
 		void SetMinWidth(long newMinWidth) noexcept { minWidth = newMinWidth; }
@@ -82,17 +82,17 @@ namespace PGUI::UI::Controls
 			HeaderTextItemColors() = default;
 		};
 
-		[[nodiscard]] static HeaderTextItemColors GetHeaderTextItemColors() noexcept;
-		[[nodiscard]] static HeaderTextItemColors GetHeaderTextItemAccentedColors() noexcept;
+		[[nodiscard]] static auto GetHeaderTextItemColors() noexcept -> HeaderTextItemColors;
+		[[nodiscard]] static auto GetHeaderTextItemAccentedColors() noexcept -> HeaderTextItemColors;
 
 		HeaderTextItem(std::wstring_view text, long width, 
-			const HeaderTextItemColors& colors = GetHeaderTextItemColors(), 
+			HeaderTextItemColors  colors = GetHeaderTextItemColors(), 
 			TextFormat tf = TextFormat{ }) noexcept;
 
-		[[nodiscard]] const HeaderTextItemColors& GetColors() const noexcept { return colors; }
-		[[nodiscard]] HeaderTextItemColors& GetColors() noexcept { return colors; }
+		[[nodiscard]] auto GetColors() const noexcept -> const HeaderTextItemColors& { return colors; }
+		[[nodiscard]] auto GetColors() noexcept -> HeaderTextItemColors& { return colors; }
 
-		[[nodiscard]] TextLayout GetTextLayout() const noexcept { return textLayout; }
+		[[nodiscard]] auto GetTextLayout() const noexcept -> TextLayout { return textLayout; }
 		void SetTextFormat(TextFormat textFormat) noexcept;
 
 		void InitTextLayout();
@@ -137,45 +137,45 @@ namespace PGUI::UI::Controls
 		}
 		
 		template <std::derived_from<HeaderItem> T>
-		[[nodiscard]] T* GetItem(std::size_t index) const
+		[[nodiscard]] auto GetItem(std::size_t index) const -> T*
 		{
 			auto& ptr = headerItems.at(index);
 
 			return dynamic_cast<T*>(ptr.get());
 		}
-		[[nodiscard]] HeaderItem* GetItem(std::size_t index) const
+		[[nodiscard]] auto GetItem(std::size_t index) const -> HeaderItem*
 		{
 			return headerItems.at(index).get();
 		}
 
 		template <std::derived_from<HeaderItem> T>
-		[[nodiscard]] T* GetHoveredItem() const
+		[[nodiscard]] auto GetHoveredItem() const -> T*
 		{
 			auto& ptr = headerItems.at(*hoveringIndex);
 
 			return dynamic_cast<T*>(ptr.get());
 		}
-		[[nodiscard]] HeaderItem* GetHoveredItem() const
+		[[nodiscard]] auto GetHoveredItem() const -> HeaderItem*
 		{
 			return headerItems.at(*hoveringIndex).get();
 		}
 
-		[[nodiscard]] const HeaderItemList& GetHeaderItems() const noexcept { return headerItems; }
+		[[nodiscard]] auto GetHeaderItems() const noexcept -> const HeaderItemList& { return headerItems; }
 
 		void SetSeperatorBrush(const Brush& seperatorBrush) noexcept;
 		void SetBackgroundBrush(const Brush& backgroundBrush) noexcept;
 
-		[[nodiscard]] Core::Event<std::size_t>& HeaderItemClickedEvent() { return headerItemClickedEvent; }
+		[[nodiscard]] auto HeaderItemClickedEvent() -> Core::Event<std::size_t>& { return headerItemClickedEvent; }
 
 		private:
 		void CreateDeviceResources() override;
 		void DiscardDeviceResources() override;
 
-		[[nodiscard]] std::optional<std::size_t> GetHoveredHeaderItemIndex(long xPos) const noexcept;
-		[[nodiscard]] bool IsMouseOnSeperator(long xPos) const noexcept;
+		[[nodiscard]] auto GetHoveredHeaderItemIndex(long xPos) const noexcept -> std::optional<std::size_t>;
+		[[nodiscard]] auto IsMouseOnSeperator(long xPos) const noexcept -> bool;
 
-		[[nodiscard]] long CalculateHeaderItemWidthUpToIndex(std::size_t index) const noexcept;
-		[[nodiscard]] long GetTotalHeaderWidth() const noexcept;
+		[[nodiscard]] auto CalculateHeaderItemWidthUpToIndex(std::size_t index) const noexcept -> long;
+		[[nodiscard]] auto GetTotalHeaderWidth() const noexcept -> long;
 
 		Core::Event<std::size_t> headerItemClickedEvent;
 
@@ -190,13 +190,13 @@ namespace PGUI::UI::Controls
 
 		std::optional<std::size_t> hoveringIndex = std::nullopt;
 
-		Core::HandlerResult OnDPIChange(float dpiScale, RectI suggestedRect) noexcept override;
-		Core::HandlerResult OnPaint(UINT msg, WPARAM wParam, LPARAM lParam);
-		Core::HandlerResult OnMouseMove(UINT msg, WPARAM wParam, LPARAM lParam);
-		Core::HandlerResult OnMouseLButtonDown(UINT msg, WPARAM wParam, LPARAM lParam);
-		Core::HandlerResult OnMouseLButtonUp(UINT msg, WPARAM wParam, LPARAM lParam);
-		Core::HandlerResult OnMouseLeave(UINT msg, WPARAM wParam, LPARAM lParam);
-		Core::HandlerResult OnSetCursor(UINT msg, WPARAM wParam, LPARAM lParam) const;
-		Core::HandlerResult OnSize(UINT msg, WPARAM wParam, LPARAM lParam) const;
+		auto OnDPIChange(float dpiScale, RectI suggestedRect) noexcept -> Core::HandlerResult override;
+		auto OnPaint(UINT msg, WPARAM wParam, LPARAM lParam) -> Core::HandlerResult;
+		auto OnMouseMove(UINT msg, WPARAM wParam, LPARAM lParam) -> Core::HandlerResult;
+		auto OnMouseLButtonDown(UINT msg, WPARAM wParam, LPARAM lParam) -> Core::HandlerResult;
+		auto OnMouseLButtonUp(UINT msg, WPARAM wParam, LPARAM lParam) -> Core::HandlerResult;
+		auto OnMouseLeave(UINT msg, WPARAM wParam, LPARAM lParam) -> Core::HandlerResult;
+		[[nodiscard]] auto OnSetCursor(UINT msg, WPARAM wParam, LPARAM lParam) const -> Core::HandlerResult;
+		[[nodiscard]] auto OnSize(UINT msg, WPARAM wParam, LPARAM lParam) const -> Core::HandlerResult;
 	};
 }

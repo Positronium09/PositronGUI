@@ -14,7 +14,7 @@ namespace PGUI::UI::Bmp
 	{
 	}
 	
-	SizeU BitmapSource::GetSize() const noexcept
+	auto BitmapSource::GetSize() const noexcept -> SizeU
 	{
 		SizeU size{ };
 
@@ -23,7 +23,7 @@ namespace PGUI::UI::Bmp
 		return size;
 	}
 	
-	BitmapResolution BitmapSource::GetResolution() const noexcept
+	auto BitmapSource::GetResolution() const noexcept -> BitmapResolution
 	{
 		BitmapResolution resolution{ };
 
@@ -32,7 +32,7 @@ namespace PGUI::UI::Bmp
 		return resolution;
 	}
 	
-	WICPixelFormatGUID BitmapSource::GetPixelFormat() const noexcept
+	auto BitmapSource::GetPixelFormat() const noexcept -> WICPixelFormatGUID
 	{
 		WICPixelFormatGUID pixelFormat{ };
 		
@@ -53,7 +53,7 @@ namespace PGUI::UI::Bmp
 			static_cast<UINT>(buffer.size_bytes()), buffer.data()); HR_L(hr);
 	}
 
-	Palette BitmapSource::CopyPalette() const
+	auto BitmapSource::CopyPalette() const -> Palette
 	{
 		return Palette{ *this };
 	}
@@ -63,7 +63,7 @@ namespace PGUI::UI::Bmp
 		HRESULT hr = GetHeldComPtr()->CopyPalette(palette); HR_L(hr);
 	}
 
-	Graphics::GraphicsBitmap BitmapSource::ConvertToD2D1Bitmap(Graphics::Graphics g) const noexcept
+	auto BitmapSource::ConvertToD2D1Bitmap(Graphics::Graphics g) const noexcept -> Graphics::GraphicsBitmap
 	{
 		// DXGI_FORMAT_B8G8R8A8_UNORM D2D1_ALPHA_MODE_PREMULTIPLIED
 		return g.CreateBitmap(*this);

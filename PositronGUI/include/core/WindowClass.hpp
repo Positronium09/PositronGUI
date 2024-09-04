@@ -13,19 +13,19 @@ namespace PGUI::Core
 		public:
 		using WindowClassPtr = std::shared_ptr<WindowClass>;
 
-		static WindowClassPtr Create(std::wstring_view _className,
+		static auto Create(std::wstring_view _className,
 			UINT style = CS_HREDRAW | CS_VREDRAW, HBRUSH backgroundBrush = nullptr,
-			HICON icon = nullptr, HCURSOR cursor = nullptr, HICON smIcon = nullptr) noexcept;
+			HICON icon = nullptr, HCURSOR cursor = nullptr, HICON smIcon = nullptr) noexcept -> WindowClassPtr;
 
 		WindowClass(const WindowClass&) = delete;
-		WindowClass& operator=(const WindowClass&) = delete;
+		auto operator=(const WindowClass&) -> WindowClass& = delete;
 		WindowClass(WindowClass&&) noexcept = delete;
-		WindowClass& operator=(WindowClass&) noexcept = delete;
+		auto operator=(WindowClass&) noexcept -> WindowClass& = delete;
 
 		~WindowClass() noexcept;
 
 		[[nodiscard]] std::wstring_view GetClassName() const noexcept;
-		[[nodiscard]] ATOM GetAtom() const noexcept;
+		[[nodiscard]] auto GetAtom() const noexcept -> ATOM;
 
 		protected:
 		WindowClass(std::wstring_view _className,

@@ -15,13 +15,13 @@ namespace PGUI::UI
 		RegisterMessageHandler(WM_LBUTTONDOWN, &Control::OnLButtonDown);
 	}
 
-	Core::HandlerResult Control::OnCreate(UINT, WPARAM, LPARAM) const noexcept
+	auto Control::OnCreate(UINT, WPARAM, LPARAM) const noexcept -> Core::HandlerResult
 	{
 		// Controls have input enabled by default
 		EnableInput();
 		return 0;
 	}
-	Core::HandlerResult Control::OnLButtonDown(UINT, WPARAM, LPARAM) const noexcept
+	auto Control::OnLButtonDown(UINT, WPARAM, LPARAM) const noexcept -> Core::HandlerResult
 	{
 		SetFocus(Hwnd());
 

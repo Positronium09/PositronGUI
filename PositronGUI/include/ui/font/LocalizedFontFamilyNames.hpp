@@ -16,11 +16,11 @@ namespace PGUI::UI::Font
 		public:
 		explicit LocalizedFontFamilyNames(const FontFamily& fontFamily) noexcept;
 
-		[[nodiscard]] UINT32 GetCount() const noexcept;
-		[[nodiscard]] std::optional<UINT32> FindLocaleIndex(std::wstring_view localeName) const noexcept;
-		[[nodiscard]] std::optional<std::wstring> GetLocaleName(UINT index) const noexcept;
-		[[nodiscard]] std::optional<std::wstring> GetFontFamilyName() const noexcept;
-		[[nodiscard]] std::optional<std::wstring> GetFontFamilyName(std::wstring_view localeName) const noexcept;
-		[[nodiscard]] std::optional<std::wstring> GetFontFamilyName(UINT index) const noexcept;
+		[[nodiscard]] auto GetCount() const noexcept -> UINT32;
+		[[nodiscard]] auto FindLocaleIndex(std::wstring_view localeName) const noexcept -> std::optional<UINT32>;
+		[[nodiscard]] auto GetLocaleName(UINT index) const noexcept -> std::optional<std::wstring>;
+		[[nodiscard]] auto GetFontFamilyName() const noexcept -> std::optional<std::wstring>;
+		[[nodiscard]] auto GetFontFamilyName(std::wstring_view localeName) const noexcept -> std::optional<std::wstring>;
+		[[nodiscard]] auto GetFontFamilyName(UINT index) const noexcept -> std::optional<std::wstring>;
 	};
 }

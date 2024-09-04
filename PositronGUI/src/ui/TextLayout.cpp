@@ -21,7 +21,7 @@ namespace PGUI::UI
 		}
 	}
 
-	RectF TextLayout::GetBoundingRect() const noexcept
+	auto TextLayout::GetBoundingRect() const noexcept -> RectF
 	{
 		DWRITE_TEXT_METRICS metrics{ };
 		GetHeldComPtr()->GetMetrics(&metrics);
@@ -29,7 +29,7 @@ namespace PGUI::UI
 		return RectF{ metrics.left, metrics.top, metrics.left + metrics.width, metrics.top + metrics.height };
 	}
 
-	float TextLayout::CalculateMinWidth() const noexcept
+	auto TextLayout::CalculateMinWidth() const noexcept -> float
 	{
 		float minWidth = 0.0f;
 		
@@ -38,7 +38,7 @@ namespace PGUI::UI
 		return minWidth;
 	}
 
-	float TextLayout::GetMaxHeight() const noexcept
+	auto TextLayout::GetMaxHeight() const noexcept -> float
 	{
 		return GetHeldComPtr()->GetMaxHeight();
 	}
@@ -48,7 +48,7 @@ namespace PGUI::UI
 		GetHeldComPtr()->SetMaxHeight(maxHeight);
 	}
 
-	float TextLayout::GetMaxWidth() const noexcept
+	auto TextLayout::GetMaxWidth() const noexcept -> float
 	{
 		return GetHeldComPtr()->GetMaxWidth();
 	}
@@ -58,7 +58,7 @@ namespace PGUI::UI
 		GetHeldComPtr()->SetMaxWidth(maxHeight);
 	}
 
-	std::vector<DWRITE_CLUSTER_METRICS> TextLayout::GetClusterMetrics() const noexcept
+	auto TextLayout::GetClusterMetrics() const noexcept -> std::vector<DWRITE_CLUSTER_METRICS>
 	{
 		auto tl = GetHeldComPtr();
 
@@ -71,7 +71,7 @@ namespace PGUI::UI
 
 		return clusterMetrics;
 	}
-	std::vector<DWRITE_LINE_METRICS1> TextLayout::GetLineMetrics() const noexcept
+	auto TextLayout::GetLineMetrics() const noexcept -> std::vector<DWRITE_LINE_METRICS1>
 	{
 		auto tl = GetHeldComPtr();
 
@@ -85,7 +85,7 @@ namespace PGUI::UI
 		return lineMetrics;
 	}
 
-	DWRITE_TEXT_METRICS1 TextLayout::GetMetrics() const noexcept
+	auto TextLayout::GetMetrics() const noexcept -> DWRITE_TEXT_METRICS1
 	{
 		DWRITE_TEXT_METRICS1 textMetrics{ };
 		HRESULT hr = GetHeldComPtr()->GetMetrics(&textMetrics); HR_L(hr);
@@ -93,7 +93,7 @@ namespace PGUI::UI
 		return textMetrics;
 	}
 
-	Font::FontCollection TextLayout::GetFontCollection(UINT32 position, OptionalTextRangeRet textRange) const noexcept
+	auto TextLayout::GetFontCollection(UINT32 position, OptionalTextRangeRet textRange) const noexcept -> Font::FontCollection
 	{
 		ComPtr<IDWriteFontCollection> fontCollectionPtr;
 		ComPtr<IDWriteFontCollection3> fontCollection3Ptr;
@@ -110,7 +110,7 @@ namespace PGUI::UI
 		HRESULT hr = GetHeldComPtr()->SetFontCollection(fontCollection, textRange); HR_L(hr);
 	}
 
-	std::wstring TextLayout::GetFontFamilyName(UINT32 position, OptionalTextRangeRet textRange) const noexcept
+	auto TextLayout::GetFontFamilyName(UINT32 position, OptionalTextRangeRet textRange) const noexcept -> std::wstring
 	{
 		auto tl = GetHeldComPtr();
 
@@ -133,7 +133,7 @@ namespace PGUI::UI
 		HRESULT hr = GetHeldComPtr()->SetFontFamilyName(familyName.data(), textRange); HR_L(hr);
 	}
 
-	std::wstring TextLayout::GetLocaleName(UINT32 position, OptionalTextRangeRet textRange) const noexcept
+	auto TextLayout::GetLocaleName(UINT32 position, OptionalTextRangeRet textRange) const noexcept -> std::wstring
 	{
 		auto tl = GetHeldComPtr();
 
@@ -156,7 +156,7 @@ namespace PGUI::UI
 		HRESULT hr = GetHeldComPtr()->SetLocaleName(localeName.data(), textRange); HR_L(hr);
 	}
 	
-	float TextLayout::GetFontSize(UINT32 position, OptionalTextRangeRet textRange) const noexcept
+	auto TextLayout::GetFontSize(UINT32 position, OptionalTextRangeRet textRange) const noexcept -> float
 	{
 		float fontSize = 0.0f;
 		
@@ -170,7 +170,7 @@ namespace PGUI::UI
 		HRESULT hr = GetHeldComPtr()->SetFontSize(fontSize, textRange); HR_L(hr);
 	}
 
-	Font::FontStretch TextLayout::GetFontStretch(UINT32 position, OptionalTextRangeRet textRange) const noexcept
+	auto TextLayout::GetFontStretch(UINT32 position, OptionalTextRangeRet textRange) const noexcept -> Font::FontStretch
 	{
 		DWRITE_FONT_STRETCH fontStretch = DWRITE_FONT_STRETCH_NORMAL;
 		
@@ -184,7 +184,7 @@ namespace PGUI::UI
 		HRESULT hr = GetHeldComPtr()->SetFontStretch(fontStretch, textRange); HR_L(hr);
 	}
 
-	Font::FontStyle TextLayout::GetFontStyle(UINT32 position, OptionalTextRangeRet textRange) const noexcept
+	auto TextLayout::GetFontStyle(UINT32 position, OptionalTextRangeRet textRange) const noexcept -> Font::FontStyle
 	{
 		DWRITE_FONT_STYLE fontStyle = DWRITE_FONT_STYLE_NORMAL;
 
@@ -198,7 +198,7 @@ namespace PGUI::UI
 		HRESULT hr = GetHeldComPtr()->SetFontStyle(fontStyle, textRange); HR_L(hr);
 	}
 
-	Font::FontWeight TextLayout::GetFontWeight(UINT32 position, OptionalTextRangeRet textRange) const noexcept
+	auto TextLayout::GetFontWeight(UINT32 position, OptionalTextRangeRet textRange) const noexcept -> Font::FontWeight
 	{
 		DWRITE_FONT_WEIGHT fontWeight = DWRITE_FONT_WEIGHT_NORMAL;
 
@@ -212,7 +212,7 @@ namespace PGUI::UI
 		HRESULT hr = GetHeldComPtr()->SetFontWeight(fontWeight, textRange); HR_L(hr);
 	}
 
-	ComPtr<IDWriteInlineObject> TextLayout::GetInlineObject(UINT32 position, OptionalTextRangeRet textRange) const noexcept
+	auto TextLayout::GetInlineObject(UINT32 position, OptionalTextRangeRet textRange) const noexcept -> ComPtr<IDWriteInlineObject>
 	{
 		ComPtr<IDWriteInlineObject> inlineObject;
 
@@ -226,7 +226,7 @@ namespace PGUI::UI
 		HRESULT hr = GetHeldComPtr()->SetInlineObject(inlineObject.Get(), textRange); HR_L(hr);
 	}
 
-	bool TextLayout::GetStrikethrough(UINT32 position, OptionalTextRangeRet textRange) const noexcept
+	auto TextLayout::GetStrikethrough(UINT32 position, OptionalTextRangeRet textRange) const noexcept -> bool
 	{
 		BOOL hasStrikethrough = FALSE;
 
@@ -239,7 +239,7 @@ namespace PGUI::UI
 		HRESULT hr = GetHeldComPtr()->SetStrikethrough(strikethrough, textRange); HR_L(hr);
 	}
 
-	bool TextLayout::GetUnderline(UINT32 position, OptionalTextRangeRet textRange) const noexcept
+	auto TextLayout::GetUnderline(UINT32 position, OptionalTextRangeRet textRange) const noexcept -> bool
 	{
 		BOOL hasUnderline = FALSE;
 
@@ -253,7 +253,7 @@ namespace PGUI::UI
 		HRESULT hr = GetHeldComPtr()->SetUnderline(underline, textRange); HR_L(hr);
 	}
 	
-	DWRITE_TEXT_RANGE* TextLayout::GetTextRangePtr(OptionalTextRangeRet textRange) const noexcept
+	auto TextLayout::GetTextRangePtr(OptionalTextRangeRet textRange) const noexcept -> DWRITE_TEXT_RANGE*
 	{
 		DWRITE_TEXT_RANGE* trp = nullptr;
 		if (trp)

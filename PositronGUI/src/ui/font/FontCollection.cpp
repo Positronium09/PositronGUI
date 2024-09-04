@@ -8,7 +8,7 @@
 
 namespace PGUI::UI::Font
 {
-	FontCollection FontCollection::GetSystemFontCollection()
+	auto FontCollection::GetSystemFontCollection() -> FontCollection
 	{
 		auto factory = DWriteFactory::GetFactory();
 
@@ -18,11 +18,11 @@ namespace PGUI::UI::Font
 
 		return FontCollection{ fontCollection };
 	}
-	FontCollection FontCollection::LoadFontFile(std::wstring_view filePath)
+	auto FontCollection::LoadFontFile(std::wstring_view filePath) -> FontCollection
 	{
 		//TODO Implement
 		(void)filePath;
-		return FontCollection();
+		return {};
 	}
 	
 	FontCollection::FontCollection(ComPtr<IDWriteFontCollection3> _fontCollection) noexcept : 
@@ -33,12 +33,12 @@ namespace PGUI::UI::Font
 		ComPtrHolder{ GetSystemFontCollection().GetHeldComPtr() }
 	{ }
 
-	FontSet FontCollection::GetFontSet() const noexcept
+	auto FontCollection::GetFontSet() const noexcept -> FontSet
 	{
 		return FontSet{ *this };
 	}
 
-	FontFamily FontCollection::GetFontFamily(UINT32 index) const noexcept
+	auto FontCollection::GetFontFamily(UINT32 index) const noexcept -> FontFamily
 	{
 		ComPtr<IDWriteFontFamily2> fontFamily;
 
@@ -47,7 +47,7 @@ namespace PGUI::UI::Font
 		return FontFamily{ fontFamily };
 	}
 
-	UINT32 FontCollection::GetFontFamilyCount() const noexcept
+	auto FontCollection::GetFontFamilyCount() const noexcept -> UINT32
 	{
 		return GetHeldComPtr()->GetFontFamilyCount();
 	}

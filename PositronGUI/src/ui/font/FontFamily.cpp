@@ -9,7 +9,7 @@ namespace PGUI::UI::Font
 		ComPtrHolder{ _fontFamily }
 	{ }
 
-	LocalizedFontFamilyNames FontFamily::GetLocalizedFontFamilyNames() const noexcept
+	auto FontFamily::GetLocalizedFontFamilyNames() const noexcept -> LocalizedFontFamilyNames
 	{
 		return LocalizedFontFamilyNames{ *this };
 	}

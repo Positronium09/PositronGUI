@@ -7,11 +7,12 @@
 
 #include <algorithm>
 #include <strsafe.h>
+#include <utility>
 
 
 namespace PGUI::UI::Controls
 {
-	static std::pair<RGBA, RGBA> GetStaticTextColors()
+	static auto GetStaticTextColors() -> std::pair<RGBA, RGBA>
 	{
 		RGBA textColor;
 		RGBA backgroundColor;
@@ -32,7 +33,7 @@ namespace PGUI::UI::Controls
 
 	StaticText::StaticText(TextFormat _textFormat) noexcept :
 		UIComponent{ PGUI::Core::WindowClass::Create(L"StaticText_UIComponent") },
-		textFormat(_textFormat)
+		textFormat(std::move(_textFormat))
 	{
 		RegisterMessageHandler(WM_NCCREATE, &StaticText::OnNCCreate);
 		RegisterMessageHandler(WM_PAINT, &StaticText::OnPaint);
@@ -46,7 +47,7 @@ namespace PGUI::UI::Controls
 		backgroundBrush.SetParameters(backgroundColor);
 	}
 
-	TextLayout StaticText::GetTextLayout() const noexcept
+	auto StaticText::GetTextLayout() const noexcept -> TextLayout
 	{
 		return textLayout;
 	}
@@ -79,12 +80,12 @@ namespace PGUI::UI::Controls
 		textChangedEvent.Emit(text);
 	}
 
-	const std::wstring& StaticText::GetText() const noexcept
+	auto StaticText::GetText() const noexcept -> const std::wstring&
 	{
 		return text;
 	}
 
-	std::wstring& StaticText::GetText() noexcept
+	auto StaticText::GetText() noexcept -> std::wstring&
 	{
 		return text;
 	}
@@ -95,7 +96,7 @@ namespace PGUI::UI::Controls
 		Invalidate();
 	}
 
-	const Brush& StaticText::GetTextBrush() const noexcept
+	auto StaticText::GetTextBrush() const noexcept -> const Brush&
 	{
 		return textBrush;
 	}
@@ -106,12 +107,12 @@ namespace PGUI::UI::Controls
 		Invalidate();
 	}
 
-	const Brush& StaticText::GetBackgroundBrush() const noexcept
+	auto StaticText::GetBackgroundBrush() const noexcept -> const Brush&
 	{
 		return backgroundBrush;
 	}
 
-	Core::Event<std::wstring_view>& StaticText::TextChangedEvent() noexcept
+	auto StaticText::TextChangedEvent() noexcept -> Core::Event<std::wstring_view>&
 	{
 		return textChangedEvent;
 	}
@@ -138,14 +139,14 @@ namespace PGUI::UI::Controls
 		backgroundBrush.ReleaseBrush();
 	}
 
-	Core::HandlerResult StaticText::OnDPIChange(float dpiScale, RectI suggestedRect) noexcept
+	auto StaticText::OnDPIChange(float dpiScale, RectI suggestedRect) noexcept -> Core::HandlerResult
 	{
 		SetTextFormat(textFormat.AdjustFontSizeToDPI(textFormat.GetFontSize() * dpiScale));
 
 		return Window::OnDPIChange(dpiScale, suggestedRect);
 	}
 
-	Core::HandlerResult StaticText::OnNCCreate(UINT, WPARAM, LPARAM lParam) noexcept
+	auto StaticText::OnNCCreate(UINT, WPARAM, LPARAM lParam) noexcept -> Core::HandlerResult
 	{
 		auto createStruct = std::bit_cast<LPCREATESTRUCTW>(lParam);
 
@@ -158,7 +159,7 @@ namespace PGUI::UI::Controls
 		return 1;
 	}
 
-	Core::HandlerResult StaticText::OnPaint(UINT, WPARAM, LPARAM) noexcept
+	auto StaticText::OnPaint(UINT, WPARAM, LPARAM) noexcept -> Core::HandlerResult
 	{
 		BeginDraw();
 
@@ -177,14 +178,14 @@ namespace PGUI::UI::Controls
 
 		return 0;
 	}
-	Core::HandlerResult StaticText::OnSize(UINT, WPARAM, LPARAM) noexcept
+	auto StaticText::OnSize(UINT, WPARAM, LPARAM) noexcept -> Core::HandlerResult
 	{
 		InitTextLayout();
 
 		return 0;
 	}
 
-	Core::HandlerResult StaticText::OnSetText(UINT, WPARAM, LPARAM lParam) noexcept
+	auto StaticText::OnSetText(UINT, WPARAM, LPARAM lParam) noexcept -> Core::HandlerResult
 	{
 		if (auto newText = std::bit_cast<wchar_t*>(lParam); 
 			text.data() != newText)
@@ -196,7 +197,7 @@ namespace PGUI::UI::Controls
 
 		return { 1, Core::HandlerResultFlag::PassToDefWindowProc };
 	}
-	Core::HandlerResult StaticText::OnGetText(UINT, WPARAM wParam, LPARAM lParam) noexcept
+	auto StaticText::OnGetText(UINT, WPARAM wParam, LPARAM lParam) noexcept -> Core::HandlerResult
 	{
 		auto minSize = std::min(text.size() + 1, wParam);
 		
@@ -204,7 +205,7 @@ namespace PGUI::UI::Controls
 
 		return minSize;
 	}
-	Core::HandlerResult StaticText::OnGetTextLength(UINT, WPARAM, LPARAM) const noexcept
+	auto StaticText::OnGetTextLength(UINT, WPARAM, LPARAM) const noexcept -> Core::HandlerResult
 	{
 		return text.size();
 	}

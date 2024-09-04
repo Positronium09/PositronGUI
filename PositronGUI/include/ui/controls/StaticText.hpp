@@ -16,22 +16,22 @@ namespace PGUI::UI::Controls
 		public:
 		explicit StaticText(TextFormat textFormat=TextFormat{ }) noexcept;
 
-		[[nodiscard]] TextLayout GetTextLayout() const noexcept;
+		[[nodiscard]] auto GetTextLayout() const noexcept -> TextLayout;
 		void SetTextFormat(TextFormat textFormat) noexcept;
 
 		void InitTextLayout();
 
 		void SetText(std::wstring_view text) noexcept;
-		[[nodiscard]] const std::wstring& GetText() const noexcept;
-		[[nodiscard]] std::wstring& GetText() noexcept;
+		[[nodiscard]] auto GetText() const noexcept -> const std::wstring&;
+		[[nodiscard]] auto GetText() noexcept -> std::wstring&;
 
 		void SetTextBrush(const Brush& textBrush) noexcept;
-		[[nodiscard]] const Brush& GetTextBrush() const noexcept;
+		[[nodiscard]] auto GetTextBrush() const noexcept -> const Brush&;
 
 		void SetBackgroundBrush(const Brush& backgroundBrush) noexcept;
-		[[nodiscard]] const Brush& GetBackgroundBrush() const noexcept;
+		[[nodiscard]] auto GetBackgroundBrush() const noexcept -> const Brush&;
 
-		[[nodiscard]] Core::Event<std::wstring_view>& TextChangedEvent() noexcept;
+		[[nodiscard]] auto TextChangedEvent() noexcept -> Core::Event<std::wstring_view>&;
 
 		protected:
 		void CreateDeviceResources() override;
@@ -47,13 +47,13 @@ namespace PGUI::UI::Controls
 
 		Core::Event<std::wstring_view> textChangedEvent;
 
-		Core::HandlerResult OnDPIChange(float dpiScale, RectI suggestedRect) noexcept override;
-		Core::HandlerResult OnNCCreate(UINT msg, WPARAM wParam, LPARAM lParam) noexcept;
-		Core::HandlerResult OnPaint(UINT msg, WPARAM wParam, LPARAM lParam) noexcept;
-		Core::HandlerResult OnSize(UINT msg, WPARAM wParam, LPARAM lParam) noexcept;
+		auto OnDPIChange(float dpiScale, RectI suggestedRect) noexcept -> Core::HandlerResult override;
+		auto OnNCCreate(UINT msg, WPARAM wParam, LPARAM lParam) noexcept -> Core::HandlerResult;
+		auto OnPaint(UINT msg, WPARAM wParam, LPARAM lParam) noexcept -> Core::HandlerResult;
+		auto OnSize(UINT msg, WPARAM wParam, LPARAM lParam) noexcept -> Core::HandlerResult;
 		
-		Core::HandlerResult OnSetText(UINT msg, WPARAM wParam, LPARAM lParam) noexcept;
-		Core::HandlerResult OnGetText(UINT msg, WPARAM wParam, LPARAM lParam) noexcept;
-		Core::HandlerResult OnGetTextLength(UINT msg, WPARAM wParam, LPARAM lParam) const noexcept;
+		auto OnSetText(UINT msg, WPARAM wParam, LPARAM lParam) noexcept -> Core::HandlerResult;
+		auto OnGetText(UINT msg, WPARAM wParam, LPARAM lParam) noexcept -> Core::HandlerResult;
+		[[nodiscard]] auto OnGetTextLength(UINT msg, WPARAM wParam, LPARAM lParam) const noexcept -> Core::HandlerResult;
 	};
 }

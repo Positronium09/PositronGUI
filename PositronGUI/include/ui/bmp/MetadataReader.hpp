@@ -16,9 +16,9 @@ namespace PGUI::UI::Bmp
 		explicit MetadataReader(BitmapDecoder img) noexcept;
 		explicit MetadataReader(ComPtr<IWICMetadataQueryReader> reader) noexcept;
 
-		[[nodiscard]] PropVariant GetMetadata(std::wstring_view name) const noexcept;
-		[[nodiscard]] std::wstring Location() const noexcept;
+		[[nodiscard]] auto GetMetadata(std::wstring_view name) const noexcept -> PropVariant;
+		[[nodiscard]] auto Location() const noexcept -> std::wstring;
 
-		[[nodiscard]] PropVariant operator[](std::wstring_view name) const noexcept;
+		[[nodiscard]] auto operator[](std::wstring_view name) const noexcept -> PropVariant;
 	};
 }

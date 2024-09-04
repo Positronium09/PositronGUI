@@ -93,13 +93,13 @@ namespace PGUI
 		explicit(false) PropVariant(PROPVARIANT var) noexcept;
 		~PropVariant() noexcept;
 
-		PROPVARIANT* operator&() noexcept;
+		auto operator&() noexcept -> PROPVARIANT*;
 		explicit(false) operator PROPVARIANT() const noexcept;
 		explicit(false) operator PropVariantValue() const noexcept;
 
-		[[nodiscard]] PropVariantType Type() const noexcept;
+		[[nodiscard]] auto Type() const noexcept -> PropVariantType;
 
-		[[nodiscard]] PropVariantValue GetValue() const noexcept;
+		[[nodiscard]] auto GetValue() const noexcept -> PropVariantValue;
 
 		PROPVARIANT var{};
 	};

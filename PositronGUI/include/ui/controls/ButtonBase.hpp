@@ -31,13 +31,13 @@ namespace PGUI::UI::Controls
 		explicit ButtonBase(const Core::WindowClass::WindowClassPtr& wndClass) noexcept;
 		ButtonBase() noexcept;
 
-		[[nodiscard]] Core::Event<void>& ClickedEvent() noexcept;
-		[[nodiscard]] Core::Event<ButtonState>& StateChangedEvent() noexcept;
+		[[nodiscard]] auto ClickedEvent() noexcept -> Core::Event<void>&;
+		[[nodiscard]] auto StateChangedEvent() noexcept -> Core::Event<ButtonState>&;
 
-		[[nodiscard]] ButtonState GetState() const noexcept;
-		[[nodiscard]] ButtonState GetMouseState() const noexcept;
-		[[nodiscard]] ButtonState GetSelectionState() const noexcept;
-		[[nodiscard]] ButtonState GetCheckedState() const noexcept { return GetSelectionState(); }
+		[[nodiscard]] auto GetState() const noexcept -> ButtonState;
+		[[nodiscard]] auto GetMouseState() const noexcept -> ButtonState;
+		[[nodiscard]] auto GetSelectionState() const noexcept -> ButtonState;
+		[[nodiscard]] auto GetCheckedState() const noexcept -> ButtonState { return GetSelectionState(); }
 
 		void SetState(ButtonState state) noexcept;
 		void SetMouseState(ButtonState state) noexcept;
@@ -50,9 +50,9 @@ namespace PGUI::UI::Controls
 		Core::Event<void> clickedEvent;
 		Core::Event<ButtonState> stateChangedEvent;
 
-		Core::HandlerResult OnMouseMove(UINT msg, WPARAM wParam, LPARAM lParam) noexcept;
-		Core::HandlerResult OnMouseLeave(UINT msg, WPARAM wParam, LPARAM lParam) noexcept;
-		Core::HandlerResult OnLButtonDown(UINT msg, WPARAM wParam, LPARAM lParam) noexcept;
-		Core::HandlerResult OnLButtonUp(UINT msg, WPARAM wParam, LPARAM lParam) noexcept;
+		auto OnMouseMove(UINT msg, WPARAM wParam, LPARAM lParam) noexcept -> Core::HandlerResult;
+		auto OnMouseLeave(UINT msg, WPARAM wParam, LPARAM lParam) noexcept -> Core::HandlerResult;
+		auto OnLButtonDown(UINT msg, WPARAM wParam, LPARAM lParam) noexcept -> Core::HandlerResult;
+		auto OnLButtonUp(UINT msg, WPARAM wParam, LPARAM lParam) noexcept -> Core::HandlerResult;
 	};
 }

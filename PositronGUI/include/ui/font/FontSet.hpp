@@ -16,7 +16,7 @@ namespace PGUI::UI::Font
 		public:
 		explicit FontSet(const FontCollection& fontCollection);
 
-		[[nodiscard]] std::array<DWRITE_FONT_AXIS_VALUE, 5> ConvertWeightStretchStyleToAxisValues(
-			FontWeight fontWeight, FontStretch fontStretch, FontStyle fontStyle, float fontSize) const noexcept;
+		[[nodiscard]] auto ConvertWeightStretchStyleToAxisValues(
+			FontWeight fontWeight, FontStretch fontStretch, FontStyle fontStyle, float fontSize) const noexcept -> std::array<DWRITE_FONT_AXIS_VALUE, 5>;
 	};
 }

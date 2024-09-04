@@ -12,12 +12,12 @@ namespace PGUI::UI::Font
 		HRESULT hr = fontFamily->GetFamilyNames(GetHeldPtrAddress()); HR_L(hr);
 	}
 
-	UINT32 LocalizedFontFamilyNames::GetCount() const noexcept
+	auto LocalizedFontFamilyNames::GetCount() const noexcept -> UINT32
 	{
 		return GetHeldComPtr()->GetCount();
 	}
 
-	std::optional<UINT32> LocalizedFontFamilyNames::FindLocaleIndex(std::wstring_view localeName) const noexcept
+	auto LocalizedFontFamilyNames::FindLocaleIndex(std::wstring_view localeName) const noexcept -> std::optional<UINT32>
 	{
 		UINT32 index = 0;
 		BOOL exists = false;
@@ -31,7 +31,7 @@ namespace PGUI::UI::Font
 		return index;
 	}
 
-	std::optional<std::wstring> LocalizedFontFamilyNames::GetLocaleName(UINT index) const noexcept
+	auto LocalizedFontFamilyNames::GetLocaleName(UINT index) const noexcept -> std::optional<std::wstring>
 	{
 		try
 		{
@@ -52,17 +52,17 @@ namespace PGUI::UI::Font
 		}
 	}
 
-	std::optional<std::wstring> LocalizedFontFamilyNames::GetFontFamilyName() const noexcept
+	auto LocalizedFontFamilyNames::GetFontFamilyName() const noexcept -> std::optional<std::wstring>
 	{
 		return GetFontFamilyName(GetUserLocaleName());
 	}
 
-	std::optional<std::wstring> LocalizedFontFamilyNames::GetFontFamilyName(std::wstring_view localeName) const noexcept
+	auto LocalizedFontFamilyNames::GetFontFamilyName(std::wstring_view localeName) const noexcept -> std::optional<std::wstring>
 	{
 		return GetFontFamilyName(FindLocaleIndex(localeName).value_or(0));
 	}
 
-	std::optional<std::wstring> LocalizedFontFamilyNames::GetFontFamilyName(UINT index) const noexcept
+	auto LocalizedFontFamilyNames::GetFontFamilyName(UINT index) const noexcept -> std::optional<std::wstring>
 	{
 		try
 		{

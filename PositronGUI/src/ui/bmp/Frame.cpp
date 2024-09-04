@@ -13,7 +13,7 @@ namespace PGUI::UI::Bmp
 			ComPtrHolder<IWICBitmapFrameDecode>::GetHeldComPtrAddress()); HR_L(hr);
 		ComPtrHolder<IWICBitmapFrameDecode>::GetHeldComPtr().As(ComPtrHolder<IWICBitmapSource>::GetHeldComPtrAddress());
 	}
-	MetadataReader Frame::GetMetadata() const noexcept
+	auto Frame::GetMetadata() const noexcept -> MetadataReader
 	{
 		return MetadataReader{ *this };
 	}

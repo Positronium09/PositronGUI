@@ -44,29 +44,29 @@ namespace PGUI::Graphics
 		void Clear(CBrushParametersRef brushParameters) const noexcept;
 		void Clear(CBrushRef brush) const noexcept;
 
-		[[nodiscard]] GraphicsBitmap CreateBitmap(SizeU size, const D2D1_BITMAP_PROPERTIES& props) const;
-		[[nodiscard]] GraphicsBitmap CreateBitmap(SizeU size, const void* srcData, UINT32 pitch,
-			const D2D1_BITMAP_PROPERTIES& bitmapProperties) const;
-		[[nodiscard]] GraphicsBitmap CreateBitmap(const PGUI::UI::Bmp::BitmapSource& bmpSrc,
-			std::optional<D2D1_BITMAP_PROPERTIES> props = std::nullopt) const;
+		[[nodiscard]] auto CreateBitmap(SizeU size, const D2D1_BITMAP_PROPERTIES& props) const -> GraphicsBitmap;
+		[[nodiscard]] auto CreateBitmap(SizeU size, const void* srcData, UINT32 pitch,
+			const D2D1_BITMAP_PROPERTIES& bitmapProperties) const -> GraphicsBitmap;
+		[[nodiscard]] auto CreateBitmap(const PGUI::UI::Bmp::BitmapSource& bmpSrc,
+			std::optional<D2D1_BITMAP_PROPERTIES> props = std::nullopt) const -> GraphicsBitmap;
 
-		[[nodiscard]] BitmapRenderTarget CreateCompatibleRenderTarget(
+		[[nodiscard]] auto CreateCompatibleRenderTarget(
 			SizeF size, SizeU pixelSize, PixelFormat pixelFormat,
-			D2D1_COMPATIBLE_RENDER_TARGET_OPTIONS options) const;
-		[[nodiscard]] BitmapRenderTarget CreateCompatibleRenderTarget(
-			SizeF size, SizeU pixelSize, PixelFormat pixelFormat) const;
-		[[nodiscard]] BitmapRenderTarget CreateCompatibleRenderTarget(
-			SizeF size, SizeU pixelSize) const;
-		[[nodiscard]] BitmapRenderTarget CreateCompatibleRenderTarget(SizeF size) const;
-		[[nodiscard]] BitmapRenderTarget CreateCompatibleRenderTarget() const;
+			D2D1_COMPATIBLE_RENDER_TARGET_OPTIONS options) const -> BitmapRenderTarget;
+		[[nodiscard]] auto CreateCompatibleRenderTarget(
+			SizeF size, SizeU pixelSize, PixelFormat pixelFormat) const -> BitmapRenderTarget;
+		[[nodiscard]] auto CreateCompatibleRenderTarget(
+			SizeF size, SizeU pixelSize) const -> BitmapRenderTarget;
+		[[nodiscard]] auto CreateCompatibleRenderTarget(SizeF size) const -> BitmapRenderTarget;
+		[[nodiscard]] auto CreateCompatibleRenderTarget() const -> BitmapRenderTarget;
 
-		[[nodiscard]] GraphicsBitmap CreateSharedBitmap(
+		[[nodiscard]] auto CreateSharedBitmap(
 			const IID& riid, void* data,
-			std::optional<D2D1_BITMAP_PROPERTIES> bitmapProperties) const;
+			std::optional<D2D1_BITMAP_PROPERTIES> bitmapProperties) const -> GraphicsBitmap;
 
-		ComPtr<ID2D1Mesh> CreateMesh() const;
+		[[nodiscard]] auto CreateMesh() const -> ComPtr<ID2D1Mesh>;
 
-		[[nodiscard]] Brush CreateBrush(CBrushParametersRef brushParameters) const;
+		[[nodiscard]] auto CreateBrush(CBrushParametersRef brushParameters) const -> Brush;
 		void CreateBrush(Brush& brush) const;
 
 		void DrawBitmap(GraphicsBitmap bmp,
@@ -113,27 +113,27 @@ namespace PGUI::Graphics
 			return static_cast<AntialiasMode>(GetHeldComPtr()->GetAntialiasMode());
 		}
 
-		[[nodiscard]] SizeF GetDPI() const noexcept;
+		[[nodiscard]] auto GetDPI() const noexcept -> SizeF;
 
 		[[nodiscard]] auto GetMaximumBitmapSize() const noexcept { return GetHeldComPtr()->GetMaximumBitmapSize(); }
-		[[nodiscard]] PixelFormat GetPixelFormat() const noexcept { return GetHeldComPtr()->GetPixelFormat(); }
-		[[nodiscard]] SizeU GetPixelSize() const noexcept { return GetHeldComPtr()->GetPixelSize(); }
-		[[nodiscard]] SizeF GetSize() const noexcept { return GetHeldComPtr()->GetSize(); }
+		[[nodiscard]] auto GetPixelFormat() const noexcept -> PixelFormat { return GetHeldComPtr()->GetPixelFormat(); }
+		[[nodiscard]] auto GetPixelSize() const noexcept -> SizeU { return GetHeldComPtr()->GetPixelSize(); }
+		[[nodiscard]] auto GetSize() const noexcept -> SizeF { return GetHeldComPtr()->GetSize(); }
 
-		[[nodiscard]] std::pair<D2D1_TAG, D2D1_TAG> GetTags() const noexcept;
+		[[nodiscard]] auto GetTags() const noexcept -> std::pair<D2D1_TAG, D2D1_TAG>;
 		[[nodiscard]] auto GetTextAntialiasMode() const noexcept
 		{
 			return GetHeldComPtr()->GetTextAntialiasMode();
 		}
 
-		[[nodiscard]] ComPtr<IDWriteRenderingParams> GetTextRenderingParams() const noexcept;
+		[[nodiscard]] auto GetTextRenderingParams() const noexcept -> ComPtr<IDWriteRenderingParams>;
 
-		[[nodiscard]] bool IsSupported(const D2D1_RENDER_TARGET_PROPERTIES& props) const noexcept
+		[[nodiscard]] auto IsSupported(const D2D1_RENDER_TARGET_PROPERTIES& props) const noexcept -> bool
 		{
 			return GetHeldComPtr()->IsSupported(props);
 		}
 
-		[[nodiscard]] D2D1_MATRIX_3X2_F GetTransform() const noexcept;
+		[[nodiscard]] auto GetTransform() const noexcept -> D2D1_MATRIX_3X2_F;
 		void PopAxisAlignedClip() const noexcept { GetHeldComPtr()->PopAxisAlignedClip(); }
 		void PopLayer() const noexcept { GetHeldComPtr()->PopLayer(); }
 
@@ -151,7 +151,7 @@ namespace PGUI::Graphics
 		{
 			GetHeldComPtr()->RestoreDrawingState(drawingStateBlock.Get());
 		}
-		[[nodiscard]] ComPtr<ID2D1DrawingStateBlock> SaveDrawingState() const noexcept;
+		[[nodiscard]] auto SaveDrawingState() const noexcept -> ComPtr<ID2D1DrawingStateBlock>;
 
 		void SetAntialiasMode(AntialiasMode antialiasMode) const noexcept
 		{

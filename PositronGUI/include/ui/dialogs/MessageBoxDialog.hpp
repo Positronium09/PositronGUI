@@ -48,9 +48,9 @@ namespace PGUI::UI::Dialogs
 
 	class MessageBoxDialog final : public ModalDialog
 	{
-		friend MessageBoxChoice ShowMessageBox(HWND parentHwnd,
+		friend auto ShowMessageBox(HWND parentHwnd,
 			std::wstring_view caption, std::wstring_view text,
-			MessageBoxButtonSet buttonSet, MessageBoxIcon icon);
+			MessageBoxButtonSet buttonSet, MessageBoxIcon icon) -> MessageBoxChoice;
 
 		public:
 		//! Dont use directly (you can but i dont recommend it)
@@ -85,19 +85,19 @@ namespace PGUI::UI::Dialogs
 		void CreateDeviceResources() override;
 		void DiscardDeviceResources() override;
 		
-		[[nodiscard]] MessageBoxChoice Display() noexcept;
+		[[nodiscard]] auto Display() noexcept -> MessageBoxChoice;
 		void CreateButtons();
 		void SetToRequiredSize() const noexcept;
 		void ButtonHandler(MessageBoxChoice choice) noexcept;
 
-		SizeI CalculateSize() const noexcept;
+		[[nodiscard]] auto CalculateSize() const noexcept -> SizeI;
 
-		Core::HandlerResult OnCreate(UINT msg, WPARAM wParam, LPARAM lParam);
-		Core::HandlerResult OnPaint(UINT msg, WPARAM wParam, LPARAM lParam);
+		auto OnCreate(UINT msg, WPARAM wParam, LPARAM lParam) -> Core::HandlerResult;
+		auto OnPaint(UINT msg, WPARAM wParam, LPARAM lParam) -> Core::HandlerResult;
 	};
 
-	MessageBoxChoice ShowMessageBox(HWND parentHwnd,
+	auto ShowMessageBox(HWND parentHwnd,
 		std::wstring_view caption, std::wstring_view text, 
 		MessageBoxButtonSet buttonSet = MessageBoxButtonSet::Ok,
-		MessageBoxIcon icon = MessageBoxIcon::None);
+		MessageBoxIcon icon = MessageBoxIcon::None) -> MessageBoxChoice;
 }

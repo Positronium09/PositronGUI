@@ -27,8 +27,8 @@ namespace PGUI::UI
 		explicit Dialog(const Core::WindowClass::WindowClassPtr& wndClass) noexcept;
 
 		template <std::derived_from<Dialog> T, typename ...Args>
-		static Core::WindowOwnPtr<T> Create(const DialogCreateParams& dialogParam,
-			const Core::WindowCreateParams& createParams, Args&&... args)
+		static auto Create(const DialogCreateParams& dialogParam,
+			const Core::WindowCreateParams& createParams, Args&&... args) -> Core::WindowOwnPtr<T>
 		{
 			DWORD style = dialogParam.style | WS_CAPTION | WS_SYSMENU;
 			DWORD exStyle = createParams.exStyle | WS_EX_NOREDIRECTIONBITMAP;
@@ -84,7 +84,7 @@ namespace PGUI::UI
 		void CenterAroundParent() const noexcept;
 
 		private:
-		Core::HandlerResult OnInitDialog(UINT msg, WPARAM wParam, LPARAM lParam) const noexcept;
+		[[nodiscard]] auto OnInitDialog(UINT msg, WPARAM wParam, LPARAM lParam) const noexcept -> Core::HandlerResult;
 	};
 	using ModalessDialog = Dialog;
 
@@ -93,22 +93,22 @@ namespace PGUI::UI
 		public:
 		explicit ModalDialog(const Core::WindowClass::WindowClassPtr& wndClass) noexcept;
 
-		virtual int RunModal() noexcept;
+		virtual auto RunModal() noexcept -> int;
 		
 		protected:
-		[[nodiscard]] bool IsRunning() const noexcept;
+		[[nodiscard]] auto IsRunning() const noexcept -> bool;
 		void SetRunning(bool running) noexcept;
 
 		private:
 		bool running = false;
-		Core::HandlerResult OnClose(UINT msg, WPARAM wParam, LPARAM lParam) noexcept;
+		auto OnClose(UINT msg, WPARAM wParam, LPARAM lParam) noexcept -> Core::HandlerResult;
 	};
 
 	class ModalMessageLoop : public Core::MessageLoopBase
 	{
 		public:
 		explicit ModalMessageLoop(HWND modalDialogHwnd) noexcept;
-		int Run() noexcept override;
+		auto Run() noexcept -> int override;
 
 		private:
 		HWND modalDialogHwnd;

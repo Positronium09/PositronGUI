@@ -24,7 +24,7 @@ namespace PGUI::Core
 		d2d1Dc->BeginDraw();
 	}
 
-	HRESULT DirectCompositionWindow::EndDraw()
+	auto DirectCompositionWindow::EndDraw() -> HRESULT
 	{
 		HRESULT hr = d2d1Dc->EndDraw();
 
@@ -169,7 +169,7 @@ namespace PGUI::Core
 		hr = dcompDevice->Commit(); HR_T(hr);
 	}
 
-	Core::HandlerResult DirectCompositionWindow::OnNCCreate(UINT, WPARAM, LPARAM)
+	auto DirectCompositionWindow::OnNCCreate(UINT, WPARAM, LPARAM) -> Core::HandlerResult
 	{
 		InitSwapChain();
 		InitD2D1DeviceContext();
@@ -178,7 +178,7 @@ namespace PGUI::Core
 		return { 1, HandlerResultFlag::PassToDefWindowProc };
 	}
 
-	Core::HandlerResult DirectCompositionWindow::OnSize(UINT, WPARAM, LPARAM)
+	auto DirectCompositionWindow::OnSize(UINT, WPARAM, LPARAM) -> Core::HandlerResult
 	{
 		auto size = GetWindowSize();
 
@@ -198,36 +198,36 @@ namespace PGUI::Core
 		return 0;
 	}
 
-	ComPtr<ID3D11Device2> DirectCompositionWindow::D3D11Device() noexcept
+	auto DirectCompositionWindow::D3D11Device() noexcept -> ComPtr<ID3D11Device2>
 	{
 		return d3d11Device;
 	}
-	ComPtr<IDXGIDevice4> DirectCompositionWindow::DXGIDevice() noexcept
+	auto DirectCompositionWindow::DXGIDevice() noexcept -> ComPtr<IDXGIDevice4>
 	{
 		return dxgiDevice;
 	}
-	ComPtr<IDXGISwapChain1> DirectCompositionWindow::DXGISwapChain() const noexcept
+	auto DirectCompositionWindow::DXGISwapChain() const noexcept -> ComPtr<IDXGISwapChain1>
 	{
 		return swapChain;
 	}
-	ComPtr<IDCompositionDevice> DirectCompositionWindow::DCompositionDevice() noexcept
+	auto DirectCompositionWindow::DCompositionDevice() noexcept -> ComPtr<IDCompositionDevice>
 	{
 		return dcompDevice;
 	}
-	ComPtr<IDCompositionTarget> DirectCompositionWindow::DCompositionTarget() const noexcept
+	auto DirectCompositionWindow::DCompositionTarget() const noexcept -> ComPtr<IDCompositionTarget>
 	{
 		return dcompTarget;
 	}
-	ComPtr<ID2D1Device7> DirectCompositionWindow::D2D1Device() noexcept
+	auto DirectCompositionWindow::D2D1Device() noexcept -> ComPtr<ID2D1Device7>
 	{
 		return d2d1Device;
 	}
-	ComPtr<ID2D1DeviceContext7> DirectCompositionWindow::D2D1DeviceContext() const noexcept
+	auto DirectCompositionWindow::D2D1DeviceContext() const noexcept -> ComPtr<ID2D1DeviceContext7>
 	{
 		return d2d1Dc;
 	}
 
-	Graphics::Graphics DirectCompositionWindow::GetGraphics() const noexcept
+	auto DirectCompositionWindow::GetGraphics() const noexcept -> Graphics::Graphics
 	{
 		return Graphics::Graphics{ D2D1DeviceContext() };
 	}

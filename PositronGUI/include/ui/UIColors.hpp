@@ -18,18 +18,18 @@ namespace PGUI::UI
 
 		[[nodiscard]] static auto GetInstance() noexcept -> winrt::Windows::UI::ViewManagement::UISettings& { return uiSettings; }
 
-		[[nodiscard]] static RGBA GetForegroundColor() noexcept;
-		[[nodiscard]] static RGBA GetBackgroundColor() noexcept;
-		[[nodiscard]] static RGBA GetAccentColor() noexcept;
-		[[nodiscard]] static RGBA GetAccentDark1Color() noexcept;
-		[[nodiscard]] static RGBA GetAccentDark2Color() noexcept;
-		[[nodiscard]] static RGBA GetAccentDark3Color() noexcept;
-		[[nodiscard]] static RGBA GetAccentLight1Color() noexcept;
-		[[nodiscard]] static RGBA GetAccentLight2Color() noexcept;
-		[[nodiscard]] static RGBA GetAccentLight3Color() noexcept;
+		[[nodiscard]] static auto GetForegroundColor() noexcept -> RGBA;
+		[[nodiscard]] static auto GetBackgroundColor() noexcept -> RGBA;
+		[[nodiscard]] static auto GetAccentColor() noexcept -> RGBA;
+		[[nodiscard]] static auto GetAccentDark1Color() noexcept -> RGBA;
+		[[nodiscard]] static auto GetAccentDark2Color() noexcept -> RGBA;
+		[[nodiscard]] static auto GetAccentDark3Color() noexcept -> RGBA;
+		[[nodiscard]] static auto GetAccentLight1Color() noexcept -> RGBA;
+		[[nodiscard]] static auto GetAccentLight2Color() noexcept -> RGBA;
+		[[nodiscard]] static auto GetAccentLight3Color() noexcept -> RGBA;
 
-		[[nodiscard]] static bool IsDarkMode() noexcept;
-		[[nodiscard]] static bool IsLightMode() noexcept;
+		[[nodiscard]] static auto IsDarkMode() noexcept -> bool;
+		[[nodiscard]] static auto IsLightMode() noexcept -> bool;
 
 		protected:
 		UIColors() = default;

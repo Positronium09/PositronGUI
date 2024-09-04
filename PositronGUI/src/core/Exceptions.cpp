@@ -11,11 +11,11 @@ namespace PGUI::Core
 	{
 	}
 	
-	HRESULT PGUIException::GetErrorCode() const noexcept
+	auto PGUIException::GetErrorCode() const noexcept -> HRESULT
 	{
 		return errorCode;
 	}
-	const std::wstring& PGUIException::GetErrorMessage() const noexcept
+	auto PGUIException::GetErrorMessage() const noexcept -> const std::wstring&
 	{
 		return errorMessage;
 	}

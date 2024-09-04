@@ -1,3 +1,5 @@
+#include <utility>
+
 #include "ui/Clip.hpp"
 
 #include "core/Window.hpp"
@@ -7,11 +9,11 @@
 
 namespace PGUI::UI
 {
-	ComPtr<ID2D1Geometry> EmptyClip::GetClipGeometry()
+	auto EmptyClip::GetClipGeometry() -> ComPtr<ID2D1Geometry>
 	{
 		return nullptr;
 	}
-	ID2D1Geometry* EmptyClip::GetClipGeometryPtr()
+	auto EmptyClip::GetClipGeometryPtr() -> ID2D1Geometry*
 	{
 		return nullptr;
 	}
@@ -28,11 +30,11 @@ namespace PGUI::UI
 		HRESULT hr = factory->CreateRectangleGeometry(rect, GetHeldPtrAddress()); HR_T(hr);
 	}
 
-	ComPtr<ID2D1Geometry> RectangleClip::GetClipGeometry()
+	auto RectangleClip::GetClipGeometry() -> ComPtr<ID2D1Geometry>
 	{
 		return GetHeldComPtr();
 	}
-	ID2D1Geometry* RectangleClip::GetClipGeometryPtr()
+	auto RectangleClip::GetClipGeometryPtr() -> ID2D1Geometry*
 	{
 		return GetHeldPtr();
 	}
@@ -49,11 +51,11 @@ namespace PGUI::UI
 		HRESULT hr = factory->CreateRoundedRectangleGeometry(roundedRect, GetHeldPtrAddress()); HR_T(hr);
 	}
 
-	ComPtr<ID2D1Geometry> RoundedRectangleClip::GetClipGeometry()
+	auto RoundedRectangleClip::GetClipGeometry() -> ComPtr<ID2D1Geometry>
 	{
 		return GetHeldComPtr();
 	}
-	ID2D1Geometry* RoundedRectangleClip::GetClipGeometryPtr()
+	auto RoundedRectangleClip::GetClipGeometryPtr() -> ID2D1Geometry*
 	{
 		return GetHeldPtr();
 	}
@@ -70,11 +72,11 @@ namespace PGUI::UI
 		HRESULT hr = factory->CreateEllipseGeometry(ellipse, GetHeldComPtrAddress()); HR_T(hr);
 	}
 
-	ComPtr<ID2D1Geometry> EllipseClip::GetClipGeometry()
+	auto EllipseClip::GetClipGeometry() -> ComPtr<ID2D1Geometry>
 	{
 		return GetHeldComPtr();
 	}
-	ID2D1Geometry* EllipseClip::GetClipGeometryPtr()
+	auto EllipseClip::GetClipGeometryPtr() -> ID2D1Geometry*
 	{
 		return GetHeldPtr();
 	}
@@ -85,21 +87,21 @@ namespace PGUI::UI
 	{
 		
 	}
-	ComPtr<ID2D1Geometry> PathClip::GetClipGeometry()
+	auto PathClip::GetClipGeometry() -> ComPtr<ID2D1Geometry>
 	{
 		return GetHeldComPtr();
 	}
-	ID2D1Geometry* PathClip::GetClipGeometryPtr()
+	auto PathClip::GetClipGeometryPtr() -> ID2D1Geometry*
 	{
 		return GetHeldPtr();
 	}
 
-	Clip::Clip(const ClipParameters& _parameters) noexcept : 
-		parameters(_parameters)
+	Clip::Clip(ClipParameters  _parameters) noexcept : 
+		parameters(std::move(_parameters))
 	{
 		CreateClip();
 	}
-	ClipBase* Clip::Get() const noexcept
+	auto Clip::Get() const noexcept -> ClipBase*
 	{
 		return clip.get();
 	}
@@ -133,11 +135,11 @@ namespace PGUI::UI
 		clip.reset();
 	}
 
-	ClipParameters Clip::GetParameters() const noexcept
+	auto Clip::GetParameters() const noexcept -> ClipParameters
 	{
 		return parameters;
 	}
-	ClipParameters& Clip::GetParameters() noexcept
+	auto Clip::GetParameters() noexcept -> ClipParameters&
 	{
 		return parameters;
 	}

@@ -3,9 +3,10 @@
 #include "ui/Colors.hpp"
 #include "ui/UIColors.hpp"
 
+#include <algorithm>
 #include <numeric>
 #include <ranges>
-#include <algorithm>
+#include <utility>
 
 
 namespace PGUI::UI::Controls
@@ -17,8 +18,8 @@ namespace PGUI::UI::Controls
 
 	#pragma region HeaderTextItem
 
-	HeaderTextItem::HeaderTextItemColors 
-		HeaderTextItem::GetHeaderTextItemColors() noexcept
+	auto 
+		HeaderTextItem::GetHeaderTextItemColors() noexcept -> HeaderTextItem::HeaderTextItemColors
 	{
 		HeaderTextItemColors colors;
 
@@ -48,8 +49,8 @@ namespace PGUI::UI::Controls
 
 		return colors;
 	}
-	HeaderTextItem::HeaderTextItemColors 
-		HeaderTextItem::GetHeaderTextItemAccentedColors() noexcept
+	auto 
+		HeaderTextItem::GetHeaderTextItemAccentedColors() noexcept -> HeaderTextItem::HeaderTextItemColors
 	{
 		HeaderTextItemColors colors;
 
@@ -82,11 +83,11 @@ namespace PGUI::UI::Controls
 
 	HeaderTextItem::HeaderTextItem(std::wstring_view text,
 		long width, 
-		const HeaderTextItemColors& colors,
+		HeaderTextItemColors  colors,
 		TextFormat tf) noexcept :
 		HeaderItem{ width },
 		text{ text },
-		colors{ colors }, textFormat{ tf }
+		colors{std::move( colors )}, textFormat{std::move( tf )}
 	{
 		WidthChangedEvent().Subscribe([this]()
 		{
@@ -263,7 +264,7 @@ namespace PGUI::UI::Controls
 		});
 	}
 
-	std::optional<std::size_t> Header::GetHoveredHeaderItemIndex(long xPos) const noexcept
+	auto Header::GetHoveredHeaderItemIndex(long xPos) const noexcept -> std::optional<std::size_t>
 	{
 		long totalWidth = 0;
 
@@ -282,7 +283,7 @@ namespace PGUI::UI::Controls
 
 		return std::nullopt;
 	}
-	bool Header::IsMouseOnSeperator(long xPos) const noexcept
+	auto Header::IsMouseOnSeperator(long xPos) const noexcept -> bool
 	{
 		long totalWidth = 0;
 
@@ -302,14 +303,14 @@ namespace PGUI::UI::Controls
 		return false;
 	}
 
-	long Header::CalculateHeaderItemWidthUpToIndex(std::size_t index) const noexcept
+	auto Header::CalculateHeaderItemWidthUpToIndex(std::size_t index) const noexcept -> long
 	{
 		return std::accumulate(
 			headerItems.cbegin(), std::next(headerItems.cbegin(), index), 0,
 			[](long x, const auto& header) { return x + header->GetWidth(); }
 		);
 	}
-	long Header::GetTotalHeaderWidth() const noexcept
+	auto Header::GetTotalHeaderWidth() const noexcept -> long
 	{
 		return std::accumulate(
 			headerItems.cbegin(), headerItems.cend(), 0,
@@ -317,7 +318,7 @@ namespace PGUI::UI::Controls
 		);
 	}
 
-	Core::HandlerResult Header::OnDPIChange(float dpiScale, RectI suggestedRect) noexcept
+	auto Header::OnDPIChange(float dpiScale, RectI suggestedRect) noexcept -> Core::HandlerResult
 	{
 		std::ranges::for_each(headerItems, [dpiScale](const auto& item)
 		{
@@ -327,7 +328,7 @@ namespace PGUI::UI::Controls
 		return Window::OnDPIChange(dpiScale, suggestedRect);
 	}
 
-	Core::HandlerResult Header::OnPaint(UINT, WPARAM, LPARAM)
+	auto Header::OnPaint(UINT, WPARAM, LPARAM) -> Core::HandlerResult
 	{
 		BeginDraw();
 
@@ -371,7 +372,7 @@ namespace PGUI::UI::Controls
 		return 0;
 	}
 	
-	Core::HandlerResult Header::OnMouseMove(UINT, WPARAM wParam, LPARAM lParam)
+	auto Header::OnMouseMove(UINT, WPARAM wParam, LPARAM lParam) -> Core::HandlerResult
 	{
 		TRACKMOUSEEVENT tme{ };
 		tme.cbSize = sizeof(TRACKMOUSEEVENT);
@@ -431,7 +432,7 @@ namespace PGUI::UI::Controls
 
 		return 0;
 	}
-	Core::HandlerResult Header::OnMouseLButtonDown(UINT, WPARAM, LPARAM)
+	auto Header::OnMouseLButtonDown(UINT, WPARAM, LPARAM) -> Core::HandlerResult
 	{
 		if (dragging)
 		{
@@ -450,7 +451,7 @@ namespace PGUI::UI::Controls
 
 		return 0;
 	}
-	Core::HandlerResult Header::OnMouseLButtonUp(UINT, WPARAM, LPARAM)
+	auto Header::OnMouseLButtonUp(UINT, WPARAM, LPARAM) -> Core::HandlerResult
 	{
 		if (dragging)
 		{
@@ -465,7 +466,7 @@ namespace PGUI::UI::Controls
 
 		return 0;
 	}
-	Core::HandlerResult Header::OnMouseLeave(UINT, WPARAM, LPARAM)
+	auto Header::OnMouseLeave(UINT, WPARAM, LPARAM) -> Core::HandlerResult
 	{
 		if (hoveringIndex.has_value())
 		{
@@ -477,9 +478,9 @@ namespace PGUI::UI::Controls
 		return 0;
 	}
 
-	Core::HandlerResult Header::OnSetCursor(UINT, WPARAM, LPARAM) const
+	auto Header::OnSetCursor(UINT, WPARAM, LPARAM) const -> Core::HandlerResult
 	{
-		LPCWSTR cursorName;
+		LPCWSTR cursorName = nullptr;
 		if (mouseOnDivider)
 		{
 			cursorName = IDC_SIZEWE;
@@ -501,7 +502,7 @@ namespace PGUI::UI::Controls
 		return 1;
 	}
 
-	Core::HandlerResult Header::OnSize(UINT, WPARAM, LPARAM) const
+	auto Header::OnSize(UINT, WPARAM, LPARAM) const -> Core::HandlerResult
 	{
 		std::ranges::for_each(headerItems, [](const auto& item)
 		{

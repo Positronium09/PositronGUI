@@ -13,13 +13,13 @@ namespace PGUI::UI
 {
 	struct GradientStop : public D2D1_GRADIENT_STOP
 	{
-		GradientStop(float _position, RGBA _color) noexcept
+		GradientStop(float _position, RGBA _color) noexcept : D2D1_GRADIENT_STOP()
 		{
 			position = _position;
 			color = _color;
 		}
 
-		explicit(false) GradientStop(D2D1_GRADIENT_STOP gradientStop) noexcept
+		explicit(false) GradientStop(D2D1_GRADIENT_STOP gradientStop) noexcept : D2D1_GRADIENT_STOP()
 		{
 			position = gradientStop.position;
 			color = gradientStop.color;
@@ -38,16 +38,16 @@ namespace PGUI::UI
 		public:
 		virtual ~Gradient() noexcept = default;
 
-		[[nodiscard]] const GradientStops& GetGradientStops() const noexcept;
-		[[nodiscard]] GradientStops& GetGradientStops() noexcept;
+		[[nodiscard]] auto GetGradientStops() const noexcept -> const GradientStops&;
+		[[nodiscard]] auto GetGradientStops() noexcept -> GradientStops&;
 
-		[[nodiscard]] PositioningMode GetPositioningMode() const noexcept;
+		[[nodiscard]] auto GetPositioningMode() const noexcept -> PositioningMode;
 		void SetPositioningMode(PositioningMode mode) noexcept;
 
 		virtual void ApplyReferenceRect(RectF rect) noexcept = 0;
 
 		protected:
-		explicit Gradient(const GradientStops& stops) noexcept;
+		explicit Gradient(GradientStops  stops) noexcept;
 
 		private:
 		GradientStops stops;
@@ -59,13 +59,13 @@ namespace PGUI::UI
 		public:
 		LinearGradient(PointF start, PointF end, const GradientStops& stops) noexcept;
 
-		[[nodiscard]] PointF Start() const noexcept;
+		[[nodiscard]] auto Start() const noexcept -> PointF;
 		void Start(PointF center) noexcept;
-		[[nodiscard]] PointF End() const noexcept;
+		[[nodiscard]] auto End() const noexcept -> PointF;
 		void End(PointF offset) noexcept;
 
 		void ApplyReferenceRect(RectF rect) noexcept override;
-		[[nodiscard]] LinearGradient ReferenceRectApplied(RectF rect) const noexcept;
+		[[nodiscard]] auto ReferenceRectApplied(RectF rect) const noexcept -> LinearGradient;
 
 		private:
 		PointF start;
@@ -77,14 +77,14 @@ namespace PGUI::UI
 		public:
 		RadialGradient(Ellipse ellipse, PointF offset, const GradientStops& stops) noexcept;
 
-		[[nodiscard]] Ellipse GetEllipse() const noexcept;
-		[[nodiscard]] Ellipse& GetEllipse() noexcept;
+		[[nodiscard]] auto GetEllipse() const noexcept -> Ellipse;
+		[[nodiscard]] auto GetEllipse() noexcept -> Ellipse&;
 		void SetEllipse(Ellipse ellipse) noexcept;
-		[[nodiscard]] PointF Offset() const noexcept;
+		[[nodiscard]] auto Offset() const noexcept -> PointF;
 		void Offset(PointF offset) noexcept;
 
 		void ApplyReferenceRect(RectF rect) noexcept override;
-		[[nodiscard]] RadialGradient ReferenceRectApplied(RectF rect) const noexcept;
+		[[nodiscard]] auto ReferenceRectApplied(RectF rect) const noexcept -> RadialGradient;
 
 		private:
 		Ellipse ellipse;

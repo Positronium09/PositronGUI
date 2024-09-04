@@ -1,3 +1,5 @@
+#include <utility>
+
 #include "ui/Brush.hpp"
 
 #include "ui/UIComponent.hpp"
@@ -16,12 +18,12 @@ namespace PGUI::UI
 		HRESULT hr = renderTarget->CreateSolidColorBrush(color, GetHeldPtrAddress()); HR_T(hr);
 	}
 
-	ComPtr<ID2D1Brush> SolidColorBrush::GetBrush()
+	auto SolidColorBrush::GetBrush() -> ComPtr<ID2D1Brush>
 	{
 		return GetHeldComPtr();
 	}
 
-	ID2D1Brush* SolidColorBrush::GetBrushPtr()
+	auto SolidColorBrush::GetBrushPtr() -> ID2D1Brush*
 	{
 		return GetHeldPtr();
 	}
@@ -54,12 +56,12 @@ namespace PGUI::UI
 		); HR_T(hr);
 	}
 
-	ComPtr<ID2D1Brush> LinearGradientBrush::GetBrush()
+	auto LinearGradientBrush::GetBrush() -> ComPtr<ID2D1Brush>
 	{
 		return GetHeldComPtr();
 	}
 
-	ID2D1Brush* LinearGradientBrush::GetBrushPtr()
+	auto LinearGradientBrush::GetBrushPtr() -> ID2D1Brush*
 	{
 		return GetHeldPtr();
 	}
@@ -97,12 +99,12 @@ namespace PGUI::UI
 		); HR_T(hr);
 	}
 
-	ComPtr<ID2D1Brush> RadialGradientBrush::GetBrush()
+	auto RadialGradientBrush::GetBrush() -> ComPtr<ID2D1Brush>
 	{
 		return GetHeldComPtr();
 	}
 
-	ID2D1Brush* RadialGradientBrush::GetBrushPtr()
+	auto RadialGradientBrush::GetBrushPtr() -> ID2D1Brush*
 	{
 		return GetHeldPtr();
 	}
@@ -117,17 +119,17 @@ namespace PGUI::UI
 		HRESULT hr = renderTarget->CreateBitmapBrush(bitmap.Get(), GetHeldPtrAddress()); HR_T(hr);
 	}
 
-	ComPtr<ID2D1Brush> BitmapBrush::GetBrush()
+	auto BitmapBrush::GetBrush() -> ComPtr<ID2D1Brush>
 	{
 		return GetHeldComPtr();
 	}
-	ID2D1Brush* BitmapBrush::GetBrushPtr()
+	auto BitmapBrush::GetBrushPtr() -> ID2D1Brush*
 	{
 		return GetHeldPtr();
 	}
 
-	Brush::Brush(ComPtr<ID2D1RenderTarget> renderTarget, const BrushParameters& _parameters) noexcept :
-		parameters(_parameters)
+	Brush::Brush(ComPtr<ID2D1RenderTarget> renderTarget, BrushParameters  _parameters) noexcept :
+		parameters(std::move(_parameters))
 	{
 		CreateBrush(renderTarget);
 	}
@@ -138,12 +140,12 @@ namespace PGUI::UI
 	{
 	}
 
-	Brush::Brush(const BrushParameters& _parameters) noexcept :
-		parameters(_parameters)
+	Brush::Brush(BrushParameters  _parameters) noexcept :
+		parameters(std::move(_parameters))
 	{
 	}
 
-	BrushBase* Brush::Get() const noexcept
+	auto Brush::Get() const noexcept -> BrushBase*
 	{
 		return brush.get();
 	}
@@ -180,11 +182,11 @@ namespace PGUI::UI
 		brush = nullptr;
 	}
 
-	BrushParameters Brush::GetParameters() const noexcept
+	auto Brush::GetParameters() const noexcept -> BrushParameters
 	{
 		return parameters;
 	}
-	BrushParameters& Brush::GetParameters() noexcept
+	auto Brush::GetParameters() noexcept -> BrushParameters&
 	{
 		return parameters;
 	}

@@ -21,7 +21,7 @@ namespace PGUI::UI
 		Move(dialogRect.TopLeft());
 	}
 
-	HandlerResult Dialog::OnInitDialog(UINT, WPARAM, LPARAM) const noexcept
+	auto Dialog::OnInitDialog(UINT, WPARAM, LPARAM) const noexcept -> HandlerResult
 	{
 		return { NULL, HandlerResultFlag::ForceThisResult };
 	}
@@ -32,7 +32,7 @@ namespace PGUI::UI
 		RegisterMessageHandler(WM_CLOSE, &ModalDialog::OnClose);
 	}
 
-	int ModalDialog::RunModal() noexcept
+	auto ModalDialog::RunModal() noexcept -> int
 	{
 		Show();
 		MSG msg{ };
@@ -74,7 +74,7 @@ namespace PGUI::UI
 		return static_cast<int>(msg.wParam);
 	}
 
-	bool ModalDialog::IsRunning() const noexcept
+	auto ModalDialog::IsRunning() const noexcept -> bool
 	{
 		return running;
 	}
@@ -84,7 +84,7 @@ namespace PGUI::UI
 		running = _running;
 	}
 
-	Core::HandlerResult ModalDialog::OnClose(UINT, WPARAM, LPARAM) noexcept
+	auto ModalDialog::OnClose(UINT, WPARAM, LPARAM) noexcept -> Core::HandlerResult
 	{
 		running = false;
 		return 0;
@@ -94,7 +94,7 @@ namespace PGUI::UI
 		modalDialogHwnd(_modalDialogHwnd)
 	{
 	}
-	int ModalMessageLoop::Run() noexcept
+	auto ModalMessageLoop::Run() noexcept -> int
 	{
 		MSG msg{ };
 

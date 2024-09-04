@@ -52,7 +52,7 @@ namespace PGUI::UI::Bmp
 		hr = bitmapSource->CopyPalette(GetHeldComPtr().Get()); HR_T(hr);
 	}
 
-	std::vector<WICColor> Palette::GetColors() const noexcept
+	auto Palette::GetColors() const noexcept -> std::vector<WICColor>
 	{
 		auto colorCount = GetColorCount();
 
@@ -66,7 +66,7 @@ namespace PGUI::UI::Bmp
 		return colors;
 	}
 
-	UINT Palette::GetColorCount() const noexcept
+	auto Palette::GetColorCount() const noexcept -> UINT
 	{
 		UINT colorCount = 0;
 
@@ -75,7 +75,7 @@ namespace PGUI::UI::Bmp
 		return colorCount;
 	}
 
-	WICBitmapPaletteType Palette::GetPaletteType() const noexcept
+	auto Palette::GetPaletteType() const noexcept -> WICBitmapPaletteType
 	{
 		WICBitmapPaletteType paletteType = WICBitmapPaletteTypeCustom;
 
@@ -83,21 +83,21 @@ namespace PGUI::UI::Bmp
 
 		return paletteType;
 	}
-	bool Palette::IsBlackWhite() const noexcept
+	auto Palette::IsBlackWhite() const noexcept -> bool
 	{
 		BOOL isBlackWhite = FALSE;
 		HRESULT hr = GetHeldComPtr()->IsBlackWhite(&isBlackWhite); HR_L(hr);
 
 		return isBlackWhite;
 	}
-	bool Palette::IsGrayScale() const noexcept
+	auto Palette::IsGrayScale() const noexcept -> bool
 	{
 		BOOL isGrayScale = FALSE;
 		HRESULT hr = GetHeldComPtr()->IsGrayscale(&isGrayScale); HR_L(hr);
 
 		return isGrayScale;
 	}
-	bool Palette::HasAlpha() const noexcept
+	auto Palette::HasAlpha() const noexcept -> bool
 	{
 		BOOL hasAlpha = FALSE;
 		HRESULT hr = GetHeldComPtr()->HasAlpha(&hasAlpha); HR_L(hr);
