@@ -41,11 +41,6 @@ namespace PGUI::UI::Controls
 		RegisterMessageHandler(WM_GETTEXT, &StaticText::OnGetText);
 		RegisterMessageHandler(WM_GETTEXTLENGTH, &StaticText::OnGetTextLength);
 
-		if (!textFormat)
-		{
-			textFormat = TextFormat::GetDefTextFormat();
-		}
-
 		auto [textColor, backgroundColor] = GetStaticTextColors();
 		textBrush.SetParameters(textColor);
 		backgroundBrush.SetParameters(backgroundColor);
@@ -143,11 +138,22 @@ namespace PGUI::UI::Controls
 		backgroundBrush.ReleaseBrush();
 	}
 
+	Core::HandlerResult StaticText::OnDPIChange(float dpiScale, RectI suggestedRect) noexcept
+	{
+		SetTextFormat(textFormat.AdjustFontSizeToDPI(textFormat.GetFontSize() * dpiScale));
+
+		return Window::OnDPIChange(dpiScale, suggestedRect);
+	}
+
 	Core::HandlerResult StaticText::OnNCCreate(UINT, WPARAM, LPARAM lParam) noexcept
 	{
 		auto createStruct = std::bit_cast<LPCREATESTRUCTW>(lParam);
 
 		text = createStruct->lpszName;
+		if (!textFormat)
+		{
+			textFormat = TextFormat::GetDefTextFormat(ScaleByDPI(16.0f));
+		}
 
 		return 1;
 	}

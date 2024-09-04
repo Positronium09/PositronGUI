@@ -36,8 +36,8 @@ namespace PGUI::UI::Controls
 		void SetState(HeaderItemState newState) noexcept { state = newState; stateChangedEvent.Emit(); }
 		[[nodiscard]] HeaderItemState GetState() const noexcept { return state; }
 
-		[[nodiscard]] Core::Event<void>& GetStateChangedEvent() noexcept { return stateChangedEvent; }
-		[[nodiscard]] Core::Event<void>& GetWidthChangedEvent() noexcept { return widthChangedEvent; }
+		[[nodiscard]] Core::Event<void>& StateChangedEvent() noexcept { return stateChangedEvent; }
+		[[nodiscard]] Core::Event<void>& WidthChangedEvent() noexcept { return widthChangedEvent; }
 
 		void SetWidth(long _width) noexcept { width = _width; widthChangedEvent.Emit(); }
 		[[nodiscard]] long GetWidth() const noexcept { return width; }
@@ -54,6 +54,7 @@ namespace PGUI::UI::Controls
 
 		void SetMinWidth(long newMinWidth) noexcept { minWidth = newMinWidth; }
 
+		virtual void OnDPIChanged(float dpiScale) = 0;
 		virtual void OnHeaderSizeChanged() = 0;
 
 		private:
@@ -86,10 +87,15 @@ namespace PGUI::UI::Controls
 
 		HeaderTextItem(std::wstring_view text, long width, 
 			const HeaderTextItemColors& colors = GetHeaderTextItemColors(), 
-			TextFormat tf = TextFormat::GetDefTextFormat()) noexcept;
+			TextFormat tf = TextFormat{ }) noexcept;
 
 		[[nodiscard]] const HeaderTextItemColors& GetColors() const noexcept { return colors; }
 		[[nodiscard]] HeaderTextItemColors& GetColors() noexcept { return colors; }
+
+		[[nodiscard]] TextLayout GetTextLayout() const noexcept { return textLayout; }
+		void SetTextFormat(TextFormat textFormat) noexcept;
+
+		void InitTextLayout();
 
 		protected:
 		void Create() override;
@@ -97,6 +103,7 @@ namespace PGUI::UI::Controls
 		void CreateDeviceResources(Graphics::Graphics g) override;
 		void DiscardDeviceResources(Graphics::Graphics) override;
 
+		void OnDPIChanged(float dpiScale) override;
 		void OnHeaderSizeChanged() override;
 
 		private:
@@ -109,8 +116,6 @@ namespace PGUI::UI::Controls
 
 		Brush textBrush;
 		Brush backgroundBrush;
-
-		void InitTextLayout();
 
 		void OnStateChanged() noexcept;
 
@@ -185,6 +190,7 @@ namespace PGUI::UI::Controls
 
 		std::optional<std::size_t> hoveringIndex = std::nullopt;
 
+		Core::HandlerResult OnDPIChange(float dpiScale, RectI suggestedRect) noexcept override;
 		Core::HandlerResult OnPaint(UINT msg, WPARAM wParam, LPARAM lParam);
 		Core::HandlerResult OnMouseMove(UINT msg, WPARAM wParam, LPARAM lParam);
 		Core::HandlerResult OnMouseLButtonDown(UINT msg, WPARAM wParam, LPARAM lParam);

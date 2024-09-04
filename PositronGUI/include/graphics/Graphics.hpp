@@ -10,7 +10,6 @@
 #include "ui/TextFormat.hpp"
 #include "ui/TextLayout.hpp"
 #include "ui/Brush.hpp"
-#include "ui/bmp/BitmapSource.hpp"
 
 #include "AntialiasMode.hpp"
 #include "PixelFormat.hpp"
@@ -19,6 +18,10 @@
 #include <d2d1_3.h>
 
 
+namespace PGUI::UI::Bmp
+{
+	class BitmapSource;
+}
 namespace PGUI::Graphics
 {
 	class GraphicsBitmap;
@@ -44,7 +47,7 @@ namespace PGUI::Graphics
 		[[nodiscard]] GraphicsBitmap CreateBitmap(SizeU size, const D2D1_BITMAP_PROPERTIES& props) const;
 		[[nodiscard]] GraphicsBitmap CreateBitmap(SizeU size, const void* srcData, UINT32 pitch,
 			const D2D1_BITMAP_PROPERTIES& bitmapProperties) const;
-		[[nodiscard]] GraphicsBitmap CreateBitmap(PGUI::UI::Bmp::BitmapSource bmpSrc,
+		[[nodiscard]] GraphicsBitmap CreateBitmap(const PGUI::UI::Bmp::BitmapSource& bmpSrc,
 			std::optional<D2D1_BITMAP_PROPERTIES> props = std::nullopt) const;
 
 		[[nodiscard]] BitmapRenderTarget CreateCompatibleRenderTarget(
@@ -110,7 +113,7 @@ namespace PGUI::Graphics
 			return static_cast<AntialiasMode>(GetHeldComPtr()->GetAntialiasMode());
 		}
 
-		[[nodiscard]] SizeF GetDpi() const noexcept;
+		[[nodiscard]] SizeF GetDPI() const noexcept;
 
 		[[nodiscard]] auto GetMaximumBitmapSize() const noexcept { return GetHeldComPtr()->GetMaximumBitmapSize(); }
 		[[nodiscard]] PixelFormat GetPixelFormat() const noexcept { return GetHeldComPtr()->GetPixelFormat(); }

@@ -1,7 +1,9 @@
 #include "graphics/Graphics.hpp"
 #include "graphics/BitmapRenderTarget.hpp"
 #include "graphics/GraphicsBitmap.hpp"
+#include "ui/bmp/BitmapSource.hpp"
 #include "factories/Direct2DFactory.hpp"
+#include "factories/WICFactory.hpp"
 
 
 using namespace PGUI::UI;
@@ -39,17 +41,26 @@ namespace PGUI::Graphics
 		HRESULT hr = GetHeldComPtr()->CreateBitmap(size, srcData, pitch, bitmapProperties, &bmp); HR_T(hr);
 		return GraphicsBitmap{ bmp };
 	}
-	GraphicsBitmap Graphics::CreateBitmap(PGUI::UI::Bmp::BitmapSource bmpSrc, std::optional<D2D1_BITMAP_PROPERTIES> props) const
+	GraphicsBitmap Graphics::CreateBitmap(const PGUI::UI::Bmp::BitmapSource& bmpSrc, std::optional<D2D1_BITMAP_PROPERTIES> props) const
 	{
 		ComPtr<ID2D1Bitmap> bmp;
+		auto wicFactory = PGUI::WICFactory::GetFactory();
+
+		ComPtr<IWICFormatConverter> converterBitmapSource;
+		HRESULT hr = wicFactory->CreateFormatConverter(&converterBitmapSource); HR_T(hr);
+
+		hr = converterBitmapSource->Initialize(bmpSrc,
+			GUID_WICPixelFormat32bppPBGRA, WICBitmapDitherTypeNone,
+			nullptr, 0.0f, WICBitmapPaletteTypeCustom); HR_T(hr);
+
 		if (props.has_value())
 		{
-			HRESULT hr = GetHeldComPtr()->CreateBitmapFromWicBitmap(
+			hr = GetHeldComPtr()->CreateBitmapFromWicBitmap(
 				bmpSrc, *props, &bmp); HR_T(hr);
 			return GraphicsBitmap{ bmp };
 		}
-		HRESULT hr = GetHeldComPtr()->CreateBitmapFromWicBitmap(
-			bmpSrc, &bmp); HR_T(hr);
+		hr = GetHeldComPtr()->CreateBitmapFromWicBitmap(
+			converterBitmapSource.Get(), &bmp); HR_T(hr);
 		return GraphicsBitmap{ bmp };
 	}
 	BitmapRenderTarget Graphics::CreateCompatibleRenderTarget(SizeF size, SizeU pixelSize,
@@ -186,7 +197,7 @@ namespace PGUI::Graphics
 	{
 		GetHeldComPtr()->FillRoundedRectangle(rect, brush);
 	}
-	SizeF Graphics::GetDpi() const noexcept
+	SizeF Graphics::GetDPI() const noexcept
 	{
 		SizeF dpi{ };
 		GetHeldComPtr()->GetDpi(&dpi.cx, &dpi.cy);

@@ -16,7 +16,7 @@ namespace PGUI
 		WICFactory(WICFactory&) = delete;
 		void operator=(const WICFactory&) = delete;
 
-		static [[nodiscard]] ComPtr<IWICImagingFactory> GetFactory()
+		[[nodiscard]] static ComPtr<IWICImagingFactory> GetFactory()
 		{
 			if (!wicFactory)
 			{

@@ -9,6 +9,7 @@
 #include <bit>
 #include <system_error>
 #include <string.h>
+#include <shlwapi.h>
 #include <dwmapi.h>
 
 
@@ -97,11 +98,6 @@ namespace PGUI
 		return StringToWString(std::system_category().message(HRESULT_FROM_WIN32(errorCode)));
 	}
 
-	int AdjustForDpi(int value, int dpi) noexcept
-	{
-		return MulDiv(value, dpi, USER_DEFAULT_SCREEN_DPI);
-	}
-
 	std::span<PointL> MapPoints(HWND from, HWND to, std::span<PointL> points) noexcept
 	{
 		MapWindowPoints(from, to,
@@ -141,7 +137,8 @@ namespace PGUI
 		if (FAILED(hr))
 		{
 			using UHRESULT = std::make_unsigned_t<HRESULT>;
-			auto part1 = std::format("In File {}", location.file_name());
+			auto filename = PathFindFileNameA(location.file_name());
+			auto part1 = std::format("In File {}", filename);
 			auto part2 = std::format("In Function {} at line {}",
 				location.function_name(), location.line()
 			);

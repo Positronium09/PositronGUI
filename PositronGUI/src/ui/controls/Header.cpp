@@ -88,12 +88,18 @@ namespace PGUI::UI::Controls
 		text{ text },
 		colors{ colors }, textFormat{ tf }
 	{
-		GetWidthChangedEvent().Subscribe([this]()
+		WidthChangedEvent().Subscribe([this]()
 		{
 			InitTextLayout();
 		});
 
-		GetStateChangedEvent().Subscribe(BindMemberFunc(&HeaderTextItem::OnStateChanged, this));
+		StateChangedEvent().Subscribe(BindMemberFunc(&HeaderTextItem::OnStateChanged, this));
+	}
+
+	void HeaderTextItem::SetTextFormat(TextFormat _textFormat) noexcept
+	{
+		textFormat = _textFormat;
+		InitTextLayout();
 	}
 
 	void HeaderTextItem::InitTextLayout()
@@ -110,10 +116,9 @@ namespace PGUI::UI::Controls
 
 	void HeaderTextItem::OnStateChanged() noexcept
 	{
+		using enum HeaderItemState;
 		switch (GetState())
 		{
-			using enum HeaderItemState;
-
 			case Normal:
 			{
 				textBrush.SetParameters(colors.normalText);
@@ -139,6 +144,10 @@ namespace PGUI::UI::Controls
 
 	void HeaderTextItem::Create()
 	{
+		if (!textFormat)
+		{
+			textFormat = TextFormat::GetDefTextFormat(GetHeaderWindow()->ScaleByDPI(16.0f));
+		}
 		InitTextLayout();
 		OnStateChanged();
 	}
@@ -171,6 +180,12 @@ namespace PGUI::UI::Controls
 	{
 		textBrush.ReleaseBrush();
 		backgroundBrush.ReleaseBrush();
+	}
+
+	void HeaderTextItem::OnDPIChanged(float dpiScale)
+	{
+		SetWidth(ScaleForDPI(GetWidth(), dpiScale));
+		SetTextFormat(textFormat.AdjustFontSizeToDPI(textFormat.GetFontSize() * dpiScale));
 	}
 
 	void HeaderTextItem::OnHeaderSizeChanged()
@@ -302,6 +317,16 @@ namespace PGUI::UI::Controls
 		);
 	}
 
+	Core::HandlerResult Header::OnDPIChange(float dpiScale, RectI suggestedRect) noexcept
+	{
+		std::ranges::for_each(headerItems, [dpiScale](const auto& item)
+		{
+			item->OnDPIChanged(dpiScale);
+		});
+
+		return Window::OnDPIChange(dpiScale, suggestedRect);
+	}
+
 	Core::HandlerResult Header::OnPaint(UINT, WPARAM, LPARAM)
 	{
 		BeginDraw();
@@ -338,7 +363,7 @@ namespace PGUI::UI::Controls
 			g.DrawLine(
 				PointF{ static_cast<float>(totalWidth - 1), 0 }, 
 				PointF{ static_cast<float>(totalWidth - 1), static_cast<float>(height) },
-				seperatorBrush, ScaleByDpi(1.3f));
+				seperatorBrush, ScaleByDPI(1.3f));
 		}
 
 		EndDraw();
@@ -365,7 +390,7 @@ namespace PGUI::UI::Controls
 				newWidth >= ptr->GetMinWidth())
 			{
 				ptr->SetWidth(newWidth);
-				ptr->GetWidthChangedEvent().Emit();
+				ptr->WidthChangedEvent().Emit();
 				Invalidate();
 			}
 

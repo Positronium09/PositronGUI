@@ -67,7 +67,26 @@ namespace PGUI
 		return std::bind_front(memberFunc, ptr);
 	}
 
-	[[nodiscard]] int AdjustForDpi(int value, int dpi) noexcept;
+	template <typename T, std::floating_point U>
+	[[nodiscard]] T AdjustForDPI(T value, U dpi) noexcept
+	{
+		return static_cast<T>(value * dpi / static_cast<U>(96.0));
+	}
+	template <typename T, std::floating_point U>
+	[[nodiscard]] T ScaleForDPI(T value, U dpiScale) noexcept
+	{
+		return static_cast<T>(value * dpiScale);
+	}
+	template <typename T, std::floating_point U>
+	[[nodiscard]] T RemoveDPIAdjustment(T value, U dpi) noexcept
+	{
+		return static_cast<T>(value * static_cast<U>(96.0) / dpi);
+	}
+	template <typename T, std::floating_point U>
+	[[nodiscard]] T RemoveDPIScale(T value, U dpiScale) noexcept
+	{
+		return static_cast<T>(value / dpiScale);
+	}
 
 	[[nodiscard]] std::span<PointL> MapPoints(HWND from, HWND to, std::span<PointL> points) noexcept;
 	[[nodiscard]] PointL MapPoint(HWND from, HWND to, PointL point) noexcept;
@@ -83,11 +102,11 @@ namespace PGUI
 	void HR_T(HRESULT hr,
 		std::source_location location = std::source_location::current()) noexcept(false);
 
-	static inline [[nodiscard]] HRESULT HresultFromWin32() noexcept
+	[[nodiscard]] static inline HRESULT HresultFromWin32() noexcept
 	{
 		return HRESULT_FROM_WIN32(GetLastError());
 	}
-	static inline [[nodiscard]] HRESULT HresultFromWin32(DWORD errCode) noexcept
+	[[nodiscard]] static inline HRESULT HresultFromWin32(DWORD errCode) noexcept
 	{
 		return HRESULT_FROM_WIN32(errCode);
 	}

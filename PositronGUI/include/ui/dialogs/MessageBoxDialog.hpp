@@ -60,22 +60,26 @@ namespace PGUI::UI::Dialogs
 			MessageBoxIcon icon) noexcept;
 
 		private:
-		static inline const RectI margin{ 20, 20, 20, 20 };
-		static inline const SizeI maxSize{ 600, 600 };
-		static inline const SizeI buttonSize = { 85, 35 };
+		static inline RectI margin{ 20, 20, 20, 20 };
+		static inline SizeI maxSize{ 600, 600 };
+		static inline SizeI buttonSize = { 85, 35 };
+		static inline SizeI iconSize = { 32, 32 };
 
 		std::wstring text;
 		std::vector<Core::WindowPtr<Controls::TextButton>> buttons;
 
-		Core::WindowPtr<Controls::StaticText> staticText;
+		TextLayout textLayout{ };
+		TextFormat textFormat{ };
 
 		MessageBoxButtonSet buttonSet;
+		MessageBoxIcon _icon;
 		MessageBoxChoice choice = MessageBoxChoice::Ok;
 
 		Bmp::Bitmap icon;
 		Graphics::GraphicsBitmap iconBmp;
 
-		Brush buttonHighlightBrush{ Colors::Black };
+		Brush buttonHighlightBrush;
+		Brush textBrush;
 		RGBA backgroundColor;
 
 		void CreateDeviceResources() override;

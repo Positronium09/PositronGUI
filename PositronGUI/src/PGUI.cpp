@@ -7,6 +7,9 @@ namespace PGUI
 	void Initialize()
 	{
 		InitializeWindowsFoundation();
+		Core::DirectCompositionWindow::InitD3D11Device();
+		Core::DirectCompositionWindow::InitDCompDevice();
+		Core::DirectCompositionWindow::InitD2D1Device();
 		
 		BOOL suoParam = TRUE;
 		if (BOOL succeeded =

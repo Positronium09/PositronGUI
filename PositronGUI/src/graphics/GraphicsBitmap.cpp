@@ -54,7 +54,7 @@ namespace PGUI::Graphics
 		HRESULT hr = GetHeldComPtr()->CopyFromRenderTarget(dest, rt, src); HR_T(hr);
 	}
 
-	SizeF GraphicsBitmap::GetDpi() const noexcept
+	SizeF GraphicsBitmap::GetDPI() const noexcept
 	{
 		SizeF dpi{ };
 		GetHeldComPtr()->GetDpi(&dpi.cx, &dpi.cy);

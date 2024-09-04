@@ -21,7 +21,7 @@ namespace PGUI
 			cx{ cx_ }, cy{ cy_ }
 		{
 		}
-		constexpr Size(const T& sz) noexcept :
+		explicit constexpr Size(const T& sz) noexcept :
 			cx{ sz }, cy{ sz }
 		{
 		}
@@ -39,7 +39,7 @@ namespace PGUI
 		}
 		~Size() noexcept = default;
 
-		constexpr [[nodiscard]] bool operator==(const Size<T>& other) const noexcept = default;
+		[[nodiscard]] constexpr bool operator==(const Size<T>& other) const noexcept = default;
 
 		constexpr Size& operator*=(const T& factor) noexcept
 		{
@@ -84,25 +84,25 @@ namespace PGUI
 	};
 
 	template<_sz_arithmetic T>
-	[[nodiscard]] Size<T> operator*(T factor, const Size<T>& v) noexcept
+	[[nodiscard]] constexpr Size<T> operator*(T factor, const Size<T>& v) noexcept
 	{
 		return Size<T>(v.cx * factor, v.cy * factor);
 	}
 
 	template<_sz_arithmetic T>
-	[[nodiscard]] Size<T> operator/(T factor, const Size<T>& v) noexcept
+	[[nodiscard]] constexpr Size<T> operator/(T factor, const Size<T>& v) noexcept
 	{
 		return Size<T>(v.cx / factor, v.cy / factor);
 	}
 
 	template<_sz_arithmetic T>
-	[[nodiscard]] Size<T> operator*(const Size<T>& v, T factor) noexcept
+	[[nodiscard]] constexpr Size<T> operator*(const Size<T>& v, T factor) noexcept
 	{
 		return Size<T>(v.cx * factor, v.cy * factor);
 	}
 
 	template<_sz_arithmetic T>
-	[[nodiscard]] Size<T> operator/(const Size<T>& v, T factor) noexcept
+	[[nodiscard]] constexpr Size<T> operator/(const Size<T>& v, T factor) noexcept
 	{
 		return Size<T>(v.cx / factor, v.cy / factor);
 	}

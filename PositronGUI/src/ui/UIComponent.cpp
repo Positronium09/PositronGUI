@@ -20,6 +20,7 @@ namespace PGUI::UI
 	{
 		clip = params;
 		AdjustClipForWindow(clip, this);
+		OnClipChanged();
 	}
 
 	void UIComponent::ClearClip() noexcept
@@ -42,12 +43,12 @@ namespace PGUI::UI
 		Enable(false);
 	}
 
-	bool UIComponent::IsInputEnabled() const noexcept
+	auto UIComponent::IsInputEnabled() const noexcept -> bool
 	{
 		return IsWindowEnabled(Hwnd());
 	}
 
-	Core::HandlerResult UIComponent::OnCreate(UINT, WPARAM, LPARAM) const noexcept
+	auto UIComponent::OnCreate(UINT, WPARAM, LPARAM) const noexcept -> Core::HandlerResult
 	{
 		/*
 		* Disable input by default
@@ -58,7 +59,7 @@ namespace PGUI::UI
 		return 0;
 	}
 
-	Core::HandlerResult UIComponent::OnNcHitTest(UINT msg, WPARAM wParam, LPARAM lParam) const noexcept
+	auto UIComponent::OnNcHitTest(UINT msg, WPARAM wParam, LPARAM lParam) const noexcept -> Core::HandlerResult
 	{
 		LRESULT defResult = DefWindowProcW(Hwnd(), msg, wParam, lParam);
 
@@ -80,7 +81,7 @@ namespace PGUI::UI
 		return defResult;
 	}
 
-	Core::HandlerResult UIComponent::OnSize(UINT, WPARAM, LPARAM) noexcept
+	auto UIComponent::OnSize(UINT, WPARAM, LPARAM) noexcept -> Core::HandlerResult
 	{
 		AdjustClipForWindow(clip, this);
 		return 0;
@@ -103,7 +104,7 @@ namespace PGUI::UI
 		), nullptr);
 	}
 
-	HRESULT UIComponent::EndDraw()
+	auto UIComponent::EndDraw() -> HRESULT
 	{
 		GetGraphics().PopLayer();
 	

@@ -37,6 +37,24 @@ namespace PGUI::UI
 			fontSize, localeName.data(), GetHeldPtrAddress()); HR_L(hr);
 	}
 
+	TextFormat TextFormat::AdjustFontSizeToDPI(float fontSize) const noexcept
+	{
+		TextFormat newTf{ GetFontFamilyName(), fontSize, GetLocaleName(),
+			GetFontCollection(), GetFontWeight(), GetFontStyle(), GetFontStretch() };
+
+		newTf.SetFlowDirection(GetFlowDirection());
+		newTf.SetIncrementalTabStop(GetIncrementalTabStop());
+		newTf.SetLineSpacing(GetLineSpacing());
+		newTf.SetParagraphAlignment(GetParagraphAlignment());
+		newTf.SetReadingDirection(GetReadingDirection());
+		newTf.SetTextAlignment(GetTextAlignment());
+		auto [trimming, inlineObj] = GetTrimming();
+		newTf.SetTrimming(trimming, inlineObj);
+		newTf.SetWordWrapping(GetWordWrapping());
+
+		return newTf;
+	}
+
 	Font::FlowDirection TextFormat::GetFlowDirection() const noexcept
 	{
 		return GetHeldComPtr()->GetFlowDirection();

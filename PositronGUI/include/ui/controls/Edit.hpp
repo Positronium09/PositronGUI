@@ -20,36 +20,6 @@
 
 namespace PGUI::UI::Controls
 {
-	struct CharRange
-	{
-		long min = 0;
-		long max = 0;
-
-		CharRange() noexcept = default;
-		explicit(false) CharRange(CHARRANGE charRange) noexcept : 
-			min{ charRange.cpMin }, max{ charRange.cpMax }
-		{}
-		CharRange(long min, long max) noexcept : 
-			min{ min }, max{ max }
-		{}
-
-		explicit(false) operator CHARRANGE() const noexcept
-		{
-			CHARRANGE charRange{ };
-			charRange.cpMin = min;
-			charRange.cpMax = max;
-			return charRange;
-		}
-
-		long Length() const noexcept { return max - min + 1; }
-	};
-
-	struct FindTextStruct
-	{
-		CharRange toSearch{ 0, 1 };
-		std::wstring text;
-	};
-
 	enum class FindWordBreakOperations
 	{
 		Classify = WB_CLASSIFY,
@@ -80,7 +50,6 @@ namespace PGUI::UI::Controls
 		MatchDiac = FR_MATCHDIAC,
 		MatchKashida = FR_MATCHKASHIDA
 	};
-	EnableEnumFlag(EditFindFlag);
 
 	enum class EditSelectionFlag
 	{
@@ -89,8 +58,6 @@ namespace PGUI::UI::Controls
 		MultiChar = SEL_MULTICHAR,
 		MultiObject = SEL_MULTIOBJECT
 	};
-	EnableEnumFlag(EditSelectionFlag);
-
 
 	enum class EditOptionsFlag
 	{
@@ -103,7 +70,6 @@ namespace PGUI::UI::Controls
 		Selectionbar = ECO_SELECTIONBAR,
 		Vertical = ECO_VERTICAL
 	};
-	EnableEnumFlag(EditOptionsFlag);
 
 	enum class EditEventMaskFlag
 	{
@@ -122,7 +88,46 @@ namespace PGUI::UI::Controls
 		SelectionChange = ENM_SELCHANGE,
 		Update = ENM_UPDATE
 	};
-	EnableEnumFlag(EditEventMaskFlag);
+}
+EnableEnumFlag(PGUI::UI::Controls::EditFindFlag)
+EnableEnumFlag(PGUI::UI::Controls::EditSelectionFlag)
+EnableEnumFlag(PGUI::UI::Controls::EditOptionsFlag)
+EnableEnumFlag(PGUI::UI::Controls::EditEventMaskFlag)
+
+namespace PGUI::UI::Controls
+{
+	struct CharRange
+	{
+		long min = 0;
+		long max = 0;
+
+		CharRange() noexcept = default;
+		explicit(false) CharRange(CHARRANGE charRange) noexcept :
+			min{ charRange.cpMin }, max{ charRange.cpMax }
+		{
+		}
+		CharRange(long min, long max) noexcept :
+			min{ min }, max{ max }
+		{
+		}
+
+		explicit(false) operator CHARRANGE() const noexcept
+		{
+			CHARRANGE charRange{ };
+			charRange.cpMin = min;
+			charRange.cpMax = max;
+			return charRange;
+		}
+
+		long Length() const noexcept { return max - min + 1; }
+	};
+
+	struct FindTextStruct
+	{
+		CharRange toSearch{ 0, 1 };
+		std::wstring text;
+	};
+
 
 	class Edit : public Control
 	{
@@ -204,7 +209,7 @@ namespace PGUI::UI::Controls
 		/**
 		 * @return true if key event should be processed false otherwise
 		 */
-		using KeyFilterFunction = std::function<bool(UINT&, WPARAM&, LPARAM&)>;
+		using KeyFilterFunction = std::function<bool(Edit*, UINT&, WPARAM&, LPARAM&)>;
 
 		struct EditParams
 		{
@@ -220,7 +225,8 @@ namespace PGUI::UI::Controls
 				wchar_t passwordChar = L'*', 
 				DWORD propertyBits = TXTBIT_RICHTEXT | TXTBIT_SAVESELECTION) noexcept :
 				fontSize{ fontSize }, fontFace{ fontFace }, 
-				passwordChar{ passwordChar }, propertyBits{ propertyBits | (singleLine ? 0 : TXTBIT_MULTILINE) }
+				passwordChar{ passwordChar }, 
+				propertyBits{ propertyBits | (singleLine ? 0 : TXTBIT_MULTILINE) }
 			{
 			}
 		};
@@ -431,8 +437,8 @@ namespace PGUI::UI::Controls
 		KeyFilterFunction filteringFunction;
 
 		ComPtr<ITextServices2> textServices;
-		Core::WindowPtr<ScrollBar> verticalScrollBar;
-		Core::WindowPtr<ScrollBar> horizontalScrollBar;
+		Core::WindowPtr<ScrollBar> verticalScrollBar{};
+		Core::WindowPtr<ScrollBar> horizontalScrollBar{};
 
 		#pragma region Events
 
@@ -463,7 +469,7 @@ namespace PGUI::UI::Controls
 
 		bool showCaret = false;
 
-		Core::TimerId caretBlinkTimerId;
+		Core::TimerId caretBlinkTimerId{};
 
 		void CreateDeviceResources() override;
 		void DiscardDeviceResources() override;
@@ -471,7 +477,7 @@ namespace PGUI::UI::Controls
 		void CaretBlinkHandler(Core::TimerId timerId);
 
 		Core::HandlerResult OnDPIChange(float dpiScale, RectI suggestedRect) override;
-		Core::HandlerResult ForwardToTextServices(UINT msg, WPARAM wParam, LPARAM lParam) const;
+		Core::HandlerResult ForwardToTextServices(UINT msg, WPARAM wParam, LPARAM lParam);
 		Core::HandlerResult OnCreate(UINT msg, WPARAM wParam, LPARAM lParam);
 		Core::HandlerResult OnDestroy(UINT msg, WPARAM wParam, LPARAM lParam) noexcept;
 		Core::HandlerResult OnPaint(UINT msg, WPARAM wParam, LPARAM lParam) noexcept;
@@ -482,8 +488,8 @@ namespace PGUI::UI::Controls
 
 	namespace BuiltinFilters
 	{
-		bool NumericOnlyFilter(UINT& msg, WPARAM& wParam, LPARAM& lParam) noexcept;
-		bool UppercaseOnlyFilter(UINT& msg, WPARAM& wParam, LPARAM& lParam) noexcept;
-		bool LowercaseOnlyFilter(UINT& msg, WPARAM& wParam, LPARAM& lParam) noexcept;
+		bool NumericOnlyFilter(Core::WindowPtr<Edit> edit, UINT& msg, WPARAM& wParam, LPARAM& lParam) noexcept;
+		bool UppercaseOnlyFilter(Core::WindowPtr<Edit> edit, UINT& msg, WPARAM& wParam, LPARAM& lParam) noexcept;
+		bool LowercaseOnlyFilter(Core::WindowPtr<Edit> edit, UINT& msg, WPARAM& wParam, LPARAM& lParam) noexcept;
 	}
 }

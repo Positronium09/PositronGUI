@@ -26,8 +26,11 @@ namespace PGUI::UI::Controls
 		Pressed = 0x02,
 		Selected = 0x04
 	};
-	EnableEnumFlag(ListViewItemState);
+}
+EnableEnumFlag(PGUI::UI::Controls::ListViewItemState)
 
+namespace PGUI::UI::Controls
+{
 	class ListView;
 
 	class ListViewItem
@@ -64,8 +67,9 @@ namespace PGUI::UI::Controls
 		[[nodiscard]] ListView* GetListViewWindow() const noexcept { return listView; }
 		void Invalidate() const noexcept;
 
-		void SetMinHeight(long newMinheight) noexcept { minHeight = newMinheight; }
+		void SetMinHeight(long newMinHeight) noexcept { minHeight = newMinHeight; }
 
+		virtual void OnDPIChanged(float dpiScale) = 0;
 		virtual void OnListViewSizeChanged() = 0;
 
 		private:
@@ -83,11 +87,13 @@ namespace PGUI::UI::Controls
 		public:
 		struct ListViewTextItemColors
 		{
-			BrushParameters normal;
-			BrushParameters hover;
-			BrushParameters pressed;
+			BrushParameters normalText;
+			BrushParameters normalBackground;
+			BrushParameters hoverText;
+			BrushParameters hoverBackground;
+			BrushParameters pressedText;
+			BrushParameters pressedBackground;
 			BrushParameters selectedIndicator;
-			BrushParameters text;
 
 			ListViewTextItemColors() = default;
 		};
@@ -104,7 +110,8 @@ namespace PGUI::UI::Controls
 		[[nodiscard]] std::wstring& GetText() noexcept { return text; }
 
 		void SetColors(const ListViewTextItemColors& colors) noexcept;
-		[[nodiscard]] ListViewTextItemColors GetColors() const noexcept;
+		[[nodiscard]] const ListViewTextItemColors& GetColors() const noexcept { return colors; }
+		[[nodiscard]] ListViewTextItemColors& GetColors() noexcept { return colors; }
 
 		protected:
 		void Create() override;
@@ -112,18 +119,21 @@ namespace PGUI::UI::Controls
 		void CreateDeviceResources(Graphics::Graphics g) override;
 		void DiscardDeviceResources(Graphics::Graphics g) override;
 
+		void OnStateChanged();
+		void OnDPIChanged(float dpiScale) override;
 		void OnListViewSizeChanged() override;
 
 		private:
 		std::wstring text;
+
+		ListViewTextItemColors colors;
+
 		TextFormat textFormat;
 		TextLayout textLayout;
 
-		Brush normalBrush;
-		Brush hoverBrush;
-		Brush pressedBrush;
-		Brush selectedIndicatorBrush;
 		Brush textBrush;
+		Brush backgroundBrush;
+		Brush selectedIndicatorBrush;
 	};
 
 	class ListView : public Control
@@ -188,7 +198,7 @@ namespace PGUI::UI::Controls
 		void Select(std::size_t index) noexcept;
 		void Deselect(std::size_t index) noexcept;
 
-		auto GetScrollBar() const noexcept { return scrollBar; }
+		[[nodiscard]] auto GetScrollBar() const noexcept { return scrollBar; }
 
 		void SetBackgroundBrush(Brush& brush) noexcept;
 		[[nodiscard]] const Brush& GetBackgroundBrush() const noexcept { return backgroundBrush; }
@@ -200,8 +210,24 @@ namespace PGUI::UI::Controls
 		Core::Event<void>& ItemsChangedEvent() noexcept { return itemsChangedEvent; }
 
 		private:
+		Core::WindowPtr<ScrollBar> scrollBar{};
+
+		Core::Event<void> itemsChangedEvent;
+		Core::Event<void> selectionChangedEvent;
+
+		std::optional<std::size_t> lastPressedIndex = std::nullopt;
+		std::optional<std::size_t> hoveringIndex = std::nullopt;
+
+		ListViewItemList listViewItems;
+
+		Brush backgroundBrush;
+
+		SelectionMode selectionMode = SelectionMode::Single;
+
 		void CreateDeviceResources() override;
 		void DiscardDeviceResources() override;
+
+		void OnClipChanged() override;
 
 		[[nodiscard]] std::optional<std::size_t> GetHoveredListViewItemIndex(long yPos) const noexcept;
 
@@ -217,20 +243,7 @@ namespace PGUI::UI::Controls
 		void SelectMultiple(std::size_t index) noexcept;
 		void SelectExtended(std::size_t index, bool shiftPressed = false, bool ctrlPressed = false) noexcept;
 
-		Core::WindowPtr<ScrollBar> scrollBar;
-
-		Core::Event<void> itemsChangedEvent;
-		Core::Event<void> selectionChangedEvent;
-
-		std::optional<std::size_t> lastPressedIndex = std::nullopt;
-		std::optional<std::size_t> hoveringIndex = std::nullopt;
-
-		ListViewItemList listViewItems;
-
-		Brush backgroundBrush;
-
-		SelectionMode selectionMode = SelectionMode::Single;
-
+		Core::HandlerResult OnDPIChange(float dpiScale, RectI suggestedRect) noexcept override;
 		Core::HandlerResult OnCreate(UINT msg, WPARAM wParam, LPARAM lParam);
 		Core::HandlerResult OnPaint(UINT msg, WPARAM wParam, LPARAM lParam);
 		Core::HandlerResult OnMouseWheel(UINT msg, WPARAM wParam, LPARAM lParam);

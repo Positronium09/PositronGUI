@@ -9,21 +9,42 @@ namespace PGUI::UI::Controls
 	{
 		CheckBoxColors colors;
 
-		colors.unchecked.foreground = RGBA{ 0x333333 };
-		colors.unchecked.background = RGBA{ 0x1b1b1b };
-		colors.unchecked.hoverForeground = colors.unchecked.foreground;
-		colors.unchecked.hoverBackground = RGBA{ 0x202020 };
-		colors.unchecked.pressedForeground = RGBA{ 0x292929 };
-		colors.unchecked.pressedBackground = colors.unchecked.hoverBackground;
+		if (UIColors::IsDarkMode())
+		{
+			colors.unchecked.foreground = RGBA{ 0x333333 };
+			colors.unchecked.background = RGBA{ 0x1b1b1b };
+			colors.unchecked.hoverForeground = colors.unchecked.foreground;
+			colors.unchecked.hoverBackground = RGBA{ 0x202020 };
+			colors.unchecked.pressedForeground = RGBA{ 0x292929 };
+			colors.unchecked.pressedBackground = colors.unchecked.hoverBackground;
 
-		colors.checked.foreground = RGBA{ 0x333333 };
-		colors.checked.background = RGBA{ 0x151515 };
-		colors.checked.hoverForeground = colors.checked.foreground;
-		colors.checked.hoverBackground = RGBA{ 0x1b1b1b };
-		colors.checked.pressedForeground = RGBA{ 0x272727 };
-		colors.checked.pressedBackground = colors.checked.hoverBackground;
+			colors.checked.foreground = RGBA{ 0x111111 };
+			colors.checked.background = RGBA{ 0x272727 };
+			colors.checked.hoverForeground = colors.checked.foreground;
+			colors.checked.hoverBackground = RGBA{ 0x212121 };
+			colors.checked.pressedForeground = RGBA{ 0x333333 };
+			colors.checked.pressedBackground = colors.checked.hoverBackground;
 
-		colors.indeterminate = colors.checked;
+			colors.indeterminate = colors.checked;
+		}
+		else
+		{
+			colors.unchecked.foreground = RGBA{ 0x858585 };
+			colors.unchecked.background = RGBA{ 0xEDEDED };
+			colors.unchecked.hoverForeground = colors.unchecked.foreground;
+			colors.unchecked.hoverBackground = RGBA{ 0xD5D5D5 };
+			colors.unchecked.pressedForeground = RGBA{ 0xBBBBBB };
+			colors.unchecked.pressedBackground = colors.unchecked.hoverBackground;
+
+			colors.checked.foreground = RGBA{ 0xEDEDED };
+			colors.checked.background = RGBA{ 0xBBBBBB };
+			colors.checked.hoverForeground = colors.checked.foreground;
+			colors.checked.hoverBackground = RGBA{ 0xCCCCCC };
+			colors.checked.pressedForeground = colors.checked.foreground;
+			colors.checked.pressedBackground = RGBA{ 0xAAAAAA };
+
+			colors.indeterminate = colors.checked;
+		}
 
 		return colors;
 	}
@@ -31,21 +52,42 @@ namespace PGUI::UI::Controls
 	{
 		CheckBoxColors colors;
 
-		colors.unchecked.foreground = RGBA{ 0x333333 };
-		colors.unchecked.background = RGBA{ 0x1b1b1b };
-		colors.unchecked.hoverForeground = colors.unchecked.foreground;
-		colors.unchecked.hoverBackground = RGBA{ 0x202020 };
-		colors.unchecked.pressedForeground = RGBA{ 0x292929 };
-		colors.unchecked.pressedBackground = colors.unchecked.hoverBackground;
+		if (UIColors::IsDarkMode())
+		{
+			colors.unchecked.foreground = RGBA{ 0x333333 };
+			colors.unchecked.background = RGBA{ 0x1b1b1b };
+			colors.unchecked.hoverForeground = colors.unchecked.foreground;
+			colors.unchecked.hoverBackground = RGBA{ 0x202020 };
+			colors.unchecked.pressedForeground = RGBA{ 0x292929 };
+			colors.unchecked.pressedBackground = colors.unchecked.hoverBackground;
 
-		colors.checked.foreground = RGBA{ 0x1b1b1b };
-		colors.checked.background = UIColors::GetAccentColor();
-		colors.checked.hoverForeground = colors.checked.foreground;
-		colors.checked.hoverBackground = UIColors::GetAccentLight1Color();
-		colors.checked.pressedForeground = colors.checked.hoverForeground;
-		colors.checked.pressedBackground = UIColors::GetAccentDark1Color();
+			colors.checked.foreground = RGBA{ 0x1b1b1b };
+			colors.checked.background = UIColors::GetAccentColor();
+			colors.checked.hoverForeground = colors.checked.foreground;
+			colors.checked.hoverBackground = UIColors::GetAccentLight1Color();
+			colors.checked.pressedForeground = colors.checked.hoverForeground;
+			colors.checked.pressedBackground = UIColors::GetAccentDark1Color();
 
-		colors.indeterminate = colors.checked;
+			colors.indeterminate = colors.checked;
+		}
+		else
+		{
+			colors.unchecked.foreground = RGBA{ 0x858585 };
+			colors.unchecked.background = RGBA{ 0xEDEDED };
+			colors.unchecked.hoverForeground = colors.unchecked.foreground;
+			colors.unchecked.hoverBackground = RGBA{ 0xD5D5D5 };
+			colors.unchecked.pressedForeground = RGBA{ 0xBBBBBB };
+			colors.unchecked.pressedBackground = colors.unchecked.hoverBackground;
+
+			colors.checked.foreground = RGBA{ 0xEDEDED };
+			colors.checked.background = UIColors::GetAccentDark1Color();
+			colors.checked.hoverForeground = colors.checked.foreground;
+			colors.checked.hoverBackground = UIColors::GetAccentDark2Color();
+			colors.checked.pressedForeground = colors.checked.hoverForeground;
+			colors.checked.pressedBackground = UIColors::GetAccentDark3Color();
+
+			colors.indeterminate = colors.checked;
+		}
 
 		return colors;
 	}
@@ -167,9 +209,9 @@ namespace PGUI::UI::Controls
 		auto clientSize = clientRect.Size();
 		
 		if (auto clipParams = GetClip().GetParameters();
-			std::holds_alternative<RoundedRectangeClipParameters>(clipParams))
+			std::holds_alternative<RoundedRectangleClipParameters>(clipParams))
 		{
-			const auto& param = std::get<RoundedRectangeClipParameters>(clipParams);
+			const auto& param = std::get<RoundedRectangleClipParameters>(clipParams);
 			clientRect.xRadius = param.roundedRect.xRadius;
 			clientRect.yRadius = param.roundedRect.yRadius;
 		}
@@ -179,7 +221,7 @@ namespace PGUI::UI::Controls
 			case ButtonState::Unchecked:
 			{
 				g.FillRoundedRect(clientRect, backgroundBrush);
-				g.DrawRoundedRect(clientRect, foregroundBrush, ScaleByDpi(2.5f));
+				g.DrawRoundedRect(clientRect, foregroundBrush, ScaleByDPI(2.5f));
 				break;
 			}
 			case ButtonState::Checked:
@@ -190,17 +232,17 @@ namespace PGUI::UI::Controls
 
 				auto center = clientRect.Center();
 				auto scaleTransform = GetDpiScaleTransform() * D2D1::Matrix3x2F::Scale(clientSize / 50, center);
-				RectF rc{ center.x - ScaleByDpi(10.f),
+				RectF rc{ center.x - ScaleByDPI(10.f),
 					center.y, center.x,
-					center.y + ScaleByDpi(3.0f) };
-				rc.Shift(ScaleByDpi(4.0f), ScaleByDpi(3.0f));
+					center.y + ScaleByDPI(3.0f) };
+				rc.Shift(ScaleByDPI(4.0f), ScaleByDPI(3.0f));
 				g.SetTransform(D2D1::Matrix3x2F::Rotation(45, center) * scaleTransform);
 				g.FillRect(rc, foregroundBrush);
 
-				rc = RectF{ center.x - ScaleByDpi(3.0f),
-					center.y - ScaleByDpi(17.0f),
+				rc = RectF{ center.x - ScaleByDPI(3.0f),
+					center.y - ScaleByDPI(17.0f),
 					center.x, center.y };
-				rc.Shift(ScaleByDpi(4.0f), ScaleByDpi(5.0f));
+				rc.Shift(ScaleByDPI(4.0f), ScaleByDPI(5.0f));
 				g.SetTransform(D2D1::Matrix3x2F::Rotation(42, center) * scaleTransform);
 				g.FillRect(rc, foregroundBrush);
 

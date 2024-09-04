@@ -82,11 +82,6 @@ namespace PGUI::UI::Controls
 		RegisterMessageHandler(WM_GETTEXT, &TextButton::OnGetText);
 		RegisterMessageHandler(WM_GETTEXTLENGTH, &TextButton::OnGetTextLength);
 
-		if (!textFormat)
-		{
-			textFormat = TextFormat::GetDefTextFormat();
-		}
-
 		StateChangedEvent().Subscribe(PGUI::BindMemberFunc(&TextButton::OnStateChanged, this));
 		OnStateChanged(GetState());
 	}
@@ -197,11 +192,22 @@ namespace PGUI::UI::Controls
 		backgroundBrush.ReleaseBrush();
 	}
 
+	Core::HandlerResult TextButton::OnDPIChange(float dpiScale, RectI suggestedRect) noexcept
+	{
+		SetTextFormat(textFormat.AdjustFontSizeToDPI(textFormat.GetFontSize() * dpiScale));
+
+		return Window::OnDPIChange(dpiScale, suggestedRect);
+	}
+
 	Core::HandlerResult TextButton::OnNCCreate(UINT, WPARAM, LPARAM lParam) noexcept
 	{
 		auto createStruct = std::bit_cast<LPCREATESTRUCTW>(lParam);
 
 		text = createStruct->lpszName;
+		if (!textFormat)
+		{
+			textFormat = TextFormat::GetDefTextFormat(ScaleByDPI(16.0f));
+		}
 
 		return 1;
 	}

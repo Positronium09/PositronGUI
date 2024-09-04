@@ -114,6 +114,8 @@ namespace PGUI::UI::Controls
 		void CreateDeviceResources() override;
 		void DiscardDeviceResources() override;
 
+		void OnClipChanged() override;
+
 		void AdjustRect(WPARAM wParam, LPRECT rc) const noexcept;
 
 		void OnButtonClicked(bool isUp);

@@ -15,7 +15,7 @@ namespace PGUI::UI
 	class TextFormat : public ComPtrHolder<IDWriteTextFormat3>
 	{
 		public:
-		static [[nodiscard]] TextFormat GetDefTextFormat(FLOAT fontSize = 16);
+		[[nodiscard]] static TextFormat GetDefTextFormat(FLOAT fontSize = 16);
 
 		TextFormat() noexcept = default;
 		TextFormat(std::wstring_view fontFamilyName, 
@@ -24,6 +24,8 @@ namespace PGUI::UI
 			Font::FontWeight fontWeight = Font::FontWeights::Medium, 
 			Font::FontStyle fontStyle = Font::FontStyles::Normal,
 			Font::FontStretch fontStretch = Font::FontStretches::Normal) noexcept;
+
+		[[nodiscard]] TextFormat AdjustFontSizeToDPI(float fontSize) const noexcept;
 
 		[[nodiscard]] Font::FlowDirection GetFlowDirection() const noexcept;
 		void SetFlowDirection(Font::FlowDirection flowDirection) const noexcept;

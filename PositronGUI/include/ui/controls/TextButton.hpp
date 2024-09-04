@@ -63,6 +63,7 @@ namespace PGUI::UI::Controls
 
 		void OnStateChanged(ButtonState state) noexcept;
 
+		Core::HandlerResult OnDPIChange(float dpiScale, RectI suggestedRect) noexcept override;
 		Core::HandlerResult OnNCCreate(UINT msg, WPARAM wParam, LPARAM lParam) noexcept;
 		Core::HandlerResult OnPaint(UINT msg, WPARAM wParam, LPARAM lParam) noexcept;
 		Core::HandlerResult OnSize(UINT msg, WPARAM wParam, LPARAM lParam) noexcept;

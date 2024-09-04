@@ -27,7 +27,6 @@ namespace PGUI::UI
 		Ellipse,
 		Path
 	};
-	EnableEnumFlag(ClipType);
 
 	enum class AdjustFlags
 	{
@@ -36,15 +35,19 @@ namespace PGUI::UI
 		AdjustCenter = 2,
 		AdjustRadii = 4
 	};
-	EnableEnumFlag(AdjustFlags);
+}
+EnableEnumFlag(PGUI::UI::ClipType)
+EnableEnumFlag(PGUI::UI::AdjustFlags)
 
+namespace PGUI::UI
+{
 	class ClipBase
 	{
 		public:
 		virtual ~ClipBase() noexcept = default;
 
-		virtual [[nodiscard]] ComPtr<ID2D1Geometry> GetClipGeometry() = 0;
-		virtual [[nodiscard]] ID2D1Geometry* GetClipGeometryPtr() = 0;
+		[[nodiscard]] virtual ComPtr<ID2D1Geometry> GetClipGeometry() = 0;
+		[[nodiscard]] virtual ID2D1Geometry* GetClipGeometryPtr() = 0;
 	};
 
 	class EmptyClip : public ClipBase
@@ -111,21 +114,21 @@ namespace PGUI::UI
 		virtual void AdjustToWindow(PGUI::Core::Window* window) = 0;
 	};
 
-	struct RectangeClipParameters : public AdjustableToWindow
+	struct RectangleClipParameters : public AdjustableToWindow
 	{
 		RectF rect;
 
-		explicit RectangeClipParameters(RectF rect) noexcept;
+		explicit RectangleClipParameters(RectF rect) noexcept;
 
 		void AdjustToWindow(PGUI::Core::Window* window) override;
 	};
 
-	struct RoundedRectangeClipParameters : public AdjustableToWindow
+	struct RoundedRectangleClipParameters : public AdjustableToWindow
 	{
 		RoundedRect roundedRect;
 		AdjustFlags flags = AdjustFlags::AdjustNone;
 
-		explicit RoundedRectangeClipParameters(
+		explicit RoundedRectangleClipParameters(
 			RoundedRect roundedRect, AdjustFlags flags = AdjustFlags::AdjustRect) noexcept;
 
 		void AdjustToWindow(PGUI::Core::Window* window) override;
@@ -144,8 +147,8 @@ namespace PGUI::UI
 
 	using ClipParameters = 
 		std::variant<EmptyClipParameters, 
-		RectangeClipParameters, 
-		RoundedRectangeClipParameters, 
+		RectangleClipParameters, 
+		RoundedRectangleClipParameters, 
 		EllipseClipParameters>;
 
 	template<typename T>

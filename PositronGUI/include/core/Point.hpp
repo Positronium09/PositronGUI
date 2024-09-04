@@ -20,7 +20,11 @@ namespace PGUI
 
 		[[nodiscard]] static T Distance(Point<T> A, Point<T> B) noexcept
 		{
-			return std::hypot(A.x - B.x, A.y - B.y);
+			return static_cast<T>(std::sqrt(static_cast<double>(DistanceSqr(A, B))));
+		}
+		[[nodiscard]] static constexpr T DistanceSqr(Point<T> A, Point<T> B) noexcept
+		{
+			return (A.x - B.x) * (A.x - B.x) + (A.y - B.y) * (A.y - B.y);
 		}
 
 		constexpr Point() noexcept = default;
@@ -101,6 +105,10 @@ namespace PGUI
 		{
 			return Point::Distance(*this, other);
 		}
+		[[nodiscard]] constexpr T DistanceSqr(const Point<T>& other) const noexcept
+		{
+			return Point::DistanceSqr(*this, other);
+		}
 		void Rotate(float angleDegrees, Point<T> point = Point<T>{ }) noexcept
 		{
 			x -= point.x;
@@ -124,49 +132,49 @@ namespace PGUI
 		}
 
 		template<typename U>
-		explicit(false) operator Point<U>() const noexcept
+		explicit(false) constexpr operator Point<U>() const noexcept
 		{
 			return Point<U>{ static_cast<U>(x), static_cast<U>(y) };
 		}
 
-		explicit(false) operator POINT() const noexcept
+		explicit(false) constexpr operator POINT() const noexcept
 		{
 			return POINT{ static_cast<LONG>(x), static_cast<LONG>(y) };
 		}
-		explicit(false) operator POINTS() const noexcept
+		explicit(false) constexpr operator POINTS() const noexcept
 		{
 			return POINTS{ static_cast<SHORT>(x), static_cast<SHORT>(y) };
 		}
-		explicit(false) operator D2D1_POINT_2F() const noexcept
+		explicit(false) constexpr operator D2D1_POINT_2F() const noexcept
 		{
 			return D2D1_POINT_2F{ static_cast<FLOAT>(x), static_cast<FLOAT>(y) };
 		}
-		explicit(false) operator D2D1_POINT_2U() const noexcept
+		explicit(false) constexpr operator D2D1_POINT_2U() const noexcept
 		{
 			return D2D1_POINT_2U{ static_cast<UINT32>(x), static_cast<UINT32>(y) };
 		}
 	};
 
 	template<_pt_arithmetic T>
-	[[nodiscard]] Point<T> operator*(T factor, const Point<T>& v) noexcept
+	[[nodiscard]] constexpr Point<T> operator*(T factor, const Point<T>& v) noexcept
 	{
 		return Point<T>(v.x * factor, v.y * factor);
 	}
 
 	template<_pt_arithmetic T>
-	[[nodiscard]] Point<T> operator/(T factor, const Point<T>& v) noexcept
+	[[nodiscard]] constexpr Point<T> operator/(T factor, const Point<T>& v) noexcept
 	{
 		return Point<T>(v.x / factor, v.y / factor);
 	}
 
 	template<_pt_arithmetic T>
-	[[nodiscard]] Point<T> operator*(const Point<T>& v, T factor) noexcept
+	[[nodiscard]] constexpr Point<T> operator*(const Point<T>& v, T factor) noexcept
 	{
 		return Point<T>(v.x * factor, v.y * factor);
 	}
 
 	template<_pt_arithmetic T>
-	[[nodiscard]] Point<T> operator/(const Point<T>& v, T factor) noexcept
+	[[nodiscard]] constexpr Point<T> operator/(const Point<T>& v, T factor) noexcept
 	{
 		return Point<T>(v.x / factor, v.y / factor);
 	}

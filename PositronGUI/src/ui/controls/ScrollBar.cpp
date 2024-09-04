@@ -45,7 +45,7 @@ namespace PGUI::UI::Controls
 
 	void ScrollBar::SetPageSize(std::int64_t _pageSize) noexcept
 	{
-		if (_pageSize < maxScroll - minScroll)
+		if (_pageSize < GetScrollRange())
 		{
 			pageSize = _pageSize;
 			Invalidate();
@@ -164,6 +164,12 @@ namespace PGUI::UI::Controls
 		backgroundBrush.ReleaseBrush();
 	}
 
+	void ScrollBar::OnClipChanged()
+	{
+		upButton->SetClip(GetClip().GetParameters());
+		downButton->SetClip(GetClip().GetParameters());
+	}
+
 	void ScrollBar::AdjustRect(WPARAM wParam, LPRECT rc) const noexcept
 	{
 		RECT rect;
@@ -206,16 +212,24 @@ namespace PGUI::UI::Controls
 		if (direction == ScrollBarDirection::Vertical)
 		{
 			size.cy -= static_cast<float>(buttonSize) * 2;
+			if (size.cy < static_cast<float>(minThumbHeight)) //* bandage
+			{
+				return 1;
+			}
 
 			auto thumbHeight = std::clamp(
 				static_cast<float>(pageSize)
-				/ static_cast<float>(GetScrollRange())
+				/ static_cast<float>(GetScrollRange() + pageSize)
 				* size.cy, static_cast<float>(minThumbHeight), size.cy);
 
 			return thumbHeight;
 		}
 
 		size.cx -= static_cast<float>(buttonSize) * 2;
+		if (size.cx < static_cast<float>(minThumbHeight)) //* bandage
+		{
+			return 1;
+		}
 
 		auto thumbWidth = std::clamp(
 			static_cast<float>(pageSize)
@@ -235,10 +249,10 @@ namespace PGUI::UI::Controls
 
 		if (direction == ScrollBarDirection::Vertical)
 		{
-			size.cy -= ScaleByDpi(static_cast<float>(buttonSize) * 2);
+			size.cy -= ScaleByDPI(static_cast<float>(buttonSize) * 2);
 
 			auto thumbHeight = CalculateThumbSize();
-			const auto padding = ScaleByDpi(size.cx * thumbPadding);
+			const auto padding = ScaleByDPI(size.cx * thumbPadding);
 
 			return RectF{
 				padding, padding,
@@ -246,10 +260,10 @@ namespace PGUI::UI::Controls
 			}.Shifted(0, rectShift);
 		}
 
-		size.cx -= ScaleByDpi(static_cast<float>(buttonSize) * 2);
+		size.cx -= ScaleByDPI(static_cast<float>(buttonSize) * 2);
 
 		auto thumbWidth = CalculateThumbSize();
-		const auto padding = ScaleByDpi(size.cy * thumbPadding);
+		const auto padding = ScaleByDPI(size.cy * thumbPadding);
 
 		return RectF{
 			padding, padding,
@@ -329,7 +343,7 @@ namespace PGUI::UI::Controls
 	{
 		thumbPos = CalculateThumbPos();
 
-		auto size = GetClientSize();
+		auto size = GetClientSizeWithoutDPI();
 
 		auto colors = TextButton::GetTextButtonColors();
 
@@ -366,8 +380,8 @@ namespace PGUI::UI::Controls
 			downButtonParams,
 			colors
 		);
-		upButton->SetTextFormat(TextFormat::GetDefTextFormat(12));
-		downButton->SetTextFormat(TextFormat::GetDefTextFormat(12));
+		upButton->SetTextFormat(TextFormat::GetDefTextFormat(ScaleByDPI(12.0f)));
+		downButton->SetTextFormat(TextFormat::GetDefTextFormat(ScaleByDPI(12.0f)));
 
 		upButton->ClickedEvent().Subscribe(std::bind_front(&ScrollBar::OnButtonClicked, this, true));
 		downButton->ClickedEvent().Subscribe(std::bind_front(&ScrollBar::OnButtonClicked, this, false));
@@ -441,7 +455,7 @@ namespace PGUI::UI::Controls
 	}
 	Core::HandlerResult ScrollBar::OnMouseMove(UINT, WPARAM wParam, LPARAM lParam)
 	{
-		if (!(wParam & MK_LBUTTON))
+		if (!(wParam & MK_LBUTTON) || GetCapture() != Hwnd())
 		{
 			return 0;
 		}

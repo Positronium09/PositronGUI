@@ -18,8 +18,8 @@ namespace PGUI::UI
 		public:
 		virtual ~BrushBase() noexcept = default;
 		
-		virtual [[nodiscard]] ComPtr<ID2D1Brush> GetBrush() = 0;
-		virtual [[nodiscard]] ID2D1Brush* GetBrushPtr() = 0;
+		[[nodiscard]] virtual ComPtr<ID2D1Brush> GetBrush() = 0;
+		[[nodiscard]] virtual ID2D1Brush* GetBrushPtr() = 0;
 	};
 
 	class SolidColorBrush : public BrushBase, public ComPtrHolder<ID2D1SolidColorBrush>

@@ -3,10 +3,15 @@
 #include "Point.hpp"
 #include "Size.hpp"
 
+
+#include <algorithm>
 #include <cstdint>
 #include <type_traits>
 #include <d2d1_1.h>
 #include <Windows.h>
+
+#undef min
+#undef max
 
 
 template <typename T> concept _rc_arithmetic = std::is_arithmetic_v<T>;
@@ -44,7 +49,7 @@ namespace PGUI
 		}
 		~Rect() noexcept = default;
 
-		constexpr [[nodiscard]] bool operator==(const Rect<T>& other) const noexcept = default;
+		[[nodiscard]] constexpr bool operator==(const Rect<T>& other) const noexcept = default;
 
 		[[nodiscard]] constexpr Point<T> TopLeft() const noexcept
 		{
@@ -82,6 +87,33 @@ namespace PGUI
 			return
 				left <= p.x && p.x <= right &&
 				top <= p.y && p.y <= bottom;
+		}
+
+		[[nodiscard]] constexpr bool IsIntersectingRect(Rect<T> rect) const noexcept
+		{
+			return left < rect.right
+				&& right > rect.left
+				&& top < rect.bottom
+				&& bottom > top;
+		}
+		[[nodiscard]] constexpr Rect<T> IntersectRect(Rect<T> rect) const noexcept
+		{
+			if (!IsIntersectingRect(rect))
+			{
+				return Rect<T>{ };
+			}
+			return Rect<T>{
+				std::max(left, rect.left),
+				std::max(top, rect.top),
+				std::min(right, rect.right),
+				std::min(bottom, rect.bottom)
+			};
+		}
+
+		constexpr T Area() const noexcept
+		{
+			auto size = Size();
+			return size.cx * size.cy;
 		}
 
 		constexpr void Shift(T xOffset, T yOffset) noexcept
@@ -137,26 +169,26 @@ namespace PGUI
 		}
 
 		template<typename U>
-		explicit(false) operator Rect<U>() const noexcept
+		explicit(false) constexpr operator Rect<U>() const noexcept
 		{
 			return Rect<U>{
 				static_cast<U>(left), static_cast<U>(top),
 					static_cast<U>(right), static_cast<U>(bottom) };
 		}
 
-		explicit(false) operator RECT() const noexcept
+		explicit(false) constexpr operator RECT() const noexcept
 		{
 			return RECT{
 				static_cast<LONG>(left), static_cast<LONG>(top),
 				static_cast<LONG>(right), static_cast<LONG>(bottom) };
 		}
-		explicit(false) operator D2D1_RECT_F() const noexcept
+		explicit(false) constexpr operator D2D1_RECT_F() const noexcept
 		{
 			return D2D1_RECT_F{
 				static_cast<FLOAT>(left), static_cast<FLOAT>(top),
 				static_cast<FLOAT>(right), static_cast<FLOAT>(bottom) };
 		}
-		explicit(false) operator D2D1_RECT_U() const noexcept
+		explicit(false) constexpr operator D2D1_RECT_U() const noexcept
 		{
 			return D2D1_RECT_U{
 				static_cast<UINT32>(left), static_cast<UINT32>(top),

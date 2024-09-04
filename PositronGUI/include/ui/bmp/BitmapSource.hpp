@@ -9,6 +9,11 @@
 #include <wincodec.h>
 
 
+namespace PGUI::Graphics
+{
+	class Graphics;
+	class GraphicsBitmap;
+}
 namespace PGUI::UI::Bmp
 {
 	class Palette;
@@ -28,6 +33,6 @@ namespace PGUI::UI::Bmp
 		[[nodiscard]] Palette CopyPalette() const;
 		void CopyPalette(Palette palette) const noexcept;
 
-		[[nodiscard]] ComPtr<ID2D1Bitmap> ConvertToD2D1Bitmap(ComPtr<ID2D1RenderTarget> renderTarget) const noexcept;
+		[[nodiscard]] Graphics::GraphicsBitmap ConvertToD2D1Bitmap(PGUI::Graphics::Graphics g) const noexcept;
 	};
 }

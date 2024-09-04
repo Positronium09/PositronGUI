@@ -110,7 +110,7 @@ namespace PGUI::Graphics
 			return static_cast<AntialiasMode>(GetHeldComPtr()->GetAntialiasMode());
 		}
 
-		[[nodiscard]] SizeF GetDpi() const noexcept;
+		[[nodiscard]] SizeF GetDPI() const noexcept;
 
 		[[nodiscard]] auto GetMaximumBitmapSize() const noexcept { return GetHeldComPtr()->GetMaximumBitmapSize(); }
 		[[nodiscard]] PixelFormat GetPixelFormat() const noexcept { return GetHeldComPtr()->GetPixelFormat(); }

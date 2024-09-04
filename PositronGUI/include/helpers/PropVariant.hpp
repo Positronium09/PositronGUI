@@ -50,7 +50,6 @@ namespace PGUI
 		Variant = 12,
 		TypeMask = 0xfff
 	};
-	EnableEnumFlag(PropVariantType);
 
 	using PropVariantValue = 
 		std::variant<
@@ -102,6 +101,7 @@ namespace PGUI
 
 		[[nodiscard]] PropVariantValue GetValue() const noexcept;
 
-		PROPVARIANT var;
+		PROPVARIANT var{};
 	};
 }
+EnableEnumFlag(PGUI::PropVariantType);

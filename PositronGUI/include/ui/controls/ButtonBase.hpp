@@ -20,8 +20,11 @@ namespace PGUI::UI::Controls
 		Checked = 0x04,
 		Indeterminate = 0x08
 	};
-	EnableEnumFlag(ButtonState);
+}
+EnableEnumFlag(PGUI::UI::Controls::ButtonState)
 
+namespace PGUI::UI::Controls
+{
 	class ButtonBase : public Control
 	{
 		public:

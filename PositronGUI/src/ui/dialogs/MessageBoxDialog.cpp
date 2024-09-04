@@ -9,58 +9,25 @@ namespace PGUI::UI::Dialogs
 	using namespace PGUI::UI::Controls;
 
 	MessageBoxDialog::MessageBoxDialog(std::wstring_view _text, 
-		MessageBoxButtonSet _buttonSet, MessageBoxIcon _icon) noexcept : 
+		MessageBoxButtonSet _buttonSet, MessageBoxIcon __icon) noexcept : 
 		ModalDialog{ Core::WindowClass::Create(L"MessageBoxDialog_Dialog") },
-		text(_text), buttonSet(_buttonSet)
+		text(_text), buttonSet(_buttonSet), _icon(__icon)
 	{
 		RegisterMessageHandler(WM_CREATE, &MessageBoxDialog::OnCreate);
 		RegisterMessageHandler(WM_PAINT, &MessageBoxDialog::OnPaint);
 
-		switch (_icon)
+		if (UIColors::IsDarkMode())
 		{
-			using enum MessageBoxIcon;
-
-			#pragma warning (push)
-			#pragma warning (disable : 4302)
-
-			case Error: // Stop, Hand
-			{
-				auto hIcon = static_cast<HICON>(
-					LoadImageW(nullptr, MAKEINTRESOURCEW(IDI_ERROR), IMAGE_ICON, 0, 0, LR_DEFAULTSIZE | LR_SHARED)
-					);
-				icon = Bmp::Bitmap{ hIcon };
-				break;
-			}
-			case Question:
-			{
-				auto hIcon = static_cast<HICON>(
-					LoadImageW(nullptr, MAKEINTRESOURCEW(IDI_QUESTION), IMAGE_ICON, 0, 0, LR_DEFAULTSIZE | LR_SHARED)
-					);
-				icon = Bmp::Bitmap{ hIcon };
-				break;
-			}
-			case Warning: // Exclamation
-			{
-				auto hIcon = static_cast<HICON>(
-					LoadImageW(nullptr, MAKEINTRESOURCEW(IDI_WARNING), IMAGE_ICON, 0, 0, LR_DEFAULTSIZE | LR_SHARED)
-					);
-				icon = Bmp::Bitmap{ hIcon };
-				break;
-			}
-			case Information: // Asterisk
-			{ 
-				auto hIcon = static_cast<HICON>(
-					LoadImageW(nullptr, 
-						MAKEINTRESOURCEW(IDI_INFORMATION), IMAGE_ICON, 0, 0, LR_DEFAULTSIZE | LR_SHARED)
-					);
-				icon = Bmp::Bitmap{ hIcon };
-				break;
-			}
-			default:
-				break;
+			backgroundColor = 0x111111;
+			textBrush = Colors::Aliceblue;
+			buttonHighlightBrush = UIColors::GetBackgroundColor();
 		}
-
-		#pragma warning (pop)
+		else
+		{
+			backgroundColor = 0xFFFFFF;
+			textBrush = UIColors::GetForegroundColor();
+			buttonHighlightBrush = 0xDDDDDD;
+		}
 	}
 
 	void MessageBoxDialog::CreateDeviceResources()
@@ -71,11 +38,16 @@ namespace PGUI::UI::Dialogs
 		{
 			g.CreateBrush(buttonHighlightBrush);
 		}
+		if (!textBrush)
+		{
+			g.CreateBrush(textBrush);
+		}
 	}
 
 	void MessageBoxDialog::DiscardDeviceResources()
 	{
 		buttonHighlightBrush.ReleaseBrush();
+		textBrush.ReleaseBrush();
 	}
 
 	MessageBoxChoice MessageBoxDialog::Display() noexcept
@@ -88,7 +60,7 @@ namespace PGUI::UI::Dialogs
 	{
 		auto size = GetClientSize();
 
-		auto clipParams = RoundedRectangeClipParameters{ RoundedRect{ RectF{ }, 5.0f, 5.0f } };
+		auto clipParams = RoundedRectangleClipParameters{ RoundedRect{ RectF{ }, 5.0f, 5.0f } };
 
 		const auto createButton = [this, &size, &clipParams](std::size_t id, 
 			std::wstring_view buttonText, MessageBoxChoice buttonChoice)
@@ -180,11 +152,11 @@ namespace PGUI::UI::Dialogs
 
 	SizeI MessageBoxDialog::CalculateSize() const noexcept
 	{
-		auto metrics = staticText->GetTextLayout().GetMetrics();
+		auto metrics = textLayout.GetMetrics();
 		
 		SizeI size{ 
 			static_cast<int>(std::ceilf(metrics.width)), 
-			static_cast<int>(std::ceilf(metrics.height)) };
+			static_cast<int>(std::ceilf(metrics.height + metrics.top)) };
 
 		SizeI monitorSize_5_8{  };
 
@@ -202,7 +174,7 @@ namespace PGUI::UI::Dialogs
 		}
 
 		SizeI totalButtonSize{ };
-		totalButtonSize = { 20, buttonSize.cy + 40 };
+		totalButtonSize = { margin.right, buttonSize.cy + margin.top + margin.bottom };
 		switch (buttonSet)
 		{
 			using enum PGUI::UI::Dialogs::MessageBoxButtonSet;
@@ -237,11 +209,13 @@ namespace PGUI::UI::Dialogs
 			size.cx = totalButtonSize.cx;
 		}
 		size.cy += totalButtonSize.cy;
+		size.cy += margin.top + margin.bottom;
 
 		if (iconBmp)
 		{
 			size.cx += icon.GetSize().cx + margin.left * 2;
 		}
+		size.cx += margin.left + margin.right;
 
 		return size;
 	}
@@ -253,44 +227,91 @@ namespace PGUI::UI::Dialogs
 			EnableDarkTitleBar(Hwnd());
 		}
 
+		maxSize = ScaleByDPI(SizeF{ maxSize });
+
+		textFormat = TextFormat::GetDefTextFormat(ScaleByDPI(16.0f));
+		textFormat.SetParagraphAlignment(Font::ParagraphAlignments::Near);
+		textFormat.SetTextAlignment(Font::TextAlignments::Leading);
+
+		auto layoutSize = GetClientSize();
+		layoutSize.cx -= margin.left + margin.right;
+		layoutSize.cy -= (margin.top + margin.bottom) * 2 + buttonSize.cy;
+
+		margin.left = ScaleByDPI(margin.left);
+		margin.top = ScaleByDPI(margin.top);
+		margin.right = ScaleByDPI(margin.right);
+		margin.bottom = ScaleByDPI(margin.bottom);
+
+		iconSize = ScaleByDPI(SizeF{ iconSize });
+
+		switch (_icon)
+		{
+			using enum MessageBoxIcon;
+
+			#pragma warning (push)
+			#pragma warning (disable : 4302)
+
+			case Error: // Stop, Hand
+			{
+				auto hIcon = static_cast<HICON>(
+					LoadImageW(nullptr, 
+						MAKEINTRESOURCEW(IDI_ERROR), IMAGE_ICON, iconSize.cx, iconSize.cy, LR_SHARED)
+					);
+				icon = Bmp::Bitmap{ hIcon };
+				break;
+			}
+			case Question:
+			{
+				auto hIcon = static_cast<HICON>(
+					LoadImageW(nullptr, 
+						MAKEINTRESOURCEW(IDI_QUESTION), IMAGE_ICON, iconSize.cx, iconSize.cy, LR_SHARED)
+					);
+				icon = Bmp::Bitmap{ hIcon };
+				break;
+			}
+			case Warning: // Exclamation
+			{
+				auto hIcon = static_cast<HICON>(
+					LoadImageW(nullptr, 
+						MAKEINTRESOURCEW(IDI_WARNING), IMAGE_ICON, iconSize.cx, iconSize.cy, LR_SHARED)
+					);
+				icon = Bmp::Bitmap{ hIcon };
+				break;
+			}
+			case Information: // Asterisk
+			{
+				auto hIcon = static_cast<HICON>(
+					LoadImageW(nullptr,
+						MAKEINTRESOURCEW(IDI_INFORMATION), IMAGE_ICON, iconSize.cx, iconSize.cy, LR_SHARED)
+					);
+				icon = Bmp::Bitmap{ hIcon };
+				break;
+			}
+			#pragma warning (pop)
+			
+			default:
+				break;
+		}
+
 		if (icon.ComPtrHolder<IWICBitmap>::IsInitialized())
 		{
 			iconBmp = GetGraphics().CreateBitmap(icon);
+			layoutSize.cx -= iconSize.cx;
 		}
 
-		TextFormat tf = TextFormat::GetDefTextFormat();
-		tf.SetParagraphAlignment(Font::ParagraphAlignments::Center);
-		tf.SetTextAlignment(Font::TextAlignments::Leading);
-		staticText = AddChildWindow<Controls::StaticText>(
-			Core::WindowCreateParams{ text, PointL{ 0, 0 }, SizeL{ 10, 10 }, NULL },
-			tf
-		);
-		staticText->Show();
+		textLayout = TextLayout{ text, textFormat, layoutSize };
 
-		staticText->SetBackgroundBrush(Brush{ RGBA{ 0, 0 } });
-		SetToRequiredSize();
-		CreateButtons();
-
-		auto size = GetClientSize();
-
-		size.cy -= 4 * margin.bottom + buttonSize.cy;
-
-		PointL position{
-			margin.left,
-			margin.top
-		};
-
+		PointL textPos{ 0, 0 };
 		if (iconBmp)
 		{
-			auto iconSize = icon.GetSize();
-
-			position.x = 2 * margin.left + iconSize.cx;
+			textPos.x = iconBmp.GetPixelSize().cx + 10;
 		}
 
-		size.cx -= position.x + margin.right;
+		SetToRequiredSize();
+		CreateButtons();
+		AdjustForClientSize(ScaleByDPI(SizeF{ GetClientSize() }));
 
-		staticText->MoveAndResize(position, size);
-
+		buttonSize = ScaleByDPI(SizeF{ buttonSize });
 		return 0;
 	}
 
@@ -301,30 +322,30 @@ namespace PGUI::UI::Dialogs
 		SizeF size = GetClientSize();
 
 		auto g = GetGraphics();
-		g.Clear(RGBA{ 0x111111 });
+		g.Clear(backgroundColor);
 
-		auto prevTransform = g.GetTransform();
-		g.SetTransform(GetDpiScaleTransform());
-
-		g.FillRect(RectF{ 0, size.cy - buttonSize.cy - 40, size.cx, size.cy }, 
+		g.FillRect(RectF{ 0, size.cy - 
+			static_cast<float>(buttonSize.cy + margin.top + margin.bottom), 
+			size.cx, size.cy },
 			buttonHighlightBrush);
 
-		SizeI iconSize{ };
+		PointF textOrigin{ static_cast<float>(margin.left), static_cast<float>(margin.top) };
 		if (iconBmp)
 		{
-			float middleY = (size.cy - buttonSize.cy - 40) / 2.f;
+			float middleY = (size.cy - 
+				static_cast<float>(buttonSize.cy + margin.top + margin.bottom)) / 2.f;
 
-			iconSize = icon.GetSize();
 			g.DrawBitmap(iconBmp, RectF{
 				static_cast<float>(margin.left), 
 				middleY - static_cast<float>(iconSize.cy) / 2.f,
-				static_cast<float>(margin.left + iconSize.cx), 
+				static_cast<float>(margin.left + iconSize.cx),
 				middleY + 
 				static_cast<float>(iconSize.cy) / 2.f
 				});
+			textOrigin.x += static_cast<float>(margin.left + iconSize.cx);
 		}
 
-		g.SetTransform(prevTransform);
+		g.DrawTextLayout(textOrigin, textLayout, textBrush);
 
 		EndDraw();
 

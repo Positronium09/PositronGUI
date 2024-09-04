@@ -14,7 +14,7 @@ namespace PGUI::UI
 
 		void SetClip(const ClipParameters& params) noexcept;
 		void ClearClip() noexcept;
-		const Clip& GetClip() const noexcept { return clip; }
+		[[nodiscard]] const Clip& GetClip() const noexcept { return clip; }
 		void HitTestClipGeometry(bool enable) noexcept;
 
 		void EnableInput() const noexcept;
@@ -24,6 +24,8 @@ namespace PGUI::UI
 		protected:
 		void BeginDraw() override;
 		HRESULT EndDraw() override;
+
+		virtual void OnClipChanged() { /* */ }
 
 		private:
 		Clip clip;

@@ -22,7 +22,11 @@ namespace PGUI::UI::Controls
 		BACKGROUND = 2,
 		PREVIOUS = 3
 	};
-	EnableEnumFlag(FrameDisposal);
+}
+EnableEnumFlag(PGUI::UI::Controls::FrameDisposal)
+
+namespace PGUI::UI::Controls
+{
 	using BmpToRender = std::variant<Bmp::BitmapSource, Bmp::BitmapDecoder>;
 	// TODO Add aspect ratio options
 	// TODO Extract Renderers from this class

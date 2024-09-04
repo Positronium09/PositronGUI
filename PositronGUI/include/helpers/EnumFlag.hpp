@@ -4,16 +4,20 @@
 
 
 //! macro scary :O
-#define EnableEnumFlag(T) template<> struct enum_flag_enable<T> : public std::true_type{};
-
+#define EnableEnumFlag(T) namespace enum_flag_detail { template<> struct enum_flag_enable<T> : public std::true_type{}; }
 
 template<typename T>
 concept enumeration = std::is_enum_v<T>;
-template <enumeration T>
-struct enum_flag_enable : public std::false_type { };
+
+namespace enum_flag_detail
+{
+	template <enumeration T>
+	struct enum_flag_enable : public std::false_type { };
+}
+
 
 template <typename T>
-concept enum_flag = enumeration<T> && enum_flag_enable<T>::value;
+concept enum_flag = enumeration<T> && enum_flag_detail::enum_flag_enable<T>::value;
 template <enumeration T>
 using underlying_t = std::underlying_type_t<T>;
 

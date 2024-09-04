@@ -114,7 +114,6 @@ namespace PGUI::UI::Controls
 		RegisterMessageHandler(WM_PASTE, &Edit::ForwardToTextServices);
 		RegisterMessageHandler(WM_DROPFILES, &Edit::ForwardToTextServices);
 		
-		charFormat.crTextColor = RGBA{ 0xffffff };
 		charFormat.yHeight = PixelsToTwips(params.fontSize);
 		StringCchCopyW(charFormat.szFaceName, params.fontFace.length(), params.fontFace.c_str());
 
@@ -122,11 +121,13 @@ namespace PGUI::UI::Controls
 		{
 			charFormat.crTextColor = Colors::Aliceblue;
 			backgroundBrush.SetParameters(0x1b1b1b);
+			charFormat.crBackColor = std::get<RGBA>(backgroundBrush.GetParameters());
 		}
 		else
 		{
-			charFormat.crTextColor = Colors::Black;
-			backgroundBrush.SetParameters(Colors::White);
+			charFormat.crTextColor = UIColors::GetForegroundColor();
+			backgroundBrush.SetParameters(UIColors::GetBackgroundColor());
+			charFormat.crBackColor = std::get<RGBA>(backgroundBrush.GetParameters());
 		}
 
 		Msftedit::LoadMsftedit();
@@ -821,14 +822,12 @@ namespace PGUI::UI::Controls
 
 	Core::HandlerResult Edit::OnDPIChange(float dpiScale, RectI suggestedRect)
 	{
-		auto cf = GetDefaultCharFormat();
-		cf.yHeight = ScaleByDpi(cf.yHeight);
-		SetDefaultCharFormat(cf);
+		textServices->TxSendMessage(EM_SETZOOM, GetDPI(), PGUI::Core::DEFAULT_SCREEN_DPI, nullptr);
 
 		return Window::OnDPIChange(dpiScale, suggestedRect);
 	}
 
-	Core::HandlerResult Edit::ForwardToTextServices(UINT msg, WPARAM wParam, LPARAM lParam) const
+	Core::HandlerResult Edit::ForwardToTextServices(UINT msg, WPARAM wParam, LPARAM lParam)
 	{
 		if (!textServices)
 		{
@@ -838,7 +837,7 @@ namespace PGUI::UI::Controls
 		if (msg >= WM_KEYFIRST && msg <= WM_KEYLAST
 			&& filteringFunction)
 		{
-			if (auto process = filteringFunction(msg, wParam, lParam);
+			if (auto process = std::invoke(filteringFunction, this, msg, wParam, lParam);
 				!process)
 			{
 				return DefWindowProcW(Hwnd(), msg, wParam, lParam);
@@ -847,6 +846,13 @@ namespace PGUI::UI::Controls
 
 		LRESULT result{ };
 
+		if (msg >= WM_MOUSEFIRST && msg <= WM_MOUSELAST)
+		{
+			auto p = std::bit_cast<LPPOINTS>(&lParam);
+			p->x = ScaleByDPI(p->x);
+			p->y = ScaleByDPI(p->y);
+		}
+		
 		if (HRESULT hr = textServices->TxSendMessage(msg, wParam, lParam, &result); 
 			hr == E_OUTOFMEMORY)
 		{
@@ -896,6 +902,8 @@ namespace PGUI::UI::Controls
 
 		textServices->TxSetText(createStruct->lpszName);
 
+		textServices->TxSendMessage(EM_SETZOOM, GetDPI(), PGUI::Core::DEFAULT_SCREEN_DPI, nullptr);
+
 		return 0;
 	}
 
@@ -915,8 +923,8 @@ namespace PGUI::UI::Controls
 		g.Clear(backgroundBrush);
 
 		RECT bounds = GetClientRect();
-		bounds.right -= verticalScrollBar->IsVisible() ? 20 : 0;
-		bounds.bottom -= horizontalScrollBar->IsVisible() ? 20 : 0;
+		bounds.right -= verticalScrollBar->IsVisible() ? ScaleByDPI(20) : 0;
+		bounds.bottom -= horizontalScrollBar->IsVisible() ? ScaleByDPI(20) : 0;
 
 		textServices->TxDrawD2D(g, std::bit_cast<LPRECTL>(&bounds), nullptr, TXTVIEW_ACTIVE);
 
@@ -1071,7 +1079,8 @@ namespace PGUI::UI::Controls
 		auto g = parentWindow->GetGraphics();
 
 		caretRenderTarget = g.CreateCompatibleRenderTarget(
-			SizeF{ static_cast<float>(width), static_cast<float>(height) });
+			SizeF{ static_cast<float>(width), static_cast<float>(height) },
+			SizeU{ static_cast<std::uint32_t>(width), static_cast<std::uint32_t>(height) });
 
 		caretRenderTarget->BeginDraw();
 
@@ -1111,8 +1120,12 @@ namespace PGUI::UI::Controls
 	}
 	BOOL Edit::TextHost::TxSetCaretPos(INT x, INT y)
 	{
-		caretPos.x = x;
-		caretPos.y = y;
+		caretPos.x = static_cast<int>(static_cast<float>(x) * 
+			(static_cast<float>(PGUI::Core::DEFAULT_SCREEN_DPI) / 
+				static_cast<float>(parentWindow->GetDPI())));
+		caretPos.y = static_cast<int>(static_cast<float>(y) *
+			(static_cast<float>(PGUI::Core::DEFAULT_SCREEN_DPI) /
+				static_cast<float>(parentWindow->GetDPI())));;
 
 		parentWindow->caretPositionChangedEvent.Emit();
 		parentWindow->Invalidate();
@@ -1478,24 +1491,41 @@ namespace PGUI::UI::Controls
 
 	#pragma endregion
 
-	bool BuiltinFilters::NumericOnlyFilter(UINT&, WPARAM& wParam, LPARAM&) noexcept
+	bool BuiltinFilters::NumericOnlyFilter(Core::WindowPtr<Edit> edit, UINT& msg, WPARAM& wParam, LPARAM&) noexcept
 	{
-		if (auto c = static_cast<wchar_t>(wParam); 
-			std::isalnum(c))
+		if (msg == WM_KEYDOWN || msg == WM_KEYUP)
 		{
-			if (std::isalpha(c) && (GetKeyState(VK_CONTROL) & 0x8000))
-			{
-				return true;
-			}
-			else if (std::isdigit(c))
+			if ((wParam >= VK_LSHIFT && wParam <= VK_MEDIA_PLAY_PAUSE) ||
+				(wParam >= VK_F1 && wParam <= VK_SCROLL) ||
+				(wParam >= VK_LWIN && wParam <= VK_NUMPAD9) ||
+				wParam <= 0x39)
 			{
 				return true;
 			}
 			return false;
 		}
-		return true;
+		auto c = static_cast<wchar_t>(wParam);
+		if ((c == L'+' || c == L'-') && edit->GetTextLength() == 0)
+		{
+			return true;
+		}
+		WORD charType = 0;
+		GetStringTypeW(CT_CTYPE1, &c, 1, &charType);
+		if (charType & C1_CNTRL)
+		{
+			return true;
+		}
+		if (charType & C1_DIGIT)
+		{
+			return true;
+		}
+		if (charType & C1_ALPHA && (GetKeyState(VK_CONTROL) & 0x8000))
+		{
+			return true;
+		}
+		return false;
 	}
-	bool BuiltinFilters::UppercaseOnlyFilter(UINT&, WPARAM& wParam, LPARAM&) noexcept
+	bool BuiltinFilters::UppercaseOnlyFilter(Core::WindowPtr<Edit>, UINT&, WPARAM& wParam, LPARAM&) noexcept
 	{
 		NLSVERSIONINFOEX v{ };
 		v.dwNLSVersionInfoSize = sizeof(NLSVERSIONINFO);
@@ -1521,7 +1551,7 @@ namespace PGUI::UI::Controls
 
 		return true;
 	}
-	bool BuiltinFilters::LowercaseOnlyFilter(UINT&, WPARAM& wParam, LPARAM&) noexcept
+	bool BuiltinFilters::LowercaseOnlyFilter(Core::WindowPtr<Edit>, UINT&, WPARAM& wParam, LPARAM&) noexcept
 	{
 		NLSVERSIONINFOEX v{ };
 		v.dwNLSVersionInfoSize = sizeof(NLSVERSIONINFO);

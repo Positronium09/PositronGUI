@@ -16,7 +16,7 @@ namespace PGUI
 		DWriteFactory(DWriteFactory&) = delete;
 		void operator=(const DWriteFactory&) = delete;
 
-		static [[nodiscard]] ComPtr<IDWriteFactory8> GetFactory()
+		[[nodiscard]] static ComPtr<IDWriteFactory8> GetFactory()
 		{
 			if (!directWriteFactory)
 			{

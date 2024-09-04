@@ -190,7 +190,7 @@ namespace PGUI::Graphics
 	{
 		GetHeldComPtr()->FillRoundedRectangle(rect, brush);
 	}
-	SizeF RenderTarget::GetDpi() const noexcept
+	SizeF RenderTarget::GetDPI() const noexcept
 	{
 		SizeF dpi{ };
 		GetHeldComPtr()->GetDpi(&dpi.cx, &dpi.cy);

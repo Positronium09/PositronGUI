@@ -16,7 +16,7 @@ namespace PGUI
 		DXGIFactory(DXGIFactory&) = delete;
 		void operator=(const DXGIFactory&) = delete;
 
-		static [[nodiscard]] ComPtr<IDXGIFactory7> GetFactory()
+		[[nodiscard]] static ComPtr<IDXGIFactory7> GetFactory()
 		{
 			if (!dxgiFactory)
 			{

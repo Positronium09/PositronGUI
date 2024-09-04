@@ -7,9 +7,9 @@
 
 namespace PGUI::Core
 {
-	Window* GetWindowFromHwnd(HWND hWnd) noexcept
+	WindowPtr<Window> GetWindowFromHwnd(HWND hWnd) noexcept
 	{
-		return std::bit_cast<Window*>(GetWindowLongPtrW(hWnd, GWLP_USERDATA));
+		return std::bit_cast<WindowPtr<Window>>(GetWindowLongPtrW(hWnd, GWLP_USERDATA));
 	}
 
 	void Window::Invalidate() const noexcept
@@ -89,6 +89,14 @@ namespace PGUI::Core
 		return clientRect;
 	}
 
+	RectL Window::GetClientRectWithoutDPI() const noexcept
+	{
+		RectF rect = GetClientRect();
+		auto topLeft = rect.TopLeft();
+		SizeL size = UnScaleByDPI<SizeF>(GetClientSize());
+		return RectL{ topLeft, size };
+	}
+
 	void Window::Move(PointL newPos) const noexcept
 	{
 		SetWindowPos(Hwnd(), nullptr, newPos.x, newPos.y, NULL, NULL, 
@@ -125,14 +133,14 @@ namespace PGUI::Core
 			SWP_NOZORDER | SWP_NOACTIVATE);
 	}
 
-	UINT Window::GetDpi() const noexcept
+	UINT Window::GetDPI() const noexcept
 	{
 		return GetDpiForWindow(Hwnd());
 	}
 
 	D2D1_MATRIX_3X2_F Window::GetDpiScaleTransform(std::optional<PointF> center) const noexcept
 	{
-		auto dpi = static_cast<float>(GetDpi());
+		auto dpi = static_cast<float>(GetDPI());
 		return D2D1::Matrix3x2F::Scale(dpi / DEFAULT_SCREEN_DPI, dpi / DEFAULT_SCREEN_DPI,
 				center.value_or(GetClientRect().Center()));
 	}
@@ -155,6 +163,17 @@ namespace PGUI::Core
 	RectL Window::MapRect(HWND hWndTo, RectL rect) const noexcept
 	{
 		return PGUI::MapRect(Hwnd(), hWndTo, rect);
+	}
+
+	WindowPtr<Window> Window::ChildWindowFromPoint(PointL point, UINT flags) const noexcept
+	{
+		WindowPtr<Window> wnd = nullptr;
+		if (HWND hwnd = ChildWindowFromPointEx(Hwnd(), point, flags);
+			hwnd != nullptr)
+		{
+			return GetWindowFromHwnd(hwnd);
+		}
+		return wnd;
 	}
 
 	TimerId Window::AddTimer(TimerId id, std::chrono::milliseconds delay, 
@@ -220,7 +239,7 @@ namespace PGUI::Core
 			static_cast<DWORD>(GetWindowLongPtrW(hWnd, GWL_STYLE)), 
 			FALSE,
 			static_cast<DWORD>(GetWindowLongPtrW(hWnd, GWL_EXSTYLE)), 
-			GetDpi());
+			GetDPI());
 
 		RectL r = rc;
 		Resize(r.Size());
@@ -229,7 +248,7 @@ namespace PGUI::Core
 	void Window::AdjustForRect(RectI rect) const noexcept
 	{
 		RECT rc = rect;
-		auto dpi = GetDpi();
+		auto dpi = GetDPI();
 
 		AdjustWindowRectExForDpi(&rc,
 			static_cast<DWORD>(GetWindowLongPtrW(hWnd, GWL_STYLE)),
@@ -292,6 +311,11 @@ namespace PGUI::Core
 	SizeL Window::GetClientSize() const noexcept
 	{
 		return GetClientRect().Size();
+	}
+
+	SizeL Window::GetClientSizeWithoutDPI() const noexcept
+	{
+		return GetClientRectWithoutDPI().Size();
 	}
 
 	void Window::RegisterMessageHandler(UINT msg, const Handler& handler) noexcept
@@ -366,7 +390,7 @@ namespace PGUI::Core
 
 			window->hWnd = hWnd;
 			window->parenthWnd = createStruct->hwndParent;
-			window->prevDpi = window->GetDpi();
+			window->prevDpi = window->GetDPI();
 		}
 
 		auto window = GetWindowFromHwnd(hWnd);

@@ -7,6 +7,7 @@
 #include "Size.hpp"
 #include "WindowClass.hpp"
 #include "helpers/HelperFunctions.hpp"
+#include "helpers/ScopedTimer.hpp"
 #include "helpers/EnumFlag.hpp"
 
 #include <bit>
@@ -34,7 +35,7 @@ namespace PGUI::Core
 		ReturnPrevResult = 0x04,
 		PassToDefWindowProc = 0x08
 	};
-	EnableEnumFlag(HandlerResultFlag);
+	//EnableEnumFlag(HandlerResultFlag);
 
 	struct HandlerResult
 	{
@@ -69,11 +70,11 @@ namespace PGUI::Core
 	class Window;
 
 	template<typename T>
-	concept IsWindowType = std::is_same_v<T, Window> || std::derived_from<T, Window>;
+	concept WindowType = std::is_same_v<T, Window> || std::derived_from<T, Window>;
 
-	template<IsWindowType T>
+	template<WindowType T>
 	using WindowOwnPtr = std::unique_ptr<T>;
-	template<IsWindowType T>
+	template<WindowType T>
 	using WindowPtr = T*;
 
 	using ChildWindowList = std::vector<WindowOwnPtr<Window>>;
@@ -82,7 +83,7 @@ namespace PGUI::Core
 	using TimerCallback = std::function<void(TimerId)>;
 	using TimerMap = std::unordered_map<TimerId, TimerCallback>;
 
-	[[nodiscard]] Window* GetWindowFromHwnd(HWND hWnd) noexcept;
+	[[nodiscard]] WindowPtr<Window> GetWindowFromHwnd(HWND hWnd) noexcept;
 
 	class Window
 	{
@@ -95,12 +96,18 @@ namespace PGUI::Core
 			auto window = std::make_unique<T>(std::forward<Args>(args)...);
 			auto wnd = window.get();
 
+			auto size = AdjustForDPI(SizeF{ createParams.size }, static_cast<float>(GetDpiForSystem()));
+			RECT rc = RectI{ PointI{ }, size };
+			AdjustWindowRectExForDpi(&rc, createParams.style, FALSE, createParams.exStyle, GetDpiForSystem());
+			RectI rect = rc;
+			auto scaledSize = rect.Size();
+
 			CreateWindowExW(createParams.exStyle, 
 				window->windowClass->GetClassName().data(), createParams.windowName.data(),
 				createParams.style,
-				createParams.position.x, createParams.position.y, 
-				createParams.size.cx, 
-				createParams.size.cy,
+				createParams.position.x,
+				createParams.position.y,
+				scaledSize.cx, scaledSize.cy,
 				NULL, NULL, GetHInstance(),
 				static_cast<LPVOID>(wnd));
 
@@ -110,16 +117,6 @@ namespace PGUI::Core
 				HR_L(HresultFromWin32(errCode));
 				throw Win32Exception{ errCode };
 			}
-			
-			const auto dpi = GetDpiForWindow(window->Hwnd());
-			auto rect = window->GetWindowRect();
-
-			rect.left = AdjustForDpi(rect.left, dpi);
-			rect.top = AdjustForDpi(rect.top, dpi);
-			rect.right = AdjustForDpi(rect.right, dpi);
-			rect.bottom = AdjustForDpi(rect.bottom, dpi);
-
-			window->MoveAndResize(rect);
 
 			return window;
 		}
@@ -129,11 +126,18 @@ namespace PGUI::Core
 			auto window = std::make_unique<T>(std::forward<Args>(args)...);
 			auto wnd = window.get();
 
+			auto size = AdjustForDPI(SizeF{ createParams.size }, static_cast<float>(GetDpiForSystem()));
+			RECT rc = RectI{ createParams.position, size };
+			AdjustWindowRectExForDpi(&rc, createParams.style, FALSE, createParams.exStyle, GetDpiForSystem());
+			RectI rect = rc;
+			PointI pos = AdjustForDPI(PointF{ rect.TopLeft() }, static_cast<float>(GetDpiForSystem()));
+			auto scaledSize = rect.Size();
+
 			CreateWindowExW(createParams.exStyle,
 				window->windowClass->GetClassName().data(), createParams.windowName.data(),
 				createParams.style | WS_CHILD,
-				createParams.position.x, createParams.position.y,
-				createParams.size.cx, createParams.size.cy,
+				pos.x, pos.y,
+				scaledSize.cx, scaledSize.cy,
 				Hwnd(), NULL, GetHInstance(),
 				static_cast<LPVOID>(wnd));
 
@@ -145,18 +149,6 @@ namespace PGUI::Core
 			}
 		
 			childWindows.push_back(std::move(window));
-
-			const auto dpi = GetDpiForWindow(wnd->Hwnd());
-
-			auto rect = wnd->GetWindowRect();
-			rect = ScreenToClient(rect);
-
-			rect.left = AdjustForDpi(rect.left, dpi);
-			rect.top = AdjustForDpi(rect.top, dpi);
-			rect.right = AdjustForDpi(rect.right, dpi);
-			rect.bottom = AdjustForDpi(rect.bottom, dpi);
-
-			wnd->MoveAndResize(rect);
 
 			return wnd;
 		}
@@ -171,18 +163,6 @@ namespace PGUI::Core
 			SetParent(wnd->Hwnd(), Hwnd());
 
 			childWindows.push_back(std::move(window));
-
-			const auto dpi = GetDpiForWindow(wnd->Hwnd());
-
-			auto rect = wnd->GetWindowRect();
-			rect = ScreenToClient(rect);
-
-			rect.left = AdjustForDpi(rect.left, dpi);
-			rect.top = AdjustForDpi(rect.top, dpi);
-			rect.right = AdjustForDpi(rect.right, dpi);
-			rect.bottom = AdjustForDpi(rect.bottom, dpi);
-
-			wnd->MoveAndResize(rect);
 
 			return wnd;
 		}
@@ -202,14 +182,14 @@ namespace PGUI::Core
 		[[nodiscard]] HWND ParentHwnd() const noexcept { return parenthWnd; }
 
 		void Show(int show=SW_SHOW) const noexcept;
-		bool IsVisible() const noexcept;
+		[[nodiscard]] bool IsVisible() const noexcept;
 
 		void Move(PointL newPos) const noexcept;
 		void Resize(SizeL newSize) const noexcept;
 		void MoveAndResize(RectL newRect) const noexcept;
 		void MoveAndResize(PointL newPos, SizeL newSize) const noexcept;
 
-		[[nodiscard]] UINT GetDpi() const noexcept;
+		[[nodiscard]] UINT GetDPI() const noexcept;
 		[[nodiscard]] D2D1_MATRIX_3X2_F GetDpiScaleTransform(std::optional<PointF> center = std::nullopt) const noexcept;
 
 		[[nodiscard]] std::span<PointL> MapPoints(HWND hWndTo, std::span<PointL> points) const noexcept;
@@ -218,11 +198,19 @@ namespace PGUI::Core
 		[[nodiscard]] std::span<RectL> MapRects(HWND hWndTo, std::span<RectL> rects) const noexcept;
 		[[nodiscard]] RectL MapRect(HWND hWndTo, RectL rect) const noexcept;
 
+		[[nodiscard]] WindowPtr<Window> ChildWindowFromPoint(PointL point, UINT flags) const noexcept;
+
 		template <typename T>
-		[[nodiscard]] T ScaleByDpi(T val) const noexcept
+		[[nodiscard]] T ScaleByDPI(T val) const noexcept
 		{
 			return static_cast<T>(val * 
-				static_cast<float>(GetDpi()) / Core::DEFAULT_SCREEN_DPI);
+				static_cast<float>(GetDPI()) / Core::DEFAULT_SCREEN_DPI);
+		}
+		template <typename T>
+		[[nodiscard]] T UnScaleByDPI(T val) const noexcept
+		{
+			return static_cast<T>(val *
+				Core::DEFAULT_SCREEN_DPI / static_cast<float>(GetDPI()));
 		}
 
 		TimerId AddTimer(TimerId id, std::chrono::milliseconds delay, 
@@ -248,8 +236,10 @@ namespace PGUI::Core
 
 		[[nodiscard]] RectL GetWindowRect() const noexcept;
 		[[nodiscard]] RectL GetClientRect() const noexcept;
+		[[nodiscard]] RectL GetClientRectWithoutDPI() const noexcept;
 		[[nodiscard]] SizeL GetWindowSize() const noexcept;
 		[[nodiscard]] SizeL GetClientSize() const noexcept;
+		[[nodiscard]] SizeL GetClientSizeWithoutDPI() const noexcept;
 
 		void Invalidate() const noexcept;
 
@@ -300,3 +290,4 @@ namespace PGUI::Core
 
 	LRESULT _WindowProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 }
+template<> struct enum_flag_detail::enum_flag_enable<PGUI::Core::HandlerResultFlag> : public std::true_type { };

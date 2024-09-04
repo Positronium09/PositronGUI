@@ -114,11 +114,11 @@ namespace PGUI::UI
 			{
 				clip = std::make_unique<EmptyClip>();
 			}
-			else if constexpr (std::is_same_v<T, RectangeClipParameters>)
+			else if constexpr (std::is_same_v<T, RectangleClipParameters>)
 			{
 				clip = std::make_unique<RectangleClip>(parameter.rect);
 			}
-			else if constexpr (std::is_same_v<T, RoundedRectangeClipParameters>)
+			else if constexpr (std::is_same_v<T, RoundedRectangleClipParameters>)
 			{
 				clip = std::make_unique<RoundedRectangleClip>(parameter.roundedRect);
 			}
@@ -130,7 +130,7 @@ namespace PGUI::UI
 	}
 	void Clip::ReleaseClip() noexcept
 	{
-		clip = nullptr;
+		clip.reset();
 	}
 
 	ClipParameters Clip::GetParameters() const noexcept
@@ -147,20 +147,20 @@ namespace PGUI::UI
 	}
 	
 
-	RectangeClipParameters::RectangeClipParameters(RectF _rect) noexcept
+	RectangleClipParameters::RectangleClipParameters(RectF _rect) noexcept
 		: rect(_rect)
 	{
 	}
-	void RectangeClipParameters::AdjustToWindow(PGUI::Core::Window* window)
+	void RectangleClipParameters::AdjustToWindow(PGUI::Core::Window* window)
 	{
 		rect = window->GetClientRect();
 	}
 
-	RoundedRectangeClipParameters::RoundedRectangeClipParameters(RoundedRect _roundedRect, AdjustFlags _flags) noexcept
+	RoundedRectangleClipParameters::RoundedRectangleClipParameters(RoundedRect _roundedRect, AdjustFlags _flags) noexcept
 		: roundedRect(_roundedRect), flags(_flags)
 	{
 	}
-	void RoundedRectangeClipParameters::AdjustToWindow(PGUI::Core::Window* window)
+	void RoundedRectangleClipParameters::AdjustToWindow(PGUI::Core::Window* window)
 	{
 		RectF rect = window->GetClientRect();
 

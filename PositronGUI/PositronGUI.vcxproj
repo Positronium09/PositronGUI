@@ -141,6 +141,9 @@
     <ClInclude Include="include\ui\Brush.hpp" />
     <ClCompile Include="src\ui\controls\Edit.cpp" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include=".clang-tidy" />
+  </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>
     <Keyword>Win32Proj</Keyword>
@@ -201,21 +204,29 @@
     <OutDir>$(ProjectDir)bin\$(Configuration)\$(Platform)\</OutDir>
     <IntDir>$(ProjectDir)bin\intermediate\$(Configuration)\$(Platform)\</IntDir>
     <TargetName>$(ProjectName)_$(Platform)</TargetName>
+    <ClangTidyChecks>clang-diagnostic-*,clang-analyzer-*,cppcoreguidelines-*,modernize-*,modernize-use-trailing-return-type</ClangTidyChecks>
+    <EnableClangTidyCodeAnalysis>true</EnableClangTidyCodeAnalysis>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <OutDir>$(ProjectDir)bin\$(Configuration)\$(Platform)\</OutDir>
     <IntDir>$(ProjectDir)bin\intermediate\$(Configuration)\$(Platform)\</IntDir>
     <TargetName>$(ProjectName)_$(Platform)</TargetName>
+    <ClangTidyChecks>clang-diagnostic-*,clang-analyzer-*,cppcoreguidelines-*,modernize-*,modernize-use-trailing-return-type</ClangTidyChecks>
+    <EnableClangTidyCodeAnalysis>true</EnableClangTidyCodeAnalysis>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <OutDir>$(ProjectDir)bin\$(Configuration)\$(Platform)\</OutDir>
     <IntDir>$(ProjectDir)bin\intermediate\$(Configuration)\$(Platform)\</IntDir>
     <TargetName>$(ProjectName)_$(Platform)</TargetName>
+    <ClangTidyChecks>clang-diagnostic-*,clang-analyzer-*,cppcoreguidelines-*,modernize-*,modernize-use-trailing-return-type</ClangTidyChecks>
+    <EnableClangTidyCodeAnalysis>true</EnableClangTidyCodeAnalysis>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <OutDir>$(ProjectDir)bin\$(Configuration)\$(Platform)\</OutDir>
     <IntDir>$(ProjectDir)bin\intermediate\$(Configuration)\$(Platform)\</IntDir>
     <TargetName>$(ProjectName)_$(Platform)</TargetName>
+    <ClangTidyChecks>clang-diagnostic-*,clang-analyzer-*,cppcoreguidelines-*,modernize-*,modernize-use-trailing-return-type</ClangTidyChecks>
+    <EnableClangTidyCodeAnalysis>true</EnableClangTidyCodeAnalysis>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -231,6 +242,7 @@
       <DisableSpecificWarnings>4063</DisableSpecificWarnings>
       <UndefinePreprocessorDefinitions>
       </UndefinePreprocessorDefinitions>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
       <SubSystem>
@@ -238,7 +250,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
     <Lib>
-      <AdditionalDependencies>dwmapi.lib;d2d1.lib;dwrite.lib;dxgi.lib;dcomp.lib;d3d11.lib;runtimeobject.lib;Imm32.lib;dxguid.lib</AdditionalDependencies>
+      <AdditionalDependencies>shlwapi.lib;dwmapi.lib;d2d1.lib;dwrite.lib;dxgi.lib;dcomp.lib;d3d11.lib;runtimeobject.lib;Imm32.lib;dxguid.lib</AdditionalDependencies>
       <AdditionalOptions> /ignore:4006 %(AdditionalOptions)</AdditionalOptions>
     </Lib>
   </ItemDefinitionGroup>
@@ -258,6 +270,7 @@
       <DisableSpecificWarnings>4063</DisableSpecificWarnings>
       <UndefinePreprocessorDefinitions>
       </UndefinePreprocessorDefinitions>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
       <SubSystem>
@@ -267,7 +280,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
     <Lib>
-      <AdditionalDependencies>dwmapi.lib;d2d1.lib;dwrite.lib;dxgi.lib;dcomp.lib;d3d11.lib;runtimeobject.lib;Imm32.lib;dxguid.lib</AdditionalDependencies>
+      <AdditionalDependencies>shlwapi.lib;dwmapi.lib;d2d1.lib;dwrite.lib;dxgi.lib;dcomp.lib;d3d11.lib;runtimeobject.lib;Imm32.lib;dxguid.lib</AdditionalDependencies>
       <AdditionalOptions> /ignore:4006 %(AdditionalOptions)</AdditionalOptions>
     </Lib>
   </ItemDefinitionGroup>
@@ -285,6 +298,7 @@
       <DisableSpecificWarnings>4063</DisableSpecificWarnings>
       <UndefinePreprocessorDefinitions>
       </UndefinePreprocessorDefinitions>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
       <SubSystem>
@@ -292,7 +306,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
     <Lib>
-      <AdditionalDependencies>dwmapi.lib;d2d1.lib;dwrite.lib;dxgi.lib;dcomp.lib;d3d11.lib;runtimeobject.lib;Imm32.lib;dxguid.lib</AdditionalDependencies>
+      <AdditionalDependencies>shlwapi.lib;dwmapi.lib;d2d1.lib;dwrite.lib;dxgi.lib;dcomp.lib;d3d11.lib;runtimeobject.lib;Imm32.lib;dxguid.lib</AdditionalDependencies>
       <AdditionalOptions> /ignore:4006 %(AdditionalOptions)</AdditionalOptions>
     </Lib>
   </ItemDefinitionGroup>
@@ -312,6 +326,7 @@
       <DisableSpecificWarnings>4063</DisableSpecificWarnings>
       <UndefinePreprocessorDefinitions>
       </UndefinePreprocessorDefinitions>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
       <SubSystem>
@@ -321,7 +336,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
     <Lib>
-      <AdditionalDependencies>dwmapi.lib;d2d1.lib;dwrite.lib;dxgi.lib;dcomp.lib;d3d11.lib;runtimeobject.lib;Imm32.lib;dxguid.lib</AdditionalDependencies>
+      <AdditionalDependencies>shlwapi.lib;dwmapi.lib;d2d1.lib;dwrite.lib;dxgi.lib;dcomp.lib;d3d11.lib;runtimeobject.lib;Imm32.lib;dxguid.lib</AdditionalDependencies>
       <AdditionalOptions> /ignore:4006 %(AdditionalOptions)</AdditionalOptions>
     </Lib>
   </ItemDefinitionGroup>

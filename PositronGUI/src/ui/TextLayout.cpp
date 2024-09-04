@@ -99,7 +99,7 @@ namespace PGUI::UI
 		ComPtr<IDWriteFontCollection3> fontCollection3Ptr;
 
 		HRESULT hr = GetHeldComPtr()->GetFontCollection(position, 
-			&fontCollectionPtr), GetTextRangePtr(textRange)); HR_L(hr);
+			&fontCollectionPtr, GetTextRangePtr(textRange)); HR_L(hr);
 
 		fontCollectionPtr.As(&fontCollection3Ptr);
 

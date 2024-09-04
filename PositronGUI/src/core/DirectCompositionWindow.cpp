@@ -50,8 +50,12 @@ namespace PGUI::Core
 
 	void DirectCompositionWindow::InitD3D11Device()
 	{
-		auto dxgiFactory = DXGIFactory::GetFactory();
+		if (d3d11Device)
+		{
+			return;
+		}
 
+		auto dxgiFactory = DXGIFactory::GetFactory();
 		SYSTEM_POWER_STATUS powerStatus{ };
 		GetSystemPowerStatus(&powerStatus);
 
@@ -83,7 +87,6 @@ namespace PGUI::Core
 			D3D_FEATURE_LEVEL_9_2,
 			D3D_FEATURE_LEVEL_9_1
 		};
-
 		ComPtr<ID3D11Device> device;
 		hr = D3D11CreateDevice(adapter.Get(),
 			D3D_DRIVER_TYPE_UNKNOWN, nullptr,
@@ -92,10 +95,21 @@ namespace PGUI::Core
 			static_cast<UINT>(featureLevels.size()),
 			D3D11_SDK_VERSION,
 			&device, nullptr, nullptr);  HR_T(hr);
-
 		hr = device.As(&d3d11Device); HR_T(hr);
 		hr = d3d11Device.As(&dxgiDevice); HR_T(hr);
+}
 
+	void DirectCompositionWindow::InitDCompDevice()
+	{
+		HRESULT hr = DCompositionCreateDevice(
+			dxgiDevice.Get(),
+			__uuidof(dcompDevice),
+			std::bit_cast<void**>(&dcompDevice)); HR_T(hr);
+	}
+
+	void DirectCompositionWindow::InitSwapChain()
+	{
+		auto dxgiFactory = DXGIFactory::GetFactory();
 
 		DXGI_SWAP_CHAIN_DESC1 description = {};
 		description.Format = DXGI_FORMAT_B8G8R8A8_UNORM;
@@ -107,7 +121,7 @@ namespace PGUI::Core
 		description.Width = 1;
 		description.Height = 1;
 
-		hr = dxgiFactory->CreateSwapChainForComposition(dxgiDevice.Get(),
+		HRESULT hr = dxgiFactory->CreateSwapChainForComposition(dxgiDevice.Get(),
 			&description, nullptr,
 			&swapChain); HR_T(hr);
 	}
@@ -118,17 +132,15 @@ namespace PGUI::Core
 
 		HRESULT hr = d2Factory->CreateDevice(dxgiDevice.Get(),
 			&d2d1Device); HR_T(hr);
-
-		hr = d2d1Device->CreateDeviceContext(D2D1_DEVICE_CONTEXT_OPTIONS_NONE,
-			&d2d1Dc); HR_T(hr);
-
-		InitD2D1DeviceContextTarget();
 	}
 
-	void DirectCompositionWindow::InitD2D1DeviceContextTarget() const
+	void DirectCompositionWindow::InitD2D1DeviceContext()
 	{
+		HRESULT hr = d2d1Device->CreateDeviceContext(D2D1_DEVICE_CONTEXT_OPTIONS_NONE,
+			&d2d1Dc); HR_T(hr);
+
 		ComPtr<IDXGISurface2> surface;
-		HRESULT hr = swapChain->GetBuffer(0, IID_PPV_ARGS(surface.GetAddressOf())); HR_T(hr);
+		hr = swapChain->GetBuffer(0, IID_PPV_ARGS(surface.GetAddressOf())); HR_T(hr);
 
 		D2D1_BITMAP_PROPERTIES1 properties = {};
 		properties.pixelFormat.alphaMode = D2D1_ALPHA_MODE_PREMULTIPLIED;
@@ -145,12 +157,7 @@ namespace PGUI::Core
 
 	void DirectCompositionWindow::InitDirectComposition()
 	{
-		HRESULT hr = DCompositionCreateDevice(
-			dxgiDevice.Get(),
-			__uuidof(dcompDevice),
-			std::bit_cast<void**>(&dcompDevice)); HR_T(hr);
-
-		hr = dcompDevice->CreateTargetForHwnd(Hwnd(), false,
+		HRESULT hr = dcompDevice->CreateTargetForHwnd(Hwnd(), false,
 			&dcompTarget); HR_T(hr);
 
 		ComPtr<IDCompositionVisual> visual;
@@ -164,8 +171,8 @@ namespace PGUI::Core
 
 	Core::HandlerResult DirectCompositionWindow::OnNCCreate(UINT, WPARAM, LPARAM)
 	{
-		InitD3D11Device();
-		InitD2D1Device();
+		InitSwapChain();
+		InitD2D1DeviceContext();
 		InitDirectComposition();
 
 		return { 1, HandlerResultFlag::PassToDefWindowProc };
@@ -186,16 +193,16 @@ namespace PGUI::Core
 			DXGI_FORMAT_UNKNOWN, NULL); HR_T(hr);
 
 		DiscardDeviceResources();
-		InitD2D1DeviceContextTarget();
+		InitD2D1DeviceContext();
 
 		return 0;
 	}
 
-	ComPtr<ID3D11Device2> DirectCompositionWindow::D3D11Device() const noexcept
+	ComPtr<ID3D11Device2> DirectCompositionWindow::D3D11Device() noexcept
 	{
 		return d3d11Device;
 	}
-	ComPtr<IDXGIDevice4> DirectCompositionWindow::DXGIDevice() const noexcept
+	ComPtr<IDXGIDevice4> DirectCompositionWindow::DXGIDevice() noexcept
 	{
 		return dxgiDevice;
 	}
@@ -203,7 +210,7 @@ namespace PGUI::Core
 	{
 		return swapChain;
 	}
-	ComPtr<IDCompositionDevice> DirectCompositionWindow::DCompositionDevice() const noexcept
+	ComPtr<IDCompositionDevice> DirectCompositionWindow::DCompositionDevice() noexcept
 	{
 		return dcompDevice;
 	}
@@ -211,7 +218,7 @@ namespace PGUI::Core
 	{
 		return dcompTarget;
 	}
-	ComPtr<ID2D1Device7> DirectCompositionWindow::D2D1Device() const noexcept
+	ComPtr<ID2D1Device7> DirectCompositionWindow::D2D1Device() noexcept
 	{
 		return d2d1Device;
 	}
