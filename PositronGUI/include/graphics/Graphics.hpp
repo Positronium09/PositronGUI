@@ -64,43 +64,43 @@ namespace PGUI::Graphics
 			const IID& riid, void* data,
 			std::optional<D2D1_BITMAP_PROPERTIES> bitmapProperties) const -> GraphicsBitmap;
 
-		[[nodiscard]] auto CreateMesh() const -> ComPtr<ID2D1Mesh>;
+		[[nodiscard]] static auto CreateMesh() -> ComPtr<ID2D1Mesh>;
 
 		[[nodiscard]] auto CreateBrush(CBrushParametersRef brushParameters) const -> Brush;
 		void CreateBrush(Brush& brush) const;
 
-		void DrawBitmap(GraphicsBitmap bmp,
+		void DrawBitmap(const GraphicsBitmap& bmp,
 			OptRect  destRect = std::nullopt,
-			float opacity = 1.0f,
+			float opacity = 1.0F,
 			D2D1_BITMAP_INTERPOLATION_MODE interpolationMode = D2D1_BITMAP_INTERPOLATION_MODE_LINEAR,
 			OptRect  srcRect = std::nullopt) const noexcept;
 
 		void DrawEllipse(Ellipse ellipse, CBrushRef brush,
-			float strokeWidth = 1.0f, ComPtr<ID2D1StrokeStyle> strokeStyle = nullptr) const noexcept;
+			float strokeWidth = 1.0F, const ComPtr<ID2D1StrokeStyle>& strokeStyle = nullptr) const noexcept;
 
 		void DrawGlyphRun(PointF baseLineOrigin,
 			const DWRITE_GLYPH_RUN& glyphRun, CBrushRef foregroundBrush,
 			DWRITE_MEASURING_MODE measuringMode = DWRITE_MEASURING_MODE_NATURAL) const noexcept;
 
 		void DrawLine(PointF p1, PointF p2, CBrushRef brush,
-			float strokeWidth = 1.0f, ComPtr<ID2D1StrokeStyle> strokeStyle = nullptr) const noexcept;
+			float strokeWidth = 1.0F, const ComPtr<ID2D1StrokeStyle>& strokeStyle = nullptr) const noexcept;
 
 		void DrawRect(RectF rect, CBrushRef brush,
-			float strokeWidth = 1.0f, ComPtr<ID2D1StrokeStyle> strokeStyle = nullptr) const noexcept;
+			float strokeWidth = 1.0F, const ComPtr<ID2D1StrokeStyle>& strokeStyle = nullptr) const noexcept;
 
 		void DrawRoundedRect(RoundedRect rect, CBrushRef brush,
-			float strokeWidth = 1.0f, ComPtr<ID2D1StrokeStyle> strokeStyle = nullptr) const noexcept;
+			float strokeWidth = 1.0F, const ComPtr<ID2D1StrokeStyle>& strokeStyle = nullptr) const noexcept;
 
-		void DrawText(std::wstring_view text, UI::TextFormat textFormat,
+		void DrawText(std::wstring_view text, const UI::TextFormat& textFormat,
 			RectF layoutRect, CBrushRef brush,
 			D2D1_DRAW_TEXT_OPTIONS options = D2D1_DRAW_TEXT_OPTIONS_NONE,
 			DWRITE_MEASURING_MODE measuringMode = DWRITE_MEASURING_MODE_NATURAL) const noexcept;
-		void DrawTextLayout(PointF origin, UI::TextLayout textLayout,
+		void DrawTextLayout(PointF origin, const UI::TextLayout& textLayout,
 			CBrushRef brush, D2D1_DRAW_TEXT_OPTIONS options = D2D1_DRAW_TEXT_OPTIONS_NONE) const noexcept;
 
 		void FillEllipse(Ellipse ellipse, CBrushRef brush) const noexcept;
 
-		void FillOpacityMask(GraphicsBitmap bmp, CBrushRef brush,
+		void FillOpacityMask(const GraphicsBitmap& bmp, CBrushRef brush,
 			OptRect destRect = std::nullopt, OptRect srcRect = std::nullopt,
 			D2D1_OPACITY_MASK_CONTENT content = D2D1_OPACITY_MASK_CONTENT_GRAPHICS) const noexcept;
 
@@ -142,12 +142,12 @@ namespace PGUI::Graphics
 			GetHeldComPtr()->PushAxisAlignedClip(rect, static_cast<D2D1_ANTIALIAS_MODE>(antialiasMode));
 		}
 
-		void PushLayer(const D2D1_LAYER_PARAMETERS& layerParameters, ComPtr<ID2D1Layer> layer) const noexcept
+		void PushLayer(const D2D1_LAYER_PARAMETERS& layerParameters, const ComPtr<ID2D1Layer>& layer) const noexcept
 		{
 			GetHeldComPtr()->PushLayer(layerParameters, layer.Get());
 		}
 
-		void RestoreDrawingState(ComPtr<ID2D1DrawingStateBlock> drawingStateBlock) const noexcept
+		void RestoreDrawingState(const ComPtr<ID2D1DrawingStateBlock>& drawingStateBlock) const noexcept
 		{
 			GetHeldComPtr()->RestoreDrawingState(drawingStateBlock.Get());
 		}
@@ -177,7 +177,7 @@ namespace PGUI::Graphics
 			GetHeldComPtr()->SetTextAntialiasMode(textAntialiasMode);
 		}
 
-		void SetTextRenderingParams(ComPtr<IDWriteRenderingParams> textRenderingParams) const noexcept
+		void SetTextRenderingParams(const ComPtr<IDWriteRenderingParams>& textRenderingParams) const noexcept
 		{
 			GetHeldComPtr()->SetTextRenderingParams(textRenderingParams.Get());
 		}

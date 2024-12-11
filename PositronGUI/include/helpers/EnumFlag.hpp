@@ -24,7 +24,7 @@ using underlying_t = std::underlying_type_t<T>;
 template <
 	enum_flag EnumFlagType,
 	typename UnderlyingType = underlying_t<EnumFlagType>>
-	constexpr EnumFlagType operator|(EnumFlagType lhs, EnumFlagType rhs) noexcept
+	constexpr auto operator|(EnumFlagType lhs, EnumFlagType rhs) noexcept
 {
 	return static_cast<EnumFlagType>(
 		static_cast<UnderlyingType>(lhs) | static_cast<UnderlyingType>(rhs)
@@ -38,7 +38,7 @@ constexpr auto& operator|=(enum_flag auto& lhs, enum_flag auto rhs) noexcept
 template <
 	enum_flag EnumFlagType,
 	typename UnderlyingType = underlying_t<EnumFlagType>>
-	constexpr EnumFlagType operator&(EnumFlagType lhs, EnumFlagType rhs) noexcept
+	constexpr auto operator&(EnumFlagType lhs, EnumFlagType rhs) noexcept
 {
 	return static_cast<EnumFlagType>(
 		static_cast<UnderlyingType>(lhs) & static_cast<UnderlyingType>(rhs)
@@ -52,7 +52,7 @@ constexpr auto& operator&=(enum_flag auto& lhs, enum_flag auto rhs) noexcept
 template <
 	enum_flag EnumFlagType,
 	typename UnderlyingType = underlying_t<EnumFlagType>>
-	constexpr EnumFlagType operator^(EnumFlagType lhs, EnumFlagType rhs) noexcept
+	constexpr auto operator^(EnumFlagType lhs, EnumFlagType rhs) noexcept
 {
 	return static_cast<EnumFlagType>(
 		static_cast<UnderlyingType>(lhs) ^ static_cast<UnderlyingType>(rhs)
@@ -66,7 +66,7 @@ constexpr auto& operator^=(enum_flag auto& lhs, enum_flag auto rhs) noexcept
 template <
 	enum_flag EnumFlagType,
 	typename UnderlyingType = underlying_t<EnumFlagType>>
-	constexpr EnumFlagType operator~(EnumFlagType lhs) noexcept
+	constexpr auto operator~(EnumFlagType lhs) noexcept
 {
 	return static_cast<EnumFlagType>(
 		~static_cast<UnderlyingType>(lhs));
@@ -74,12 +74,12 @@ template <
 template <
 	enum_flag EnumFlagType,
 	typename UnderlyingType = underlying_t<EnumFlagType>>
-	constexpr bool operator!(EnumFlagType lhs)
+	constexpr auto operator!(EnumFlagType lhs) -> bool
 {
 	return !static_cast<UnderlyingType>(lhs);
 }
 template <enum_flag EnumFlagType>
-bool IsFlagSet(EnumFlagType var, EnumFlagType flag)
+auto IsFlagSet(EnumFlagType var, EnumFlagType flag)
 {
 	return (var & flag) != static_cast<EnumFlagType>(0);
 }

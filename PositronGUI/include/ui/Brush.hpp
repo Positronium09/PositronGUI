@@ -28,7 +28,7 @@ namespace PGUI::UI
 		public:
 		SolidColorBrush() noexcept = default;
 		explicit SolidColorBrush(ComPtr<ID2D1SolidColorBrush> brush) noexcept;
-		explicit SolidColorBrush(ComPtr<ID2D1RenderTarget> renderTarget, RGBA color);
+		explicit SolidColorBrush(const ComPtr<ID2D1RenderTarget>& renderTarget, RGBA color);
 		
 		[[nodiscard]] auto GetBrush() -> ComPtr<ID2D1Brush> override;
 		[[nodiscard]] auto GetBrushPtr() -> ID2D1Brush* override;
@@ -39,7 +39,7 @@ namespace PGUI::UI
 		public:
 		LinearGradientBrush() noexcept = default;
 		explicit LinearGradientBrush(ComPtr<ID2D1LinearGradientBrush> brush) noexcept;
-		explicit LinearGradientBrush(ComPtr<ID2D1RenderTarget> renderTarget, LinearGradient gradient,
+		explicit LinearGradientBrush(const ComPtr<ID2D1RenderTarget>& renderTarget, LinearGradient gradient,
 			std::optional<RectF> referenceRect = std::nullopt);
 
 		[[nodiscard]] auto GetBrush() -> ComPtr<ID2D1Brush> override;
@@ -51,7 +51,7 @@ namespace PGUI::UI
 		public:
 		RadialGradientBrush() noexcept = default;
 		explicit RadialGradientBrush(ComPtr<ID2D1RadialGradientBrush> brush) noexcept;
-		explicit RadialGradientBrush(ComPtr<ID2D1RenderTarget> renderTarget, RadialGradient gradient,
+		explicit RadialGradientBrush(const ComPtr<ID2D1RenderTarget>& renderTarget, RadialGradient gradient,
 			std::optional<RectF> referenceRect = std::nullopt);
 
 		[[nodiscard]] auto GetBrush() -> ComPtr<ID2D1Brush> override;
@@ -63,7 +63,7 @@ namespace PGUI::UI
 		public:
 		BitmapBrush() noexcept = default;
 		explicit BitmapBrush(ComPtr<ID2D1BitmapBrush> brush) noexcept;
-		explicit BitmapBrush(ComPtr<ID2D1RenderTarget> renderTarget, ComPtr<ID2D1Bitmap> bitmap);
+		explicit BitmapBrush(const ComPtr<ID2D1RenderTarget>& renderTarget, const ComPtr<ID2D1Bitmap>& bitmap);
 
 		[[nodiscard]] auto GetBrush() -> ComPtr<ID2D1Brush> override;
 		[[nodiscard]] auto GetBrushPtr() -> ID2D1Brush* override;
@@ -77,12 +77,11 @@ namespace PGUI::UI
 		std::optional<RectF> referenceRect;
 
 		LinearGradientBrushParameters(
-			LinearGradient  gradient, 
+			const LinearGradient& gradient, 
 			const std::optional<RectF>& referenceRect = std::nullopt) noexcept
-			: gradient(std::move(gradient)), referenceRect(referenceRect)
+			: gradient(gradient), referenceRect(referenceRect)
 		{
 		}
-		~LinearGradientBrushParameters() noexcept = default;
 	};
 
 	struct RadialGradientBrushParameters
@@ -91,12 +90,11 @@ namespace PGUI::UI
 		std::optional<RectF> referenceRect;
 
 		RadialGradientBrushParameters(
-			RadialGradient  gradient, 
+			const RadialGradient& gradient, 
 			const std::optional<RectF>& referenceRect = std::nullopt) noexcept
-			: gradient(std::move(gradient)), referenceRect(referenceRect)
+			: gradient(gradient), referenceRect(referenceRect)
 		{
 		}
-		~RadialGradientBrushParameters() noexcept = default;
 	};
 
 	using BrushParameters = 
@@ -110,11 +108,11 @@ namespace PGUI::UI
 	{
 		public:
 		Brush() noexcept = default;
-		~Brush() = default;
-
 		Brush(ComPtr<ID2D1RenderTarget> renderTarget, BrushParameters  parameters) noexcept;
+		Brush(const Brush&) noexcept = delete;
 		Brush(Brush&& other) noexcept;
-		explicit(false) Brush(BrushParameters  parameters) noexcept;
+		explicit(false) Brush(BrushParameters parameters) noexcept;
+		~Brush() = default;
 
 		[[nodiscard]] auto Get() const noexcept -> BrushBase*;
 		
@@ -127,7 +125,7 @@ namespace PGUI::UI
 		[[nodiscard]] auto GetParameters() noexcept -> BrushParameters&;
 		void SetParameters(const BrushParameters& parameters) noexcept;
 
-		void operator=(const BrushParameters& _parameters) noexcept { parameters = _parameters; }
+		auto operator=(const BrushParameters& _parameters) noexcept -> Brush& { parameters = _parameters; return *this; }
 		[[nodiscard]] auto operator->() const noexcept -> ID2D1Brush* { return brush->GetBrushPtr(); }
 		[[nodiscard]] explicit(false) operator BrushBase* () const noexcept { return brush.get(); }
 		[[nodiscard]] explicit(false) operator ID2D1Brush* () const noexcept { return brush->GetBrushPtr(); }

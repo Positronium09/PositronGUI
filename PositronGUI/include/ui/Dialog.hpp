@@ -60,7 +60,7 @@ namespace PGUI::UI
 			auto window = std::make_unique<T>(std::forward<Args>(args)...);
 
 			CreateWindowExW(exStyle,
-				window->GetWindowClass()->GetClassName().data(), createParams.windowName.data(),
+				window->GetWindowClass()->ClassName().data(), createParams.windowName.data(),
 				style,
 				position.x, position.y,
 				size.cx, size.cy,
@@ -84,7 +84,7 @@ namespace PGUI::UI
 		void CenterAroundParent() const noexcept;
 
 		private:
-		[[nodiscard]] auto OnInitDialog(UINT msg, WPARAM wParam, LPARAM lParam) const noexcept -> Core::HandlerResult;
+		[[nodiscard]] static auto OnInitDialog(UINT msg, WPARAM wParam, LPARAM lParam) noexcept -> Core::HandlerResult;
 	};
 	using ModalessDialog = Dialog;
 
@@ -96,7 +96,7 @@ namespace PGUI::UI
 		virtual auto RunModal() noexcept -> int;
 		
 		protected:
-		[[nodiscard]] auto IsRunning() const noexcept -> bool;
+		[[nodiscard]] auto IsRunning() const noexcept -> bool { return running; }
 		void SetRunning(bool running) noexcept;
 
 		private:

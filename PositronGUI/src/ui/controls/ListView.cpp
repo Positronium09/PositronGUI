@@ -85,7 +85,7 @@ namespace PGUI::UI::Controls
 	{
 		if (!textFormat)
 		{
-			textFormat = TextFormat::GetDefTextFormat(GetListViewWindow()->ScaleByDPI(16.0f));
+			textFormat = TextFormat::GetDefTextFormat(GetListViewWindow()->ScaleByDPI(16.0F));
 		}
 		InitTextLayout();
 		OnStateChanged();
@@ -100,13 +100,13 @@ namespace PGUI::UI::Controls
 		{
 			const auto lv = GetListViewWindow();
 			auto selectedIndicatorRect = renderRect;
-			selectedIndicatorRect.top += lv->ScaleByDPI(10.0f);
-			selectedIndicatorRect.bottom -= lv->ScaleByDPI(10.0f);
-			selectedIndicatorRect.left -= lv->ScaleByDPI(5.0f);
-			selectedIndicatorRect.right = selectedIndicatorRect.left + lv->ScaleByDPI(10.0f);
+			selectedIndicatorRect.top += lv->ScaleByDPI(10.0F);
+			selectedIndicatorRect.bottom -= lv->ScaleByDPI(10.0F);
+			selectedIndicatorRect.left -= lv->ScaleByDPI(5.0F);
+			selectedIndicatorRect.right = selectedIndicatorRect.left + lv->ScaleByDPI(10.0F);
 
 			g.FillRoundedRect(RoundedRect{ selectedIndicatorRect, 
-				lv->ScaleByDPI(3.5f), lv->ScaleByDPI(5.0f) },
+				lv->ScaleByDPI(3.5F), lv->ScaleByDPI(5.0F) },
 				selectedIndicatorBrush);
 		}
 
@@ -280,7 +280,7 @@ namespace PGUI::UI::Controls
 		selectionChangedEvent.Emit();
 	}
 
-	std::vector<ListViewItem*> ListView::GetSelectedItems() const noexcept
+	auto ListView::GetSelectedItems() const noexcept -> std::vector<ListViewItem*>
 	{
 		std::vector<ListViewItem*> selectedItems;
 		std::ranges::for_each(listViewItems, [&selectedItems](const auto& item)
@@ -355,7 +355,7 @@ namespace PGUI::UI::Controls
 		scrollBar->SetClip(GetClip().GetParameters());
 	}
 
-	std::optional<std::size_t> ListView::GetHoveredListViewItemIndex(long yPos) const noexcept
+	auto ListView::GetHoveredListViewItemIndex(long yPos) const noexcept -> std::optional<std::size_t>
 	{
 		long totalHeight = 0;
 
@@ -374,7 +374,7 @@ namespace PGUI::UI::Controls
 
 		return std::nullopt;
 	}
-	std::optional<std::size_t> ListView::GetSelectedItemIndex() const noexcept
+	auto ListView::GetSelectedItemIndex() const noexcept -> std::optional<std::size_t>
 	{
 		if (auto iter = std::ranges::find_if(listViewItems, [](const auto& item)
 		{
@@ -385,7 +385,7 @@ namespace PGUI::UI::Controls
 		}
 		return std::nullopt;
 	}
-	std::vector<std::size_t> ListView::GetSelectedItemIndexes() const noexcept
+	auto ListView::GetSelectedItemIndexes() const noexcept -> std::vector<std::size_t>
 	{
 		std::vector<std::size_t> selectedItemIndexes;
 		for (const auto& [index, item] : listViewItems | std::views::enumerate)
@@ -398,7 +398,7 @@ namespace PGUI::UI::Controls
 		return selectedItemIndexes;
 	}
 
-	bool ListView::IsIndexSelected(std::size_t index) const noexcept
+	auto ListView::IsIndexSelected(std::size_t index) const noexcept -> bool
 	{
 		if (index <= listViewItems.size())
 		{
@@ -407,14 +407,14 @@ namespace PGUI::UI::Controls
 		return false;
 	}
 
-	long ListView::CalculateListViewItemHeightUpToIndex(std::size_t index) const noexcept
+	auto ListView::CalculateListViewItemHeightUpToIndex(std::size_t index) const noexcept -> long
 	{
 		return std::accumulate(
 			listViewItems.cbegin(), std::next(listViewItems.cbegin(), index), 0,
 			[](long y, const auto& item) { return y + item->GetHeight(); }
 		);
 	}
-	long ListView::GetTotalListViewItemHeight() const noexcept
+	auto ListView::GetTotalListViewItemHeight() const noexcept -> long
 	{
 		return std::accumulate(
 			listViewItems.cbegin(), listViewItems.cend(), 0,
@@ -512,10 +512,7 @@ namespace PGUI::UI::Controls
 			scrollBar->SetPageSize(clientSize.cy);
 			return;
 		}
-		else
-		{
-			scrollBar->Show();
-		}
+		scrollBar->Show();
 
 		scrollBar->SetMaxScroll(static_cast<std::int64_t>(totalItemHeight - clientSize.cy));
 		scrollBar->SetPageSize(clientSize.cy);
@@ -598,7 +595,7 @@ namespace PGUI::UI::Controls
 		}
 	}
 
-	Core::HandlerResult ListView::OnDPIChange(float dpiScale, RectI suggestedRect) noexcept
+	auto ListView::OnDPIChange(float dpiScale, RectI suggestedRect) noexcept -> Core::HandlerResult
 	{
 		std::ranges::for_each(listViewItems, [dpiScale](const auto& item)
 		{
@@ -608,7 +605,7 @@ namespace PGUI::UI::Controls
 		return Window::OnDPIChange(dpiScale, suggestedRect);
 	}
 
-	Core::HandlerResult ListView::OnCreate(UINT, WPARAM, LPARAM)
+	auto ListView::OnCreate(UINT /*unused*/, WPARAM /*unused*/, LPARAM /*unused*/) -> Core::HandlerResult
 	{
 		auto clientRect = GetClientRectWithoutDPI();
 		auto clientSize = clientRect.Size();
@@ -627,7 +624,7 @@ namespace PGUI::UI::Controls
 		return 0;
 	}
 
-	Core::HandlerResult ListView::OnPaint(UINT, WPARAM, LPARAM)
+	auto ListView::OnPaint(UINT /*unused*/, WPARAM /*unused*/, LPARAM /*unused*/) -> Core::HandlerResult
 	{
 		BeginDraw();
 
@@ -680,7 +677,7 @@ namespace PGUI::UI::Controls
 
 		return 0;
 	}
-	Core::HandlerResult ListView::OnMouseWheel(UINT, WPARAM wParam, LPARAM)
+	auto ListView::OnMouseWheel(UINT /*unused*/, WPARAM wParam, LPARAM /*unused*/) -> Core::HandlerResult
 	{
 		if (scrollBar->IsVisible())
 		{
@@ -689,7 +686,7 @@ namespace PGUI::UI::Controls
 
 		return 0;
 	}
-	Core::HandlerResult ListView::OnMouseMove(UINT, WPARAM, LPARAM lParam)
+	auto ListView::OnMouseMove(UINT /*unused*/, WPARAM /*unused*/, LPARAM lParam) -> Core::HandlerResult
 	{
 		TRACKMOUSEEVENT tme{ };
 		tme.cbSize = sizeof(TRACKMOUSEEVENT);
@@ -735,7 +732,7 @@ namespace PGUI::UI::Controls
 
 		return 0;
 	}
-	Core::HandlerResult ListView::OnMouseLButtonDown(UINT, WPARAM, LPARAM)
+	auto ListView::OnMouseLButtonDown(UINT /*unused*/, WPARAM /*unused*/, LPARAM /*unused*/) -> Core::HandlerResult
 	{
 		if (hoveringIndex.has_value())
 		{
@@ -745,7 +742,7 @@ namespace PGUI::UI::Controls
 
 		return 0;
 	}
-	Core::HandlerResult ListView::OnMouseLButtonUp(UINT, WPARAM wParam, LPARAM)
+	auto ListView::OnMouseLButtonUp(UINT /*unused*/, WPARAM wParam, LPARAM /*unused*/) -> Core::HandlerResult
 	{
 		using enum ListViewItemState;
 
@@ -753,7 +750,7 @@ namespace PGUI::UI::Controls
 		{
 			return 0;
 		}
-		else if (const auto& item = listViewItems.at(*hoveringIndex);
+		if (const auto& item = listViewItems.at(*hoveringIndex);
 			!IsFlagSet(item->GetState(), Pressed))
 		{
 			return 0;
@@ -792,7 +789,7 @@ namespace PGUI::UI::Controls
 
 		return 0;
 	}
-	Core::HandlerResult ListView::OnMouseLeave(UINT, WPARAM, LPARAM)
+	auto ListView::OnMouseLeave(UINT /*unused*/, WPARAM /*unused*/, LPARAM /*unused*/) -> Core::HandlerResult
 	{
 		if (hoveringIndex.has_value())
 		{
@@ -803,7 +800,7 @@ namespace PGUI::UI::Controls
 
 		return 0;
 	}
-	Core::HandlerResult ListView::OnSize(UINT, WPARAM, LPARAM)
+	auto ListView::OnSize(UINT /*unused*/, WPARAM /*unused*/, LPARAM /*unused*/) -> Core::HandlerResult
 	{
 		UpdateScrollBar();
 

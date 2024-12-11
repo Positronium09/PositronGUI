@@ -101,7 +101,7 @@ namespace PGUI::UI::Controls
 		void Create() override;
 		void Render(Graphics::Graphics g, RectF renderRect) override;
 		void CreateDeviceResources(Graphics::Graphics g) override;
-		void DiscardDeviceResources(Graphics::Graphics) override;
+		void DiscardDeviceResources(Graphics::Graphics /*g*/) override;
 
 		void OnDPIChanged(float dpiScale) override;
 		void OnHeaderSizeChanged() override;
@@ -139,7 +139,7 @@ namespace PGUI::UI::Controls
 		template <std::derived_from<HeaderItem> T>
 		[[nodiscard]] auto GetItem(std::size_t index) const -> T*
 		{
-			auto& ptr = headerItems.at(index);
+			const auto& ptr = headerItems.at(index);
 
 			return dynamic_cast<T*>(ptr.get());
 		}
@@ -151,7 +151,7 @@ namespace PGUI::UI::Controls
 		template <std::derived_from<HeaderItem> T>
 		[[nodiscard]] auto GetHoveredItem() const -> T*
 		{
-			auto& ptr = headerItems.at(*hoveringIndex);
+			const auto& ptr = headerItems.at(*hoveringIndex);
 
 			return dynamic_cast<T*>(ptr.get());
 		}
@@ -162,7 +162,7 @@ namespace PGUI::UI::Controls
 
 		[[nodiscard]] auto GetHeaderItems() const noexcept -> const HeaderItemList& { return headerItems; }
 
-		void SetSeperatorBrush(const Brush& seperatorBrush) noexcept;
+		void SetSeparatorBrush(const Brush& separatorBrush) noexcept;
 		void SetBackgroundBrush(const Brush& backgroundBrush) noexcept;
 
 		[[nodiscard]] auto HeaderItemClickedEvent() -> Core::Event<std::size_t>& { return headerItemClickedEvent; }
@@ -172,17 +172,17 @@ namespace PGUI::UI::Controls
 		void DiscardDeviceResources() override;
 
 		[[nodiscard]] auto GetHoveredHeaderItemIndex(long xPos) const noexcept -> std::optional<std::size_t>;
-		[[nodiscard]] auto IsMouseOnSeperator(long xPos) const noexcept -> bool;
+		[[nodiscard]] auto IsMouseOnSeparator(long xPos) const noexcept -> bool;
 
 		[[nodiscard]] auto CalculateHeaderItemWidthUpToIndex(std::size_t index) const noexcept -> long;
 		[[nodiscard]] auto GetTotalHeaderWidth() const noexcept -> long;
 
 		Core::Event<std::size_t> headerItemClickedEvent;
 
-		const long sizingMargin = 5;
+		static inline const long sizingMargin = 5;
 		HeaderItemList headerItems;
 
-		Brush seperatorBrush;
+		Brush separatorBrush;
 		Brush backgroundBrush;
 
 		bool dragging = false;

@@ -151,9 +151,9 @@ namespace PGUI::UI
 		SetWindowLongPtrW(Hwnd(), GWL_EXSTYLE, style);
 	}
 
-	auto AppWindow::OnNCCreate(UINT, WPARAM, LPARAM lParam) noexcept -> Core::HandlerResult
+	auto AppWindow::OnNCCreate(UINT /*unused*/, WPARAM /*unused*/, LPARAM lParam) noexcept -> Core::HandlerResult
 	{
-		auto createStruct = std::bit_cast<LPCREATESTRUCTW>(lParam);
+		auto* createStruct = std::bit_cast<LPCREATESTRUCTW>(lParam);
 
 		titleText = createStruct->lpszName;
 		createStruct->dwExStyle |= WS_EX_NOREDIRECTIONBITMAP;
@@ -161,25 +161,25 @@ namespace PGUI::UI
 		return { 1, Core::HandlerResultFlag::PassToDefWindowProc };
 	}
 
-	auto AppWindow::OnSetText(UINT, WPARAM, LPARAM lParam) noexcept -> Core::HandlerResult
+	auto AppWindow::OnSetText(UINT /*unused*/, WPARAM /*unused*/, LPARAM lParam) noexcept -> Core::HandlerResult
 	{
 		titleText = std::bit_cast<wchar_t*>(lParam);
 
 		return { 1, Core::HandlerResultFlag::PassToDefWindowProc };
 	}
-	auto AppWindow::OnGetText(UINT, WPARAM wParam, LPARAM lParam) const noexcept -> Core::HandlerResult
+	auto AppWindow::OnGetText(UINT /*unused*/, WPARAM wParam, LPARAM lParam) const noexcept -> Core::HandlerResult
 	{
 		auto size = std::min(titleText.size() + 1, wParam);
 		wcsncpy_s(std::bit_cast<wchar_t*>(lParam), wParam, titleText.data(), size);
 		return size;
 	}
-	auto AppWindow::OnGetTextLength(UINT, WPARAM, LPARAM) const noexcept -> Core::HandlerResult
+	auto AppWindow::OnGetTextLength(UINT /*unused*/, WPARAM /*unused*/, LPARAM /*unused*/) const noexcept -> Core::HandlerResult
 	{
 		return titleText.length();
 	}
-	auto AppWindow::OnGetMinMaxInfo(UINT, WPARAM, LPARAM lParam) const noexcept -> Core::HandlerResult
+	auto AppWindow::OnGetMinMaxInfo(UINT /*unused*/, WPARAM /*unused*/, LPARAM lParam) const noexcept -> Core::HandlerResult
 	{
-		auto minMaxInfo = std::bit_cast<LPMINMAXINFO>(lParam);
+		auto* minMaxInfo = std::bit_cast<LPMINMAXINFO>(lParam);
 
 		int frameX = GetSystemMetrics(SM_CXFRAME);
 		int frameY = GetSystemMetrics(SM_CYFRAME);
@@ -190,7 +190,7 @@ namespace PGUI::UI
 
 		return 0;
 	}
-	auto AppWindow::OnLButtonDown(UINT, WPARAM, LPARAM) const noexcept -> Core::HandlerResult
+	auto AppWindow::OnLButtonDown(UINT /*unused*/, WPARAM /*unused*/, LPARAM /*unused*/) const noexcept -> Core::HandlerResult
 	{
 		SetFocus(Hwnd());
 

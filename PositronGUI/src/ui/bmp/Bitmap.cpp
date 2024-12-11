@@ -7,7 +7,7 @@
 
 namespace PGUI::UI::Bmp
 {
-	Bitmap::Bitmap(ComPtr<IWICBitmap> bmp) noexcept : 
+	Bitmap::Bitmap(const ComPtr<IWICBitmap>& bmp) noexcept : 
 		ComPtrHolder<IWICBitmap>{ bmp }, BitmapSource{ bmp }
 	{
 		
@@ -29,7 +29,7 @@ namespace PGUI::UI::Bmp
 		ComPtrHolder<IWICBitmap>::GetHeldComPtr().As(ComPtrHolder<IWICBitmapSource>::GetHeldComPtrAddress());
 	}
 
-	void Bitmap::SetPalette(Palette palette) const
+	void Bitmap::SetPalette(const Palette& palette) const
 	{
 		auto ptr = ComPtrHolder<IWICBitmap>::GetHeldComPtr();
 		HRESULT hr = ptr->SetPalette(palette); HR_T(hr);

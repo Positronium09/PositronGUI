@@ -17,13 +17,13 @@ namespace PGUI::UI::Bmp
 	{
 		public:
 		BitmapDecoder(std::wstring_view filePath, bool readOnly = true, 
-			std::optional<GUID> vendorGUID = std::nullopt) noexcept;
+			std::optional<GUID> vendorGUID = std::nullopt);
 		BitmapDecoder(ULONG_PTR fileHandle,
-			std::optional<GUID> vendorGUID = std::nullopt) noexcept;
+			std::optional<GUID> vendorGUID = std::nullopt);
 		BitmapDecoder() noexcept;
 
 		[[nodiscard]] auto GetFrame(UINT frameIndex = 0) const noexcept -> Frame;
-		[[nodiscard]] auto GetFrames() const noexcept -> std::vector<Frame>;
+		[[nodiscard]] auto GetFrames() const -> std::vector<Frame>;
 		[[nodiscard]] auto GetFrameCount() const noexcept -> UINT;
 		[[nodiscard]] auto GetMetadata() const noexcept -> MetadataReader;
 

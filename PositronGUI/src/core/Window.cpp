@@ -7,7 +7,7 @@
 
 namespace PGUI::Core
 {
-	WindowPtr<Window> GetWindowFromHwnd(HWND hWnd) noexcept
+	auto GetWindowFromHwnd(HWND hWnd) noexcept -> WindowPtr<Window>
 	{
 		return std::bit_cast<WindowPtr<Window>>(GetWindowLongPtrW(hWnd, GWLP_USERDATA));
 	}
@@ -27,12 +27,14 @@ namespace PGUI::Core
 				std::advance(iter, index);
 				childWindows.erase(iter);
 
-				SetParent(childHwnd, NULL);
+				SetParent(childHwnd, nullptr);
 
 				LONG_PTR style = GetWindowLongPtrW(childHwnd, GWL_STYLE);
 				style &= ~(WS_CHILD);
 				style |= WS_POPUP;
 				SetWindowLongPtrW(childHwnd, GWL_STYLE, style);
+
+				OnChildRemoved();
 
 				break;
 			}
@@ -60,36 +62,26 @@ namespace PGUI::Core
 		ShowWindow(hWnd, show);
 	}
 
-	bool Window::IsVisible() const noexcept
+	auto Window::IsVisible() const noexcept -> bool
 	{
 		return IsWindowVisible(Hwnd());
 	}
 
-	WindowClass::WindowClassPtr Window::GetWindowClass() const noexcept
-	{
-		return windowClass;
-	}
-
-	const ChildWindowList& Window::GetChildWindowList() const noexcept
-	{
-		return childWindows;
-	}
-
-	RectL Window::GetWindowRect() const noexcept
+	auto Window::GetWindowRect() const noexcept -> RectL
 	{
 		RECT windowRect{ };
 		::GetWindowRect(hWnd, &windowRect);
 		return windowRect;
 	}
 
-	RectL Window::GetClientRect() const noexcept
+	auto Window::GetClientRect() const noexcept -> RectL
 	{
 		RECT clientRect{ };
 		::GetClientRect(hWnd, &clientRect);
 		return clientRect;
 	}
 
-	RectL Window::GetClientRectWithoutDPI() const noexcept
+	auto Window::GetClientRectWithoutDPI() const noexcept -> RectL
 	{
 		RectF rect = GetClientRect();
 		auto topLeft = rect.TopLeft();
@@ -133,39 +125,39 @@ namespace PGUI::Core
 			SWP_NOZORDER | SWP_NOACTIVATE);
 	}
 
-	UINT Window::GetDPI() const noexcept
+	auto Window::GetDPI() const noexcept -> UINT32
 	{
 		return GetDpiForWindow(Hwnd());
 	}
 
-	D2D1_MATRIX_3X2_F Window::GetDpiScaleTransform(std::optional<PointF> center) const noexcept
+	auto Window::GetDpiScaleTransform(std::optional<PointF> center) const noexcept -> D2D1_MATRIX_3X2_F
 	{
 		auto dpi = static_cast<float>(GetDPI());
 		return D2D1::Matrix3x2F::Scale(dpi / DEFAULT_SCREEN_DPI, dpi / DEFAULT_SCREEN_DPI,
 				center.value_or(GetClientRect().Center()));
 	}
 
-	std::span<PointL> Window::MapPoints(HWND hWndTo, std::span<PointL> points) const noexcept
+	auto Window::MapPoints(HWND hWndTo, std::span<PointL> points) const noexcept -> std::span<PointL>
 	{
 		return PGUI::MapPoints(Hwnd(), hWndTo, points);
 	}
 
-	PointL Window::MapPoint(HWND hWndTo, PointL point) const noexcept
+	auto Window::MapPoint(HWND hWndTo, PointL point) const noexcept -> PointL
 	{
 		return PGUI::MapPoint(Hwnd(), hWndTo, point);
 	}
 
-	std::span<RectL> Window::MapRects(HWND hWndTo, std::span<RectL> rects) const noexcept
+	auto Window::MapRects(HWND hWndTo, std::span<RectL> rects) const noexcept -> std::span<RectL>
 	{
 		return PGUI::MapRects(Hwnd(), hWndTo, rects);
 	}
 
-	RectL Window::MapRect(HWND hWndTo, RectL rect) const noexcept
+	auto Window::MapRect(HWND hWndTo, RectL rect) const noexcept -> RectL
 	{
 		return PGUI::MapRect(Hwnd(), hWndTo, rect);
 	}
 
-	WindowPtr<Window> Window::ChildWindowFromPoint(PointL point, UINT flags) const noexcept
+	auto Window::ChildWindowFromPoint(PointL point, UINT flags) const noexcept -> WindowPtr<Window>
 	{
 		WindowPtr<Window> wnd = nullptr;
 		if (HWND hwnd = ChildWindowFromPointEx(Hwnd(), point, flags);
@@ -176,8 +168,8 @@ namespace PGUI::Core
 		return wnd;
 	}
 
-	TimerId Window::AddTimer(TimerId id, std::chrono::milliseconds delay, 
-		std::optional<TimerCallback> callback) noexcept
+	auto Window::AddTimer(TimerId id, std::chrono::milliseconds delay, 
+		std::optional<TimerCallback> callback) noexcept -> TimerId
 	{
 		 if (TimerId setTimerId = 
 			 SetTimer(Hwnd(), id, static_cast<UINT>(delay.count()), nullptr); 
@@ -220,11 +212,6 @@ namespace PGUI::Core
 		}
 	}
 
-	bool Window::HasTimer(TimerId id) const noexcept
-	{
-		return timerMap.contains(id);
-	}
-
 	void Window::Enable(bool enable) const noexcept
 	{
 		EnableWindow(Hwnd(), static_cast<BOOL>(enable));
@@ -259,17 +246,7 @@ namespace PGUI::Core
 		MoveAndResize(rc);
 	}
 
-	const TimerMap& Window::GetTimerMap() const noexcept
-	{
-		return timerMap;
-	}
-
-	TimerMap& Window::GetTimerMap() noexcept
-	{
-		return timerMap;
-	}
-
-	PointL Window::ScreenToClient(PointL point) const noexcept
+	auto Window::ScreenToClient(PointL point) const noexcept -> PointL
 	{
 		POINT p = point;
 		::ScreenToClient(hWnd, &p);
@@ -277,7 +254,7 @@ namespace PGUI::Core
 		return p;
 	}
 
-	RectL Window::ScreenToClient(RectL rect) const noexcept
+	auto Window::ScreenToClient(RectL rect) const noexcept -> RectL
 	{
 		RECT rc = rect;
 		::ScreenToClient(hWnd, std::bit_cast<LPPOINT>(&rc));
@@ -286,7 +263,7 @@ namespace PGUI::Core
 		return rc;
 	}
 
-	PointL Window::ClientToScreen(PointL point) const noexcept
+	auto Window::ClientToScreen(PointL point) const noexcept -> PointL
 	{
 		POINT p = point;
 		::ClientToScreen(hWnd, &p);
@@ -294,7 +271,7 @@ namespace PGUI::Core
 		return p;
 	}
 
-	RectL Window::ClientToScreen(RectL rect) const noexcept
+	auto Window::ClientToScreen(RectL rect) const noexcept -> RectL
 	{
 		RECT rc = rect;
 		::ClientToScreen(hWnd, std::bit_cast<LPPOINT>(&rc));
@@ -303,17 +280,17 @@ namespace PGUI::Core
 		return rc;
 	}
 
-	SizeL Window::GetWindowSize() const noexcept
+	auto Window::GetWindowSize() const noexcept -> SizeL
 	{
 		return GetWindowRect().Size();
 	}
 
-	SizeL Window::GetClientSize() const noexcept
+	auto Window::GetClientSize() const noexcept -> SizeL
 	{
 		return GetClientRect().Size();
 	}
 
-	SizeL Window::GetClientSizeWithoutDPI() const noexcept
+	auto Window::GetClientSizeWithoutDPI() const noexcept -> SizeL
 	{
 		return GetClientRectWithoutDPI().Size();
 	}
@@ -328,7 +305,7 @@ namespace PGUI::Core
 		generalHandler.reset();
 	}
 
-	HandlerResult Window::OnDPIChange(float dpiScale, RectI suggestedRect)
+	auto Window::OnDPIChange(float dpiScale, RectI suggestedRect) -> HandlerResult
 	{
 		MoveAndResize(suggestedRect);
 
@@ -362,7 +339,17 @@ namespace PGUI::Core
 		}
 	}
 
-	Core::HandlerResult Window::OnDPIChanged(UINT, WPARAM wParam, LPARAM lParam)
+	void Window::OnChildAdded(WindowPtr<Window> /* unused */)
+	{
+		/* not implemented */
+	}
+
+	void Window::OnChildRemoved()
+	{
+		/* not implemented */
+	}
+
+	auto Window::OnDPIChanged(UINT, WPARAM wParam, LPARAM lParam) -> HandlerResult
 	{
 		const auto result = OnDPIChange(
 			static_cast<float>(LOWORD(wParam)) /
@@ -374,26 +361,26 @@ namespace PGUI::Core
 		return result;
 	}
 
-	bool Window::operator==(const Window& other) const noexcept
+	auto Window::operator==(const Window& other) const noexcept -> bool
 	{
 		return hWnd == other.hWnd;
 	}
 
-	LRESULT _WindowProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
+	auto _WindowProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) -> LRESULT
 	{
 		if (msg == WM_NCCREATE)
 		{
-			auto createStruct = std::bit_cast<LPCREATESTRUCTW>(lParam);
+			auto* createStruct = std::bit_cast<LPCREATESTRUCTW>(lParam);
 
 			SetWindowLongPtrW(hWnd, GWLP_USERDATA, std::bit_cast<LONG_PTR>(createStruct->lpCreateParams));
-			auto window = GetWindowFromHwnd(hWnd);
+			auto* window = GetWindowFromHwnd(hWnd);
 
 			window->hWnd = hWnd;
 			window->parenthWnd = createStruct->hwndParent;
 			window->prevDpi = window->GetDPI();
 		}
 
-		auto window = GetWindowFromHwnd(hWnd);
+		auto* window = GetWindowFromHwnd(hWnd);
 
 		LRESULT result = 0;
 		if (!window)

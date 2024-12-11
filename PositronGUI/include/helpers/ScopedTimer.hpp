@@ -13,7 +13,7 @@ namespace PGUI
 	class ScopedTimer
 	{
 		public:
-		explicit ScopedTimer(std::wstring_view name, std::source_location location = std::source_location::current()) noexcept :
+		explicit ScopedTimer(std::wstring_view name, std::source_location location = std::source_location::current()) :
 			name{ name }, location{ location }
 		{
 		}

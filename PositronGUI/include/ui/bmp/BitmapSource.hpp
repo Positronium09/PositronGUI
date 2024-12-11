@@ -31,8 +31,8 @@ namespace PGUI::UI::Bmp
 		[[nodiscard]] auto GetPixelFormat() const noexcept -> WICPixelFormatGUID;
 		void CopyPixels(RectI copyRect, UINT stride, std::span<BYTE> buffer) const;
 		[[nodiscard]] auto CopyPalette() const -> Palette;
-		void CopyPalette(Palette palette) const noexcept;
+		void CopyPalette(const Palette& palette) const noexcept;
 
-		[[nodiscard]] auto ConvertToD2D1Bitmap(PGUI::Graphics::Graphics g) const noexcept -> Graphics::GraphicsBitmap;
+		[[nodiscard]] auto ConvertToD2D1Bitmap(const PGUI::Graphics::Graphics& g) const noexcept -> Graphics::GraphicsBitmap;
 	};
 }

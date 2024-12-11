@@ -58,7 +58,7 @@ namespace PGUI::UI::Controls
 		return (state & ButtonState::Unchecked) | (state & ButtonState::Checked) | (state & ButtonState::Indeterminate);
 	}
 	
-	auto ButtonBase::OnMouseMove(UINT, WPARAM, LPARAM) noexcept -> Core::HandlerResult
+	auto ButtonBase::OnMouseMove(UINT /*unused*/, WPARAM /*unused*/, LPARAM /*unused*/) noexcept -> Core::HandlerResult
 	{
 		if (IsFlagSet(state, ButtonState::Pressed))
 		{
@@ -78,21 +78,21 @@ namespace PGUI::UI::Controls
 		return 0;
 	}
 
-	auto Controls::ButtonBase::OnMouseLeave(UINT, WPARAM, LPARAM) noexcept -> Core::HandlerResult
+	auto Controls::ButtonBase::OnMouseLeave(UINT /*unused*/, WPARAM /*unused*/, LPARAM /*unused*/) noexcept -> Core::HandlerResult
 	{
 		SetMouseState(ButtonState::Normal);
 
 		return 0;
 	}
 
-	auto Controls::ButtonBase::OnLButtonDown(UINT, WPARAM, LPARAM) noexcept -> Core::HandlerResult
+	auto Controls::ButtonBase::OnLButtonDown(UINT /*unused*/, WPARAM /*unused*/, LPARAM /*unused*/) noexcept -> Core::HandlerResult
 	{
 		SetMouseState(ButtonState::Pressed);
 
 		return 0;
 	}
 
-	auto ButtonBase::OnLButtonUp(UINT, WPARAM, LPARAM) noexcept -> Core::HandlerResult
+	auto ButtonBase::OnLButtonUp(UINT /*unused*/, WPARAM /*unused*/, LPARAM /*unused*/) noexcept -> Core::HandlerResult
 	{
 		if (IsFlagSet(state, ButtonState::Pressed))
 		{

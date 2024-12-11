@@ -7,7 +7,7 @@
 
 namespace PGUI::UI::Bmp
 {
-	Frame::Frame(BitmapDecoder image, UINT frameIndex) noexcept
+	Frame::Frame(const BitmapDecoder& image, UINT frameIndex) noexcept
 	{
 		HRESULT hr = image->GetFrame(frameIndex, 
 			ComPtrHolder<IWICBitmapFrameDecode>::GetHeldComPtrAddress()); HR_L(hr);

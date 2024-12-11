@@ -1,3 +1,5 @@
+#include <utility>
+
 #include "ui/bmp/BitmapSource.hpp"
 
 #include "graphics/GraphicsBitmap.hpp"
@@ -10,7 +12,7 @@
 namespace PGUI::UI::Bmp
 {
 	BitmapSource::BitmapSource(ComPtr<IWICBitmapSource> bmp) noexcept : 
-		ComPtrHolder{ bmp }
+		ComPtrHolder{ std::move(bmp) }
 	{
 	}
 	
@@ -58,12 +60,12 @@ namespace PGUI::UI::Bmp
 		return Palette{ *this };
 	}
 
-	void BitmapSource::CopyPalette(Palette palette) const noexcept
+	void BitmapSource::CopyPalette(const Palette& palette) const noexcept
 	{
 		HRESULT hr = GetHeldComPtr()->CopyPalette(palette); HR_L(hr);
 	}
 
-	auto BitmapSource::ConvertToD2D1Bitmap(Graphics::Graphics g) const noexcept -> Graphics::GraphicsBitmap
+	auto BitmapSource::ConvertToD2D1Bitmap(const Graphics::Graphics& g) const noexcept -> Graphics::GraphicsBitmap
 	{
 		// DXGI_FORMAT_B8G8R8A8_UNORM D2D1_ALPHA_MODE_PREMULTIPLIED
 		return g.CreateBitmap(*this);

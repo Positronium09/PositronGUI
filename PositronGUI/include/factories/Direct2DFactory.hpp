@@ -14,10 +14,13 @@ namespace PGUI
 	{
 		public:
 		D2DFactory() = delete;
-		D2DFactory(D2DFactory&) = delete;
-		void operator=(const D2DFactory&) = delete;
+		D2DFactory(const D2DFactory&) = delete;
+		auto operator=(const D2DFactory&) -> D2DFactory& = delete;
+		D2DFactory(D2DFactory&&) = delete;
+		auto operator=(D2DFactory&&) -> D2DFactory& = delete;
+		~D2DFactory() = default;
 
-		[[nodiscard]] static ComPtr<ID2D1Factory8> GetFactory()
+		[[nodiscard]] static auto GetFactory()
 		{
 			if (!direct2DFactory)
 			{

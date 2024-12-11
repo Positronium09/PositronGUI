@@ -19,7 +19,7 @@ namespace PGUI::UI
 	}
 
 	RectangleClip::RectangleClip(ComPtr<ID2D1RectangleGeometry> geometry) noexcept : 
-		ComPtrHolder{ geometry }
+		ComPtrHolder{ std::move(geometry) }
 	{
 	}
 
@@ -41,7 +41,7 @@ namespace PGUI::UI
 
 	
 	RoundedRectangleClip::RoundedRectangleClip(ComPtr<ID2D1RoundedRectangleGeometry> geometry) noexcept : 
-		ComPtrHolder{ geometry }
+		ComPtrHolder{ std::move(geometry) }
 	{
 	}
 	RoundedRectangleClip::RoundedRectangleClip(RoundedRect roundedRect)
@@ -62,7 +62,7 @@ namespace PGUI::UI
 
 
 	EllipseClip::EllipseClip(ComPtr<ID2D1EllipseGeometry> geometry) noexcept : 
-		ComPtrHolder{ geometry }
+		ComPtrHolder{ std::move(geometry) }
 	{
 	}
 	EllipseClip::EllipseClip(PGUI::Ellipse ellipse)
@@ -83,7 +83,7 @@ namespace PGUI::UI
 
 
 	PathClip::PathClip(ComPtr<ID2D1PathGeometry1> geometry) noexcept : 
-		ComPtrHolder{ geometry }
+		ComPtrHolder{ std::move(geometry) }
 	{
 		
 	}

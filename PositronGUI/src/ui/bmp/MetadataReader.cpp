@@ -1,3 +1,5 @@
+#include <utility>
+
 #include "ui/bmp/MetadataReader.hpp"
 
 #include "helpers/HelperFunctions.hpp"
@@ -6,17 +8,17 @@
 
 namespace PGUI::UI::Bmp
 {
-	MetadataReader::MetadataReader(Frame frame) noexcept
+	MetadataReader::MetadataReader(const Frame& frame) noexcept
 	{
-		auto frameDecode = (IWICBitmapFrameDecode*)frame;
+		auto* frameDecode = (IWICBitmapFrameDecode*)frame;
 		HRESULT hr = frameDecode->GetMetadataQueryReader(GetHeldPtrAddress()); HR_T(hr);
 	}
-	MetadataReader::MetadataReader(BitmapDecoder img) noexcept
+	MetadataReader::MetadataReader(const BitmapDecoder& img) noexcept
 	{
 		HRESULT hr = img->GetMetadataQueryReader(GetHeldPtrAddress()); HR_T(hr);
 	}
 	MetadataReader::MetadataReader(ComPtr<IWICMetadataQueryReader> reader) noexcept : 
-		ComPtrHolder{ reader }
+		ComPtrHolder{ std::move(reader) }
 
 	{
 	}

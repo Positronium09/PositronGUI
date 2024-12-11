@@ -54,7 +54,7 @@ namespace PGUI::UI::Controls
 
 	void StaticText::SetTextFormat(TextFormat _textFormat) noexcept
 	{
-		textFormat = _textFormat;
+		textFormat = std::move(_textFormat);
 
 		InitTextLayout();
 	}
@@ -146,20 +146,20 @@ namespace PGUI::UI::Controls
 		return Window::OnDPIChange(dpiScale, suggestedRect);
 	}
 
-	auto StaticText::OnNCCreate(UINT, WPARAM, LPARAM lParam) noexcept -> Core::HandlerResult
+	auto StaticText::OnNCCreate(UINT /*unused*/, WPARAM /*unused*/, LPARAM lParam) noexcept -> Core::HandlerResult
 	{
-		auto createStruct = std::bit_cast<LPCREATESTRUCTW>(lParam);
+		const auto* createStruct = std::bit_cast<LPCREATESTRUCTW>(lParam);
 
 		text = createStruct->lpszName;
 		if (!textFormat)
 		{
-			textFormat = TextFormat::GetDefTextFormat(ScaleByDPI(16.0f));
+			textFormat = TextFormat::GetDefTextFormat(ScaleByDPI(16.0F));
 		}
 
 		return 1;
 	}
 
-	auto StaticText::OnPaint(UINT, WPARAM, LPARAM) noexcept -> Core::HandlerResult
+	auto StaticText::OnPaint(UINT /*unused*/, WPARAM /*unused*/, LPARAM /*unused*/) noexcept -> Core::HandlerResult
 	{
 		BeginDraw();
 
@@ -178,16 +178,16 @@ namespace PGUI::UI::Controls
 
 		return 0;
 	}
-	auto StaticText::OnSize(UINT, WPARAM, LPARAM) noexcept -> Core::HandlerResult
+	auto StaticText::OnSize(UINT /*unused*/, WPARAM /*unused*/, LPARAM /*unused*/) noexcept -> Core::HandlerResult
 	{
 		InitTextLayout();
 
 		return 0;
 	}
 
-	auto StaticText::OnSetText(UINT, WPARAM, LPARAM lParam) noexcept -> Core::HandlerResult
+	auto StaticText::OnSetText(UINT /*unused*/, WPARAM /*unused*/, LPARAM lParam) noexcept -> Core::HandlerResult
 	{
-		if (auto newText = std::bit_cast<wchar_t*>(lParam); 
+		if (const auto* newText = std::bit_cast<wchar_t*>(lParam); 
 			text.data() != newText)
 		{
 			text = newText;
@@ -197,7 +197,7 @@ namespace PGUI::UI::Controls
 
 		return { 1, Core::HandlerResultFlag::PassToDefWindowProc };
 	}
-	auto StaticText::OnGetText(UINT, WPARAM wParam, LPARAM lParam) noexcept -> Core::HandlerResult
+	auto StaticText::OnGetText(UINT /*unused*/, WPARAM wParam, LPARAM lParam) noexcept -> Core::HandlerResult
 	{
 		auto minSize = std::min(text.size() + 1, wParam);
 		
@@ -205,7 +205,7 @@ namespace PGUI::UI::Controls
 
 		return minSize;
 	}
-	auto StaticText::OnGetTextLength(UINT, WPARAM, LPARAM) const noexcept -> Core::HandlerResult
+	auto StaticText::OnGetTextLength(UINT /*unused*/, WPARAM /*unused*/, LPARAM /*unused*/) const noexcept -> Core::HandlerResult
 	{
 		return text.size();
 	}

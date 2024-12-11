@@ -40,7 +40,7 @@ namespace PGUI::UI::Controls
 		TextChanged = CN_TEXTCHANGED
 	};
 
-	enum class EditFindFlag : std::uint64_t
+	enum class EditFindFlag : std::int64_t
 	{
 		Down = 0x1, // FR_DOWN
 		WholeWord = 0x2, // FR_WHOLEWORD
@@ -140,17 +140,17 @@ namespace PGUI::UI::Controls
 
 			#pragma region ITextHost2_Impl
 
-			HRESULT STDMETHODCALLTYPE QueryInterface(REFIID riid, void** ppvObject) override;
-			ULONG STDMETHODCALLTYPE AddRef() override;
-			ULONG STDMETHODCALLTYPE Release() override;
+			auto STDMETHODCALLTYPE QueryInterface(REFIID riid, void** ppvObject) -> HRESULT override;
+			auto STDMETHODCALLTYPE AddRef() -> ULONG override;
+			auto STDMETHODCALLTYPE Release() -> ULONG override;
 
 			auto TxGetDC() -> HDC override;
 			auto TxReleaseDC(HDC hdc) -> INT override;
-			auto TxShowScrollBar(INT fnBar, BOOL fShow) -> BOOL override;
+			auto TxShowScrollBar(INT bars, BOOL fShow) -> BOOL override;
 			auto TxEnableScrollBar(INT fuSBFlags, INT fuArrowflags) -> BOOL override;
 			auto TxSetScrollRange(INT fnBar, LONG nMinPos, INT nMaxPos, BOOL fRedraw) -> BOOL override;
 			auto TxSetScrollPos(INT fnBar, INT nPos, BOOL fRedraw) -> BOOL override;
-			void TxInvalidateRect(LPCRECT prc, BOOL fMode) override;
+			void TxInvalidateRect(LPCRECT rect, BOOL erase) override;
 			void TxViewChange(BOOL fUpdate) override;
 			auto TxCreateCaret(HBITMAP hbmp, INT xWidth, INT yHeight) -> BOOL override;
 			auto TxShowCaret(BOOL fShow) -> BOOL override;
@@ -160,7 +160,7 @@ namespace PGUI::UI::Controls
 			void TxScrollWindowEx(INT dx, INT dy, LPCRECT lprcScroll, LPCRECT lprcClip, HRGN hrgnUpdate, LPRECT lprcUpdate, UINT fuScroll) override;
 			void TxSetCapture(BOOL fCapture) override;
 			void TxSetFocus() override;
-			void TxSetCursor(HCURSOR hcur, BOOL fText) override;
+			void TxSetCursor(HCURSOR cursorHandle, BOOL fText) override;
 			auto TxScreenToClient(LPPOINT lppt) -> BOOL override;
 			auto TxClientToScreen(LPPOINT lppt) -> BOOL override;
 			auto TxActivate(LONG* plOldState) -> HRESULT override;
@@ -179,7 +179,7 @@ namespace PGUI::UI::Controls
 			auto OnTxCharFormatChange(const CHARFORMATW* pCF) -> HRESULT override;
 			auto OnTxParaFormatChange(const PARAFORMAT* pPF) -> HRESULT override;
 			auto TxGetPropertyBits(DWORD dwMask, DWORD* pdwBits) -> HRESULT override;
-			auto TxNotify(DWORD iNotify, void* pv) -> HRESULT override;
+			auto TxNotify(DWORD notifyCode, void* data) -> HRESULT override;
 			auto TxImmGetContext() -> HIMC override;
 			void TxImmReleaseContext(HIMC himc) override;
 
@@ -189,7 +189,7 @@ namespace PGUI::UI::Controls
 			auto TxSetForegroundWindow() -> HRESULT override;
 			auto TxGetPalette() -> HPALETTE override;
 			auto TxGetEastAsianFlags(LONG* pFlags) -> HRESULT override;
-			auto TxSetCursor2(HCURSOR hcur, BOOL bText) -> HCURSOR override;
+			auto TxSetCursor2(HCURSOR cursorHandle, BOOL bText) -> HCURSOR override;
 			void TxFreeTextServicesNotification() override;
 			auto TxGetEditStyle(DWORD dwItem, DWORD* pdwData) -> HRESULT override;
 			auto TxGetWindowStyles(DWORD* pdwStyle, DWORD* pdwExStyle) -> HRESULT override;
@@ -315,7 +315,7 @@ namespace PGUI::UI::Controls
 		[[nodiscard]] auto FormatRange(std::optional<FORMATRANGE> formatRange, bool display = true) const noexcept -> std::int64_t;
 
 		[[nodiscard]] auto GetDefaultCharFormat() const noexcept -> CHARFORMAT2W { return charFormat; }
-		void SetDefaultCharFormat(const CHARFORMAT2W& charFormat) noexcept;
+		void SetDefaultCharFormat(const CHARFORMAT2W& cf) noexcept;
 
 		[[nodiscard]] auto GetEventMask() const noexcept -> EditEventMaskFlag;
 		void SetEventMask(EditEventMaskFlag eventFlags) const noexcept;
@@ -331,7 +331,7 @@ namespace PGUI::UI::Controls
 		void SetOptions(EditOptionsFlag options) const noexcept;
 
 		[[nodiscard]] auto GetParaFormat() const noexcept -> PARAFORMAT2 { return paraFormat; }
-		void SetParaFormat(const PARAFORMAT2& paraFormat) noexcept;
+		void SetParaFormat(const PARAFORMAT2& pf) noexcept;
 
 		[[nodiscard]] auto GetFormattingRect() const noexcept -> RectL;
 		void SetFormattingRect(RectL rect) const noexcept;
@@ -347,9 +347,9 @@ namespace PGUI::UI::Controls
 		void SetSelection(CharRange charRange) const noexcept;
 
 		[[nodiscard]] auto GetSelectionCharFormat() const noexcept -> CHARFORMAT2W;
-		void SetSelectionCharFormat(const CHARFORMAT2W& charFormat) const noexcept;
+		void SetSelectionCharFormat(const CHARFORMAT2W& cf) const noexcept;
 
-		void SetWordCharFormat(const CHARFORMAT2W& charFormat) const noexcept;
+		void SetWordCharFormat(const CHARFORMAT2W& cf) const noexcept;
 
 		[[nodiscard]] auto GetSelectionType() const noexcept -> EditSelectionFlag;
 
@@ -397,7 +397,7 @@ namespace PGUI::UI::Controls
 		void RequestSize() const noexcept;
 
 		[[nodiscard]] auto GetRichEditOle() const noexcept -> ComPtr<IRichEditOle>;
-		void SetOleCallack(ComPtr<IRichEditOleCallback> callback) const noexcept;
+		void SetOleCallack(const ComPtr<IRichEditOleCallback>& callback) const noexcept;
 
 		void EnableAutoURLDetect() const noexcept;
 		void DisableAutoURLDetect() const noexcept;

@@ -12,7 +12,7 @@ namespace PGUI
 		ComPtrHolder() = default;
 		explicit ComPtrHolder(ComPtr<T> ptr) noexcept : heldPtr(ptr) { }
 
-		[[nodiscard]] bool IsInitialized() const noexcept
+		[[nodiscard]] auto IsInitialized() const noexcept -> bool
 		{
 			return heldPtr;
 		}
@@ -22,12 +22,12 @@ namespace PGUI
 			heldPtr = nullptr;
 		}
 
-		[[nodiscard]] T* operator->() const noexcept { return GetHeldPtr(); }
+		[[nodiscard]] auto operator->() const noexcept { return GetHeldPtr(); }
 		[[nodiscard]] explicit(false) operator T* () const noexcept { return GetHeldPtr(); }
 		[[nodiscard]] explicit operator bool () const noexcept { return IsInitialized(); }
 
 		protected:
-		[[nodiscard]] ComPtr<T> GetHeldComPtr() const noexcept
+		[[nodiscard]] auto GetHeldComPtr() const noexcept
 		{
 			return heldPtr;
 		}
@@ -39,15 +39,15 @@ namespace PGUI
 		{
 			return &heldPtr;
 		}
-		[[nodiscard]] T* GetHeldPtr() const noexcept
+		[[nodiscard]] auto GetHeldPtr() const noexcept
 		{
 			return heldPtr.Get();
 		}
-		[[nodiscard]] T* const* GetHeldPtrAddress() const noexcept
+		[[nodiscard]] auto GetHeldPtrAddress() const noexcept
 		{
 			return heldPtr.GetAddressOf();
 		}
-		[[nodiscard]] T** GetHeldPtrAddress() noexcept
+		[[nodiscard]] auto GetHeldPtrAddress() noexcept
 		{
 			return heldPtr.GetAddressOf();
 		}

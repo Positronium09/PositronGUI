@@ -79,18 +79,9 @@ namespace PGUI::Core
 		logger = _logger;
 	}
 
-	ILogger* Logger::GetLogger() noexcept
-	{
-		return logger;
-	}
-
 	void Logger::SetLogLevel(LogLevel _logLevel) noexcept
 	{
 		logLevel = _logLevel;
-	}
-	LogLevel Logger::GetLogLevel() noexcept
-	{
-		return logLevel;
 	}
 
 	void DebugConsoleLogger::Log(LogLevel logLevel, std::wstring_view string) noexcept

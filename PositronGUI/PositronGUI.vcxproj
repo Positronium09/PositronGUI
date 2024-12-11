@@ -27,8 +27,11 @@
     <ClCompile Include="src\ui\bmp\BitmapSource.cpp" />
     <ClCompile Include="src\ui\controls\CheckBox.cpp" />
     <ClCompile Include="src\ui\controls\Header.cpp" />
+    <ClCompile Include="src\ui\controls\HorizontalLayout.cpp" />
     <ClCompile Include="src\ui\controls\ListView.cpp" />
+    <ClCompile Include="src\ui\controls\RadioButton.cpp" />
     <ClCompile Include="src\ui\controls\ScrollBar.cpp" />
+    <ClCompile Include="src\ui\controls\VerticalLayout.cpp" />
     <ClCompile Include="src\ui\dialogs\MessageBoxDialog.cpp" />
     <ClCompile Include="src\ui\Dialog.cpp" />
     <ClCompile Include="src\helpers\TimerEvent.cpp" />
@@ -44,6 +47,7 @@
     <ClCompile Include="src\ui\controls\ButtonBase.cpp" />
     <ClCompile Include="src\ui\controls\StaticText.cpp" />
     <ClCompile Include="src\ui\bmp\Palette.cpp" />
+    <ClCompile Include="src\ui\ImgRenderer.cpp" />
     <ClCompile Include="src\ui\TextLayout.cpp" />
     <ClCompile Include="src\ui\font\FontCollection.cpp" />
     <ClCompile Include="src\ui\font\FontFamily.cpp" />
@@ -74,10 +78,14 @@
     <ClInclude Include="include\graphics\PGUI.graphics.hpp" />
     <ClInclude Include="include\graphics\PixelFormat.hpp" />
     <ClInclude Include="include\helpers\ScopedTimer.hpp" />
+    <ClInclude Include="include\helpers\StringHashes.hpp" />
     <ClInclude Include="include\ui\controls\CheckBox.hpp" />
     <ClInclude Include="include\ui\controls\Edit.hpp" />
     <ClInclude Include="include\ui\controls\Header.hpp" />
+    <ClInclude Include="include\ui\controls\HorizontalLayout.hpp" />
+    <ClInclude Include="include\ui\controls\RadioButton.hpp" />
     <ClInclude Include="include\ui\controls\ScrollBar.hpp" />
+    <ClInclude Include="include\ui\controls\VerticalLayout.hpp" />
     <ClInclude Include="include\ui\Dialog.hpp" />
     <ClInclude Include="include\core\Ellipse.hpp" />
     <ClInclude Include="include\helpers\EnumFlag.hpp" />
@@ -99,6 +107,7 @@
     <ClInclude Include="include\ui\bmp\PGUI.ui.img.hpp" />
     <ClInclude Include="include\ui\dialogs\MessageBoxDialog.hpp" />
     <ClInclude Include="include\ui\controls\ListView.hpp" />
+    <ClInclude Include="include\ui\ImgRenderer.hpp" />
     <ClInclude Include="include\ui\PositioningMode.hpp" />
     <ClInclude Include="include\helpers\ComPtrHolder.hpp" />
     <ClInclude Include="include\ui\Color.hpp" />
@@ -143,6 +152,10 @@
   </ItemGroup>
   <ItemGroup>
     <None Include=".clang-tidy" />
+    <None Include="cpp.hint" />
+  </ItemGroup>
+  <ItemGroup>
+    <Natvis Include="visualiser.natvis" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>
@@ -204,28 +217,28 @@
     <OutDir>$(ProjectDir)bin\$(Configuration)\$(Platform)\</OutDir>
     <IntDir>$(ProjectDir)bin\intermediate\$(Configuration)\$(Platform)\</IntDir>
     <TargetName>$(ProjectName)_$(Platform)</TargetName>
-    <ClangTidyChecks>clang-diagnostic-*,clang-analyzer-*,cppcoreguidelines-*,modernize-*,modernize-use-trailing-return-type</ClangTidyChecks>
+    <ClangTidyChecks>clang-diagnostic-*,clang-analyzer-*,cppcoreguidelines-*,modernize-*,readability-*,performance-*,-readability-identifier-length,-readability-implicit-bool-conversion,-clang-diagnostic-pragma-once-outside-header,-readability-magic-numbers,-readability-convert-member-functions-to-static,-cppcoreguidelines-avoid-magic-numbers,-clang-diagnostic-switch,-cppcoreguidelines-pro-type-union-access,-cppcoreguidelines-pro-bounds-pointer-arithmetic,-performance-enum-size,-cppcoreguidelines-narrowing-conversions, -clang-diagnostic-pragma-once-outside-header</ClangTidyChecks>
     <EnableClangTidyCodeAnalysis>true</EnableClangTidyCodeAnalysis>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <OutDir>$(ProjectDir)bin\$(Configuration)\$(Platform)\</OutDir>
     <IntDir>$(ProjectDir)bin\intermediate\$(Configuration)\$(Platform)\</IntDir>
     <TargetName>$(ProjectName)_$(Platform)</TargetName>
-    <ClangTidyChecks>clang-diagnostic-*,clang-analyzer-*,cppcoreguidelines-*,modernize-*,modernize-use-trailing-return-type</ClangTidyChecks>
+    <ClangTidyChecks>clang-diagnostic-*,clang-analyzer-*,cppcoreguidelines-*,modernize-*,readability-*,performance-*,-readability-identifier-length,-readability-implicit-bool-conversion,-clang-diagnostic-pragma-once-outside-header,-readability-magic-numbers,-readability-convert-member-functions-to-static,-cppcoreguidelines-avoid-magic-numbers,-clang-diagnostic-switch,-cppcoreguidelines-pro-type-union-access,-cppcoreguidelines-pro-bounds-pointer-arithmetic,-performance-enum-size,-cppcoreguidelines-narrowing-conversions, -clang-diagnostic-pragma-once-outside-header</ClangTidyChecks>
     <EnableClangTidyCodeAnalysis>true</EnableClangTidyCodeAnalysis>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <OutDir>$(ProjectDir)bin\$(Configuration)\$(Platform)\</OutDir>
     <IntDir>$(ProjectDir)bin\intermediate\$(Configuration)\$(Platform)\</IntDir>
     <TargetName>$(ProjectName)_$(Platform)</TargetName>
-    <ClangTidyChecks>clang-diagnostic-*,clang-analyzer-*,cppcoreguidelines-*,modernize-*,modernize-use-trailing-return-type</ClangTidyChecks>
+    <ClangTidyChecks>clang-diagnostic-*,clang-analyzer-*,cppcoreguidelines-*,modernize-*,readability-*,performance-*,-readability-identifier-length,-readability-implicit-bool-conversion,-clang-diagnostic-pragma-once-outside-header,-readability-magic-numbers,-readability-convert-member-functions-to-static,-cppcoreguidelines-avoid-magic-numbers,-clang-diagnostic-switch,-cppcoreguidelines-pro-type-union-access,-cppcoreguidelines-pro-bounds-pointer-arithmetic,-performance-enum-size,-cppcoreguidelines-narrowing-conversions, -clang-diagnostic-pragma-once-outside-header</ClangTidyChecks>
     <EnableClangTidyCodeAnalysis>true</EnableClangTidyCodeAnalysis>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <OutDir>$(ProjectDir)bin\$(Configuration)\$(Platform)\</OutDir>
     <IntDir>$(ProjectDir)bin\intermediate\$(Configuration)\$(Platform)\</IntDir>
     <TargetName>$(ProjectName)_$(Platform)</TargetName>
-    <ClangTidyChecks>clang-diagnostic-*,clang-analyzer-*,cppcoreguidelines-*,modernize-*,modernize-use-trailing-return-type</ClangTidyChecks>
+    <ClangTidyChecks>clang-diagnostic-*,clang-analyzer-*,cppcoreguidelines-*,modernize-*,readability-*,performance-*,-readability-identifier-length,-readability-implicit-bool-conversion,-clang-diagnostic-pragma-once-outside-header,-readability-magic-numbers,-readability-convert-member-functions-to-static,-cppcoreguidelines-avoid-magic-numbers,-clang-diagnostic-switch,-cppcoreguidelines-pro-type-union-access,-cppcoreguidelines-pro-bounds-pointer-arithmetic,-performance-enum-size,-cppcoreguidelines-narrowing-conversions, -clang-diagnostic-pragma-once-outside-header</ClangTidyChecks>
     <EnableClangTidyCodeAnalysis>true</EnableClangTidyCodeAnalysis>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">

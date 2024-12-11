@@ -9,8 +9,8 @@ namespace PGUI
 	{
 		public:
 		PointF center;
-		float xRadius = 0.0f;
-		float yRadius = 0.0f;
+		float xRadius = 0.0F;
+		float yRadius = 0.0F;
 
 		constexpr Ellipse() noexcept = default;
 		constexpr Ellipse(PointF _center, float radius) noexcept :
@@ -25,9 +25,8 @@ namespace PGUI
 			center(ellipse.point), xRadius(ellipse.radiusX), yRadius(ellipse.radiusY)
 		{
 		}
-		~Ellipse() noexcept = default;
 
-		[[nodiscard]] constexpr bool operator==(const Ellipse& other) const noexcept = default;
+		[[nodiscard]] constexpr auto operator==(const Ellipse& other) const noexcept -> bool = default;
 
 		explicit(false) operator D2D1_ELLIPSE() const noexcept
 		{

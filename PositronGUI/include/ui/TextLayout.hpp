@@ -32,9 +32,10 @@ namespace PGUI::UI
 			length = _length;
 		}
 
-		explicit(false) operator DWRITE_TEXT_RANGE() const noexcept { return DWRITE_TEXT_RANGE{ startPosition, length }; }
-
-		[[nodiscard]] constexpr auto operator==(const TextRange& other) const noexcept -> bool = delete;
+		[[nodiscard]] constexpr auto operator==(const TextRange& other) const noexcept -> bool
+		{
+			return startPosition == other.startPosition && length == other.length;
+		}
 	};
 
 
@@ -83,7 +84,7 @@ namespace PGUI::UI
 		}
 
 		[[nodiscard]] auto GetFontCollection(UINT32 position, OptionalTextRangeRet textRange = std::nullopt) const noexcept -> Font::FontCollection;
-		void SetFontCollection(Font::FontCollection fontCollection, TextRange textRange) const noexcept;
+		void SetFontCollection(const Font::FontCollection& fontCollection, TextRange textRange) const noexcept;
 
 		[[nodiscard]] auto GetFontFamilyName(UINT32 position, OptionalTextRangeRet textRange = std::nullopt) const noexcept -> std::wstring;
 		void SetFontFamilyName(std::wstring_view familyName, TextRange textRange) const noexcept;
@@ -104,7 +105,7 @@ namespace PGUI::UI
 		void SetFontWeight(Font::FontWeight fontWeight, TextRange textRange) const noexcept;
 		
 		[[nodiscard]] auto GetInlineObject(UINT32 position, OptionalTextRangeRet textRange = std::nullopt) const noexcept -> ComPtr<IDWriteInlineObject>;
-		void SetInlineObject(ComPtr<IDWriteInlineObject> inlineObject, TextRange textRange) const noexcept;
+		void SetInlineObject(const ComPtr<IDWriteInlineObject>& inlineObject, TextRange textRange) const noexcept;
 
 		[[nodiscard]] auto GetStrikethrough(UINT32 position, OptionalTextRangeRet textRange = std::nullopt) const noexcept -> bool;
 		void SetStrikethrough(bool strikethrough, TextRange textRange) const noexcept;
@@ -113,6 +114,6 @@ namespace PGUI::UI
 		void SetUnderline(bool underline, TextRange textRange) const noexcept;
 
 		private:
-		[[nodiscard]] auto GetTextRangePtr(OptionalTextRangeRet textRange) const noexcept -> DWRITE_TEXT_RANGE*;
+		[[nodiscard]] static auto GetTextRangePtr(OptionalTextRangeRet textRange) noexcept -> DWRITE_TEXT_RANGE*;
 	};
 }

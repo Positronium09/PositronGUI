@@ -16,7 +16,7 @@ namespace PGUI
 		TimerEvent(milliseconds interval, std::optional<milliseconds> startDelay = std::nullopt) noexcept;
 
 		private:
-		void ThreadFunction(std::stop_token stopToken) const;
+		void ThreadFunction(const std::stop_token& stopToken) const;
 
 		std::jthread thread;
 

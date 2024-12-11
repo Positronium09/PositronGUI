@@ -19,7 +19,7 @@ namespace PGUI::Core
 		FATAL = 5
 	};
 
-	[[nodiscard]] constexpr std::wstring GetLogLevelStr(LogLevel logLevel) noexcept;
+	[[nodiscard]] constexpr auto GetLogLevelStr(LogLevel logLevel) noexcept -> std::wstring;
 
 	class ILogger
 	{
@@ -44,10 +44,10 @@ namespace PGUI::Core
 		static void Fatal(std::wstring_view string) noexcept;
 
 		static void SetLogger(ILogger* logger) noexcept;
-		[[nodiscard]] static ILogger* GetLogger() noexcept;
+		[[nodiscard]] static auto GetLogger() noexcept { return logger; }
 
 		static void SetLogLevel(LogLevel logLevel) noexcept;
-		[[nodiscard]] static LogLevel GetLogLevel() noexcept;
+		[[nodiscard]] static auto GetLogLevel() noexcept { return logLevel; }
 
 		private:
 		static inline ILogger* logger;

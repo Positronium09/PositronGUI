@@ -9,3 +9,6 @@
 #include "ListView.hpp"
 #include "Edit.hpp"
 #include "CheckBox.hpp"
+#include "HorizontalLayout.hpp"
+#include "VerticalLayout.hpp"
+#include "RadioButton.hpp"

@@ -31,7 +31,7 @@ namespace PGUI::UI
 
 	auto TextLayout::CalculateMinWidth() const noexcept -> float
 	{
-		float minWidth = 0.0f;
+		float minWidth = 0.0F;
 		
 		HRESULT hr = GetHeldComPtr()->DetermineMinWidth(&minWidth); HR_L(hr);
 
@@ -105,7 +105,7 @@ namespace PGUI::UI
 
 		return Font::FontCollection{ fontCollection3Ptr };
 	}
-	void TextLayout::SetFontCollection(Font::FontCollection fontCollection, TextRange textRange) const noexcept
+	void TextLayout::SetFontCollection(const Font::FontCollection& fontCollection, TextRange textRange) const noexcept
 	{
 		HRESULT hr = GetHeldComPtr()->SetFontCollection(fontCollection, textRange); HR_L(hr);
 	}
@@ -158,7 +158,7 @@ namespace PGUI::UI
 	
 	auto TextLayout::GetFontSize(UINT32 position, OptionalTextRangeRet textRange) const noexcept -> float
 	{
-		float fontSize = 0.0f;
+		float fontSize = 0.0F;
 		
 		HRESULT hr = GetHeldComPtr()->GetFontSize(position, &fontSize, GetTextRangePtr(textRange)); HR_L(hr);
 
@@ -221,7 +221,7 @@ namespace PGUI::UI
 		return inlineObject;
 	}
 
-	void TextLayout::SetInlineObject(ComPtr<IDWriteInlineObject> inlineObject, TextRange textRange) const noexcept
+	void TextLayout::SetInlineObject(const ComPtr<IDWriteInlineObject>& inlineObject, TextRange textRange) const noexcept
 	{
 		HRESULT hr = GetHeldComPtr()->SetInlineObject(inlineObject.Get(), textRange); HR_L(hr);
 	}
@@ -253,7 +253,7 @@ namespace PGUI::UI
 		HRESULT hr = GetHeldComPtr()->SetUnderline(underline, textRange); HR_L(hr);
 	}
 	
-	auto TextLayout::GetTextRangePtr(OptionalTextRangeRet textRange) const noexcept -> DWRITE_TEXT_RANGE*
+	auto TextLayout::GetTextRangePtr(OptionalTextRangeRet textRange) noexcept -> DWRITE_TEXT_RANGE*
 	{
 		DWRITE_TEXT_RANGE* trp = nullptr;
 		if (trp)

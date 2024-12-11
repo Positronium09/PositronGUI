@@ -68,8 +68,8 @@ namespace PGUI::UI::Dialogs
 		std::wstring text;
 		std::vector<Core::WindowPtr<Controls::TextButton>> buttons;
 
-		TextLayout textLayout{ };
-		TextFormat textFormat{ };
+		TextLayout textLayout;
+		TextFormat textFormat;
 
 		MessageBoxButtonSet buttonSet;
 		MessageBoxIcon _icon;

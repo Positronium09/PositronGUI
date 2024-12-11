@@ -1,3 +1,5 @@
+#include <utility>
+
 #include "graphics/GraphicsBitmap.hpp"
 #include "graphics/RenderTarget.hpp"
 
@@ -9,10 +11,10 @@ namespace PGUI::Graphics
 	{
 	}
 	GraphicsBitmap::GraphicsBitmap(ComPtr<ID2D1Bitmap> bmp) noexcept :
-		ComPtrHolder{ bmp }
+		ComPtrHolder{ std::move(bmp) }
 	{
 	}
-	void GraphicsBitmap::CopyFromBitmap(GraphicsBitmap bmp, std::optional<PointU> destPoint, std::optional<RectU> srcRect) const
+	void GraphicsBitmap::CopyFromBitmap(const GraphicsBitmap& bmp, std::optional<PointU> destPoint, std::optional<RectU> srcRect) const
 	{
 		const D2D1_POINT_2U* dest = nullptr;
 		const D2D1_RECT_U* src = nullptr;
@@ -37,7 +39,7 @@ namespace PGUI::Graphics
 		}
 		HRESULT hr = GetHeldComPtr()->CopyFromMemory(dest, data, pitch); HR_T(hr);
 	}
-	void GraphicsBitmap::CopyFromRenderTarget(RenderTarget rt, std::optional<PointU> destPoint, std::optional<RectU> srcRect) const
+	void GraphicsBitmap::CopyFromRenderTarget(const RenderTarget& rt, std::optional<PointU> destPoint, std::optional<RectU> srcRect) const
 	{
 		const D2D1_POINT_2U* dest = nullptr;
 		const D2D1_RECT_U* src = nullptr;

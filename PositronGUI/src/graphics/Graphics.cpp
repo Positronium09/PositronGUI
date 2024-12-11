@@ -1,3 +1,5 @@
+#include <utility>
+
 #include "graphics/Graphics.hpp"
 #include "graphics/BitmapRenderTarget.hpp"
 #include "graphics/GraphicsBitmap.hpp"
@@ -11,7 +13,7 @@ using namespace PGUI::UI;
 namespace PGUI::Graphics
 {
 	Graphics::Graphics(ComPtr<ID2D1DeviceContext7> rt) noexcept :
-		ComPtrHolder{ rt }
+		ComPtrHolder{ std::move(rt) }
 	{
 	}
 	void Graphics::Clear(RGBA color) const noexcept
@@ -51,7 +53,7 @@ namespace PGUI::Graphics
 
 		hr = converterBitmapSource->Initialize(bmpSrc,
 			GUID_WICPixelFormat32bppPBGRA, WICBitmapDitherTypeNone,
-			nullptr, 0.0f, WICBitmapPaletteTypeCustom); HR_T(hr);
+			nullptr, 0.0F, WICBitmapPaletteTypeCustom); HR_T(hr);
 
 		if (props.has_value())
 		{
@@ -109,7 +111,7 @@ namespace PGUI::Graphics
 		HRESULT hr = GetHeldComPtr()->CreateSharedBitmap(riid, data, props, &bmp); HR_T(hr);
 		return GraphicsBitmap{ bmp };
 	}
-	auto Graphics::CreateMesh() const -> ComPtr<ID2D1Mesh>
+	auto Graphics::CreateMesh() -> ComPtr<ID2D1Mesh>
 	{
 		return {};
 	}
@@ -123,7 +125,7 @@ namespace PGUI::Graphics
 	{
 		brush.CreateBrush(GetHeldComPtr());
 	}
-	void Graphics::DrawBitmap(GraphicsBitmap bmp, OptRect destRect,
+	void Graphics::DrawBitmap(const GraphicsBitmap& bmp, OptRect destRect,
 		float opacity, D2D1_BITMAP_INTERPOLATION_MODE interpolationMode, OptRect srcRect) const noexcept
 	{
 		const D2D1_RECT_F* dest = nullptr;
@@ -139,7 +141,7 @@ namespace PGUI::Graphics
 
 		GetHeldComPtr()->DrawBitmap(bmp, dest, opacity, interpolationMode, src);
 	}
-	void Graphics::DrawEllipse(Ellipse ellipse, CBrushRef brush, float strokeWidth, ComPtr<ID2D1StrokeStyle> strokeStyle) const noexcept
+	void Graphics::DrawEllipse(Ellipse ellipse, CBrushRef brush, float strokeWidth, const ComPtr<ID2D1StrokeStyle>& strokeStyle) const noexcept
 	{
 		GetHeldComPtr()->DrawEllipse(ellipse, brush, strokeWidth, strokeStyle.Get());
 	}
@@ -148,25 +150,25 @@ namespace PGUI::Graphics
 	{
 		GetHeldComPtr()->DrawGlyphRun(baseLineOrigin, &glyphRun, foregroundBrush, measuringMode);
 	}
-	void Graphics::DrawLine(PointF p1, PointF p2, CBrushRef brush, float strokeWidth, ComPtr<ID2D1StrokeStyle> strokeStyle) const noexcept
+	void Graphics::DrawLine(PointF p1, PointF p2, CBrushRef brush, float strokeWidth, const ComPtr<ID2D1StrokeStyle>& strokeStyle) const noexcept
 	{
 		GetHeldComPtr()->DrawLine(p1, p2, brush, strokeWidth, strokeStyle.Get());
 	}
-	void Graphics::DrawRect(RectF rect, CBrushRef brush, float strokeWidth, ComPtr<ID2D1StrokeStyle> strokeStyle) const noexcept
+	void Graphics::DrawRect(RectF rect, CBrushRef brush, float strokeWidth, const ComPtr<ID2D1StrokeStyle>& strokeStyle) const noexcept
 	{
 		GetHeldComPtr()->DrawRectangle(rect, brush, strokeWidth, strokeStyle.Get());
 	}
-	void Graphics::DrawRoundedRect(RoundedRect rect, CBrushRef brush, float strokeWidth, ComPtr<ID2D1StrokeStyle> strokeStyle) const noexcept
+	void Graphics::DrawRoundedRect(RoundedRect rect, CBrushRef brush, float strokeWidth, const ComPtr<ID2D1StrokeStyle>& strokeStyle) const noexcept
 	{
 		GetHeldComPtr()->DrawRoundedRectangle(rect, brush, strokeWidth, strokeStyle.Get());
 	}
-	void Graphics::DrawText(std::wstring_view text, UI::TextFormat textFormat,
+	void Graphics::DrawText(std::wstring_view text, const UI::TextFormat& textFormat,
 		RectF layoutRect, CBrushRef brush, D2D1_DRAW_TEXT_OPTIONS options, DWRITE_MEASURING_MODE measuringMode) const noexcept
 	{
 		GetHeldComPtr()->DrawText(text.data(), static_cast<UINT32>(text.size()),
 			textFormat, layoutRect, brush, options, measuringMode);
 	}
-	void Graphics::DrawTextLayout(PointF origin, UI::TextLayout textLayout, CBrushRef brush, D2D1_DRAW_TEXT_OPTIONS options) const noexcept
+	void Graphics::DrawTextLayout(PointF origin, const UI::TextLayout& textLayout, CBrushRef brush, D2D1_DRAW_TEXT_OPTIONS options) const noexcept
 	{
 		GetHeldComPtr()->DrawTextLayout(origin, textLayout, brush, options);
 	}
@@ -174,7 +176,7 @@ namespace PGUI::Graphics
 	{
 		GetHeldComPtr()->FillEllipse(ellipse, brush);
 	}
-	void Graphics::FillOpacityMask(GraphicsBitmap bmp, CBrushRef brush,
+	void Graphics::FillOpacityMask(const GraphicsBitmap& bmp, CBrushRef brush,
 		OptRect destRect, OptRect srcRect, D2D1_OPACITY_MASK_CONTENT content) const noexcept
 	{
 		const D2D1_RECT_F* dest = nullptr;

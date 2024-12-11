@@ -18,7 +18,7 @@ namespace PGUI::UI
 	}
 	TextFormat::TextFormat(std::wstring_view fontFamilyName,
 		FLOAT fontSize, std::wstring_view localeName,
-		std::optional<Font::FontCollection> _fontCollection,
+		const std::optional<Font::FontCollection>& _fontCollection,
 		Font::FontWeight fontWeight, Font::FontStyle fontStyle, Font::FontStretch fontStretch) noexcept
 	{
 		auto factory = DWriteFactory::GetFactory();
@@ -142,7 +142,7 @@ namespace PGUI::UI
 		HRESULT hr = GetHeldComPtr()->SetIncrementalTabStop(incrementalTabStop); HR_L(hr);
 	}
 
-	auto TextFormat::GetLocaleName() const noexcept -> std::wstring
+	auto TextFormat::GetLocaleName() const -> std::wstring
 	{
 		auto tf = GetHeldComPtr();
 
@@ -183,7 +183,7 @@ namespace PGUI::UI
 		HRESULT hr = GetHeldComPtr()->SetReadingDirection(readingDirection); HR_L(hr);
 	}
 	
-	auto TextFormat::GetTextAlignment() const noexcept -> Font::TextAlignment
+	auto TextFormat::GetTextAlignment() noexcept -> Font::TextAlignment
 	{
 		return {};
 	}
@@ -201,7 +201,7 @@ namespace PGUI::UI
 
 		return { trimming, inlineObject };
 	}
-	void TextFormat::SetTrimming(const DWRITE_TRIMMING& trimming, ComPtr<IDWriteInlineObject> inlineObject) const noexcept
+	void TextFormat::SetTrimming(const DWRITE_TRIMMING& trimming, const ComPtr<IDWriteInlineObject>& inlineObject) const noexcept
 	{
 		HRESULT hr = GetHeldComPtr()->SetTrimming(&trimming, inlineObject.Get()); HR_L(hr);
 	}

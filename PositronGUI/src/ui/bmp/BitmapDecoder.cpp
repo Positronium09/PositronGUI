@@ -8,7 +8,7 @@
 
 namespace PGUI::UI::Bmp
 {
-	BitmapDecoder::BitmapDecoder(std::wstring_view filePath, bool readOnly, std::optional<GUID> vendorGUID) noexcept
+	BitmapDecoder::BitmapDecoder(std::wstring_view filePath, bool readOnly, std::optional<GUID> vendorGUID)
 	{
 		auto wicFactory = PGUI::WICFactory::GetFactory();
 
@@ -24,7 +24,7 @@ namespace PGUI::UI::Bmp
 			filePath.data(), vendor, access, WICDecodeMetadataCacheOnDemand, GetHeldPtrAddress()); HR_L(hr);
 	}
 
-	BitmapDecoder::BitmapDecoder(ULONG_PTR fileHandle, std::optional<GUID> vendorGUID) noexcept
+	BitmapDecoder::BitmapDecoder(ULONG_PTR fileHandle, std::optional<GUID> vendorGUID)
 	{
 		auto wicFactory = PGUI::WICFactory::GetFactory();
 
@@ -64,7 +64,7 @@ namespace PGUI::UI::Bmp
 		return Frame{ *this, frameIndex };
 	}
 
-	auto BitmapDecoder::GetFrames() const noexcept -> std::vector<Frame>
+	auto BitmapDecoder::GetFrames() const -> std::vector<Frame>
 	{
 		auto frameCount = GetFrameCount();
 		std::vector<Frame> frames(frameCount);

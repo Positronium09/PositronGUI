@@ -13,10 +13,8 @@ namespace PGUI::Core
 		public:
 		explicit PGUIException(HRESULT errorCode) noexcept;
 
-		~PGUIException() noexcept override = default;
-
-		[[nodiscard]] auto GetErrorCode() const noexcept -> HRESULT;
-		[[nodiscard]] auto GetErrorMessage() const noexcept -> const std::wstring&;
+		[[nodiscard]] auto GetErrorCode() const noexcept { return errorCode; }
+		[[nodiscard]] auto GetErrorMessage() const noexcept -> std::wstring_view { return errorMessage; }
 
 		private:
 		HRESULT errorCode;

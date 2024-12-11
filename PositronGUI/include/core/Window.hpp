@@ -35,7 +35,6 @@ namespace PGUI::Core
 		ReturnPrevResult = 0x04,
 		PassToDefWindowProc = 0x08
 	};
-	//EnableEnumFlag(HandlerResultFlag);
 
 	struct HandlerResult
 	{
@@ -57,7 +56,7 @@ namespace PGUI::Core
 
 		WindowCreateParams(std::wstring_view _windowName,
 			PointI _position, SizeI _size,
-			DWORD _style, DWORD _exStyle=NULL) noexcept :
+			DWORD _style, DWORD _exStyle=NULL) :
 			windowName(_windowName),
 			position(_position), size(_size),
 			style(_style), exStyle(_exStyle)
@@ -70,12 +69,14 @@ namespace PGUI::Core
 	class Window;
 
 	template<typename T>
-	concept WindowType = std::is_same_v<T, Window> || std::derived_from<T, Window>;
+	concept WindowType = std::is_base_of_v<Window, T>;
 
 	template<WindowType T>
 	using WindowOwnPtr = std::unique_ptr<T>;
 	template<WindowType T>
 	using WindowPtr = T*;
+	template<WindowType T>
+	using CWindowPtr = const T*;
 
 	using ChildWindowList = std::vector<WindowOwnPtr<Window>>;
 
@@ -83,15 +84,15 @@ namespace PGUI::Core
 	using TimerCallback = std::function<void(TimerId)>;
 	using TimerMap = std::unordered_map<TimerId, TimerCallback>;
 
-	[[nodiscard]] WindowPtr<Window> GetWindowFromHwnd(HWND hWnd) noexcept;
+	[[nodiscard]] auto GetWindowFromHwnd(HWND hWnd) noexcept -> WindowPtr<Window>;
 
 	class Window
 	{
-		friend LRESULT _WindowProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
+		friend auto _WindowProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) -> LRESULT;
 
 		public:
-		template <std::derived_from<Window> T, typename ...Args>
-		[[nodiscard]] static WindowOwnPtr<T> Create(const WindowCreateParams& createParams, Args&&... args)
+		template <WindowType T, typename ...Args>
+		[[nodiscard]] static auto Create(const WindowCreateParams& createParams, Args&&... args) -> WindowOwnPtr<T>
 		{
 			auto window = std::make_unique<T>(std::forward<Args>(args)...);
 			auto wnd = window.get();
@@ -103,7 +104,7 @@ namespace PGUI::Core
 			auto scaledSize = rect.Size();
 
 			CreateWindowExW(createParams.exStyle, 
-				window->windowClass->GetClassName().data(), createParams.windowName.data(),
+				window->windowClass->ClassName().data(), createParams.windowName.data(),
 				createParams.style,
 				createParams.position.x,
 				createParams.position.y,
@@ -120,8 +121,8 @@ namespace PGUI::Core
 
 			return window;
 		}
-		template <std::derived_from<Window> T, typename ...Args>
-		WindowPtr<T> AddChildWindow(const WindowCreateParams& createParams, Args&&... args)
+		template <WindowType T, typename ...Args>
+		auto AddChildWindow(const WindowCreateParams& createParams, Args&&... args) -> WindowPtr<T>
 		{
 			auto window = std::make_unique<T>(std::forward<Args>(args)...);
 			auto wnd = window.get();
@@ -134,7 +135,7 @@ namespace PGUI::Core
 			auto scaledSize = rect.Size();
 
 			CreateWindowExW(createParams.exStyle,
-				window->windowClass->GetClassName().data(), createParams.windowName.data(),
+				window->windowClass->ClassName().data(), createParams.windowName.data(),
 				createParams.style | WS_CHILD,
 				pos.x, pos.y,
 				scaledSize.cx, scaledSize.cy,
@@ -150,10 +151,12 @@ namespace PGUI::Core
 		
 			childWindows.push_back(std::move(window));
 
+			OnChildAdded(wnd);
+
 			return wnd;
 		}
-		template <std::derived_from<Window> T>
-		WindowPtr<T> AddChildWindow(const WindowOwnPtr<T> window)
+		template <WindowType T>
+		auto AddChildWindow(const WindowOwnPtr<T> window) -> WindowPtr<T>
 		{
 			auto wnd = window.get();
 
@@ -164,6 +167,8 @@ namespace PGUI::Core
 
 			childWindows.push_back(std::move(window));
 
+			OnChildAdded(wnd);
+
 			return wnd;
 		}
 
@@ -173,77 +178,77 @@ namespace PGUI::Core
 		virtual ~Window() noexcept;
 		
 		Window(const Window&) = delete;
-		Window& operator=(const Window&) = delete;
+		auto operator=(const Window&) -> Window& = delete;
 		Window(Window&&) noexcept = delete;
-		Window& operator=(Window&) noexcept = delete;
+		auto operator=(Window&&) noexcept -> Window& = delete;
 		
 		explicit(false) operator HWND() const noexcept { return hWnd; }
-		[[nodiscard]] HWND Hwnd() const noexcept { return hWnd; }
-		[[nodiscard]] HWND ParentHwnd() const noexcept { return parenthWnd; }
+		[[nodiscard]] auto Hwnd() const noexcept { return hWnd; }
+		[[nodiscard]] auto ParentHwnd() const noexcept { return parenthWnd; }
 
 		void Show(int show=SW_SHOW) const noexcept;
-		[[nodiscard]] bool IsVisible() const noexcept;
+		[[nodiscard]] auto IsVisible() const noexcept -> bool;
 
 		void Move(PointL newPos) const noexcept;
 		void Resize(SizeL newSize) const noexcept;
 		void MoveAndResize(RectL newRect) const noexcept;
 		void MoveAndResize(PointL newPos, SizeL newSize) const noexcept;
 
-		[[nodiscard]] UINT GetDPI() const noexcept;
-		[[nodiscard]] D2D1_MATRIX_3X2_F GetDpiScaleTransform(std::optional<PointF> center = std::nullopt) const noexcept;
+		[[nodiscard]] auto GetDPI() const noexcept -> UINT;
+		[[nodiscard]] auto GetDpiScaleTransform(std::optional<PointF> center = std::nullopt) const noexcept -> D2D1_MATRIX_3X2_F;
 
-		[[nodiscard]] std::span<PointL> MapPoints(HWND hWndTo, std::span<PointL> points) const noexcept;
-		[[nodiscard]] PointL MapPoint(HWND hWndTo, PointL point) const noexcept;
+		[[nodiscard]] auto MapPoints(HWND hWndTo, std::span<PointL> points) const noexcept -> std::span<PointL>;
+		[[nodiscard]] auto MapPoint(HWND hWndTo, PointL point) const noexcept -> PointL;
 
-		[[nodiscard]] std::span<RectL> MapRects(HWND hWndTo, std::span<RectL> rects) const noexcept;
-		[[nodiscard]] RectL MapRect(HWND hWndTo, RectL rect) const noexcept;
+		[[nodiscard]] auto MapRects(HWND hWndTo, std::span<RectL> rects) const noexcept -> std::span<RectL>;
+		[[nodiscard]] auto MapRect(HWND hWndTo, RectL rect) const noexcept -> RectL;
 
-		[[nodiscard]] WindowPtr<Window> ChildWindowFromPoint(PointL point, UINT flags) const noexcept;
+		[[nodiscard]] auto ChildWindowFromPoint(PointL point, UINT flags) const noexcept -> WindowPtr<Window>;
 
 		template <typename T>
-		[[nodiscard]] T ScaleByDPI(T val) const noexcept
+		[[nodiscard]] auto ScaleByDPI(T val) const noexcept
 		{
 			return static_cast<T>(val * 
 				static_cast<float>(GetDPI()) / Core::DEFAULT_SCREEN_DPI);
 		}
 		template <typename T>
-		[[nodiscard]] T UnScaleByDPI(T val) const noexcept
+		[[nodiscard]] auto UnScaleByDPI(T val) const noexcept
 		{
 			return static_cast<T>(val *
 				Core::DEFAULT_SCREEN_DPI / static_cast<float>(GetDPI()));
 		}
 
-		TimerId AddTimer(TimerId id, std::chrono::milliseconds delay, 
-			std::optional<TimerCallback> callback = std::nullopt) noexcept;
+		auto AddTimer(TimerId id, std::chrono::milliseconds delay, 
+			std::optional<TimerCallback> callback = std::nullopt) noexcept -> TimerId;
 		void RemoveTimer(TimerId id) noexcept;
-		bool HasTimer(TimerId id) const noexcept;
+		[[nodiscard]] auto HasTimer(TimerId id) const noexcept { return timerMap.contains(id); }
 
 		void Enable(bool enable) const noexcept;
 		void AdjustForClientSize(SizeI size) const noexcept;
 		void AdjustForRect(RectI rect) const noexcept;
 
-		[[nodiscard]] const TimerMap& GetTimerMap() const noexcept;
-		[[nodiscard]] TimerMap& GetTimerMap() noexcept;
+		[[nodiscard]] auto& GetTimerMap() const noexcept { return timerMap; }
+		[[nodiscard]] auto& GetTimerMap() noexcept { return timerMap; }
 
-		[[nodiscard]] PointL ScreenToClient(PointL point) const noexcept;
-		[[nodiscard]] RectL ScreenToClient(RectL rect) const noexcept;
+		[[nodiscard]] auto ScreenToClient(PointL point) const noexcept -> PointL;
+		[[nodiscard]] auto ScreenToClient(RectL rect) const noexcept -> RectL;
 
-		[[nodiscard]] PointL ClientToScreen(PointL point) const noexcept;
-		[[nodiscard]] RectL ClientToScreen(RectL rect) const noexcept;
+		[[nodiscard]] auto ClientToScreen(PointL point) const noexcept -> PointL;
+		[[nodiscard]] auto ClientToScreen(RectL rect) const noexcept -> RectL;
 
-		[[nodiscard]] WindowClass::WindowClassPtr GetWindowClass() const noexcept;
-		[[nodiscard]] const ChildWindowList& GetChildWindowList() const noexcept;
+		[[nodiscard]] auto GetWindowClass() const noexcept { return windowClass; }
+		[[nodiscard]] auto& GetChildWindowList() const noexcept { return childWindows; }
 
-		[[nodiscard]] RectL GetWindowRect() const noexcept;
-		[[nodiscard]] RectL GetClientRect() const noexcept;
-		[[nodiscard]] RectL GetClientRectWithoutDPI() const noexcept;
-		[[nodiscard]] SizeL GetWindowSize() const noexcept;
-		[[nodiscard]] SizeL GetClientSize() const noexcept;
-		[[nodiscard]] SizeL GetClientSizeWithoutDPI() const noexcept;
+		[[nodiscard]] auto GetWindowRect() const noexcept -> RectL;
+		[[nodiscard]] auto GetClientRect() const noexcept -> RectL;
+		[[nodiscard]] auto GetClientRectWithoutDPI() const noexcept -> RectL;
+		[[nodiscard]] auto GetWindowSize() const noexcept -> SizeL;
+		[[nodiscard]] auto GetClientSize() const noexcept -> SizeL;
+		[[nodiscard]] auto GetClientSizeWithoutDPI() const noexcept -> SizeL;
 
 		void Invalidate() const noexcept;
 
-		[[nodiscard]] bool operator==(const Window& other) const noexcept;
+		[[nodiscard]] auto operator==(const Window& other) const noexcept -> bool;
 
 		protected:
 		virtual void RegisterMessageHandler(UINT msg, const Handler& handler) noexcept final;
@@ -270,8 +275,10 @@ namespace PGUI::Core
 		}
 		void RemoveGeneralHandler();
 
-		virtual HandlerResult OnDPIChange(float dpiScale, RectI suggestedRect);
+		virtual auto OnDPIChange(float dpiScale, RectI suggestedRect) -> HandlerResult;
 		virtual void AdjustChildWindowsForDPI(float dpiScale);
+		virtual void OnChildAdded(WindowPtr<Window> window);
+		virtual void OnChildRemoved();
 
 		private:
 		HWND hWnd = nullptr;
@@ -285,9 +292,9 @@ namespace PGUI::Core
 		TimerMap timerMap;
 		WindowClass::WindowClassPtr windowClass;
 		
-		HandlerResult OnDPIChanged(UINT msg, WPARAM wParam, LPARAM lParam);
+		auto OnDPIChanged(UINT msg, WPARAM wParam, LPARAM lParam) -> HandlerResult;
 	};
 
-	LRESULT _WindowProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
+	auto _WindowProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) -> LRESULT;
 }
-template<> struct enum_flag_detail::enum_flag_enable<PGUI::Core::HandlerResultFlag> : public std::true_type { };
+EnableEnumFlag(PGUI::Core::HandlerResultFlag);

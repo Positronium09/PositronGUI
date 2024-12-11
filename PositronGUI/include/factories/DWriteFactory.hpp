@@ -13,10 +13,13 @@ namespace PGUI
 	{
 		public:
 		DWriteFactory() = delete;
-		DWriteFactory(DWriteFactory&) = delete;
-		void operator=(const DWriteFactory&) = delete;
+		DWriteFactory(const DWriteFactory&) = delete;
+		auto operator=(const DWriteFactory&) -> DWriteFactory& = delete;
+		DWriteFactory(DWriteFactory&&) = delete;
+		auto operator=(DWriteFactory&&) -> DWriteFactory& = delete;
+		~DWriteFactory() = default;
 
-		[[nodiscard]] static ComPtr<IDWriteFactory8> GetFactory()
+		[[nodiscard]] static auto GetFactory()
 		{
 			if (!directWriteFactory)
 			{

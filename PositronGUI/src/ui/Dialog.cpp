@@ -21,7 +21,7 @@ namespace PGUI::UI
 		Move(dialogRect.TopLeft());
 	}
 
-	auto Dialog::OnInitDialog(UINT, WPARAM, LPARAM) const noexcept -> HandlerResult
+	auto Dialog::OnInitDialog(UINT /*unused*/, WPARAM /*unused*/, LPARAM /*unused*/) noexcept -> HandlerResult
 	{
 		return { NULL, HandlerResultFlag::ForceThisResult };
 	}
@@ -37,7 +37,7 @@ namespace PGUI::UI
 		Show();
 		MSG msg{ };
 
-		if (auto parentHwnd = ParentHwnd();
+		if (auto* parentHwnd = ParentHwnd();
 			parentHwnd != nullptr)
 		{
 			GetWindowFromHwnd(parentHwnd)->Enable(false);
@@ -54,17 +54,17 @@ namespace PGUI::UI
 				HR_L(HresultFromWin32(errCode));
 				return errCode;
 			}
-			else
-			{
+			
+			
 				if (!IsDialogMessageW(Hwnd(), &msg))
 				{
 					TranslateMessage(&msg);
 					DispatchMessageW(&msg);
 				}
-			}
+		
 		}
 
-		if (auto parentHwnd = ParentHwnd();
+		if (auto* parentHwnd = ParentHwnd();
 			parentHwnd != nullptr)
 		{
 			SetForegroundWindow(parentHwnd);
@@ -74,17 +74,12 @@ namespace PGUI::UI
 		return static_cast<int>(msg.wParam);
 	}
 
-	auto ModalDialog::IsRunning() const noexcept -> bool
-	{
-		return running;
-	}
-
 	void ModalDialog::SetRunning(bool _running) noexcept
 	{
 		running = _running;
 	}
 
-	auto ModalDialog::OnClose(UINT, WPARAM, LPARAM) noexcept -> Core::HandlerResult
+	auto ModalDialog::OnClose(UINT /*unused*/, WPARAM /*unused*/, LPARAM /*unused*/) noexcept -> Core::HandlerResult
 	{
 		running = false;
 		return 0;
@@ -105,16 +100,16 @@ namespace PGUI::UI
 			{
 				auto errCode = GetLastError();
 				HR_L(HresultFromWin32(errCode));
-				return errCode;
+				return static_cast<int>(errCode);
 			}
-			else
-			{
+			
+			
 				if (!IsDialogMessageW(modalDialogHwnd, &msg))
 				{
 					TranslateMessage(&msg);
 					DispatchMessageW(&msg);
 				}
-			}
+		
 		}
 
 		return static_cast<int>(msg.wParam);

@@ -1,3 +1,5 @@
+#include <utility>
+
 #include "graphics/RenderTarget.hpp"
 #include "graphics/BitmapRenderTarget.hpp"
 #include "graphics/GraphicsBitmap.hpp"
@@ -8,12 +10,8 @@ using namespace PGUI::UI;
 
 namespace PGUI::Graphics
 {
-	RenderTarget::RenderTarget() noexcept : 
-		ComPtrHolder{ nullptr }
-	{
-	}
 	RenderTarget::RenderTarget(ComPtr<ID2D1RenderTarget> rt) noexcept :
-		ComPtrHolder{ rt }
+		ComPtrHolder{ std::move(rt) }
 	{
 	}
 	void RenderTarget::Clear(RGBA color) const noexcept
@@ -43,7 +41,7 @@ namespace PGUI::Graphics
 		HRESULT hr = GetHeldComPtr()->CreateBitmap(size, srcData, pitch, bitmapProperties, &bmp); HR_T(hr);
 		return GraphicsBitmap{ bmp };
 	}
-	auto RenderTarget::CreateBitmap(PGUI::UI::Bmp::BitmapSource bmpSrc, std::optional<D2D1_BITMAP_PROPERTIES> props) const -> GraphicsBitmap
+	auto RenderTarget::CreateBitmap(const PGUI::UI::Bmp::BitmapSource& bmpSrc, std::optional<D2D1_BITMAP_PROPERTIES> props) const -> GraphicsBitmap
 	{
 		ComPtr<ID2D1Bitmap> bmp;
 		if (props.has_value())
@@ -102,7 +100,7 @@ namespace PGUI::Graphics
 		HRESULT hr = GetHeldComPtr()->CreateSharedBitmap(riid, data, props, &bmp); HR_T(hr);
 		return GraphicsBitmap{ bmp };
 	}
-	auto RenderTarget::CreateMesh() const -> ComPtr<ID2D1Mesh>
+	auto RenderTarget::CreateMesh() -> ComPtr<ID2D1Mesh>
 	{
 		return {};
 	}
@@ -116,7 +114,7 @@ namespace PGUI::Graphics
 	{
 		brush.CreateBrush(GetHeldComPtr());
 	}
-	void RenderTarget::DrawBitmap(GraphicsBitmap bmp, OptRect destRect, 
+	void RenderTarget::DrawBitmap(const GraphicsBitmap& bmp, OptRect destRect, 
 		float opacity, D2D1_BITMAP_INTERPOLATION_MODE interpolationMode, OptRect srcRect) const noexcept
 	{
 		const D2D1_RECT_F* dest = nullptr;
@@ -132,7 +130,7 @@ namespace PGUI::Graphics
 
 		GetHeldComPtr()->DrawBitmap(bmp, dest, opacity, interpolationMode, src);
 	}
-	void RenderTarget::DrawEllipse(Ellipse ellipse, CBrushRef brush, float strokeWidth, ComPtr<ID2D1StrokeStyle> strokeStyle) const noexcept
+	void RenderTarget::DrawEllipse(Ellipse ellipse, CBrushRef brush, float strokeWidth, const ComPtr<ID2D1StrokeStyle>& strokeStyle) const noexcept
 	{
 		GetHeldComPtr()->DrawEllipse(ellipse, brush, strokeWidth, strokeStyle.Get());
 	}
@@ -141,25 +139,25 @@ namespace PGUI::Graphics
 	{
 		GetHeldComPtr()->DrawGlyphRun(baseLineOrigin, &glyphRun, foregroundBrush, measuringMode);
 	}
-	void RenderTarget::DrawLine(PointF p1, PointF p2, CBrushRef brush, float strokeWidth, ComPtr<ID2D1StrokeStyle> strokeStyle) const noexcept
+	void RenderTarget::DrawLine(PointF p1, PointF p2, CBrushRef brush, float strokeWidth, const ComPtr<ID2D1StrokeStyle>& strokeStyle) const noexcept
 	{
 		GetHeldComPtr()->DrawLine(p1, p2, brush, strokeWidth, strokeStyle.Get());
 	}
-	void RenderTarget::DrawRect(RectF rect, CBrushRef brush, float strokeWidth, ComPtr<ID2D1StrokeStyle> strokeStyle) const noexcept
+	void RenderTarget::DrawRect(RectF rect, CBrushRef brush, float strokeWidth, const ComPtr<ID2D1StrokeStyle>& strokeStyle) const noexcept
 	{
 		GetHeldComPtr()->DrawRectangle(rect, brush, strokeWidth, strokeStyle.Get());
 	}
-	void RenderTarget::DrawRoundedRect(RoundedRect rect, CBrushRef brush, float strokeWidth, ComPtr<ID2D1StrokeStyle> strokeStyle) const noexcept
+	void RenderTarget::DrawRoundedRect(RoundedRect rect, CBrushRef brush, float strokeWidth, const ComPtr<ID2D1StrokeStyle>& strokeStyle) const noexcept
 	{
 		GetHeldComPtr()->DrawRoundedRectangle(rect, brush, strokeWidth, strokeStyle.Get());
 	}
-	void RenderTarget::DrawText(std::wstring_view text, UI::TextFormat textFormat, 
+	void RenderTarget::DrawText(std::wstring_view text, const UI::TextFormat& textFormat, 
 		RectF layoutRect, CBrushRef brush, D2D1_DRAW_TEXT_OPTIONS options, DWRITE_MEASURING_MODE measuringMode) const noexcept
 	{
 		GetHeldComPtr()->DrawText(text.data(), static_cast<UINT32>(text.size()),
 			textFormat, layoutRect, brush, options, measuringMode);
 	}
-	void RenderTarget::DrawTextLayout(PointF origin, UI::TextLayout textLayout, CBrushRef brush, D2D1_DRAW_TEXT_OPTIONS options) const noexcept
+	void RenderTarget::DrawTextLayout(PointF origin, const UI::TextLayout& textLayout, CBrushRef brush, D2D1_DRAW_TEXT_OPTIONS options) const noexcept
 	{
 		GetHeldComPtr()->DrawTextLayout(origin, textLayout, brush, options);
 	}
@@ -167,7 +165,7 @@ namespace PGUI::Graphics
 	{
 		GetHeldComPtr()->FillEllipse(ellipse, brush);
 	}
-	void RenderTarget::FillOpacityMask(GraphicsBitmap bmp, CBrushRef brush, 
+	void RenderTarget::FillOpacityMask(const GraphicsBitmap& bmp, CBrushRef brush, 
 		OptRect destRect, OptRect srcRect, D2D1_OPACITY_MASK_CONTENT content) const noexcept
 	{
 		const D2D1_RECT_F* dest = nullptr;

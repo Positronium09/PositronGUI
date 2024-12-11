@@ -1,3 +1,5 @@
+#include <utility>
+
 #include "ui/font/FontCollection.hpp"
 
 #include "helpers/HelperFunctions.hpp"
@@ -26,7 +28,7 @@ namespace PGUI::UI::Font
 	}
 	
 	FontCollection::FontCollection(ComPtr<IDWriteFontCollection3> _fontCollection) noexcept : 
-		ComPtrHolder{ _fontCollection }
+		ComPtrHolder{ std::move(_fontCollection) }
 	{ }
 	
 	FontCollection::FontCollection() noexcept :

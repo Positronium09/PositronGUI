@@ -173,12 +173,12 @@ namespace PGUI::UI::Controls
 	void ScrollBar::AdjustRect(WPARAM wParam, LPRECT rc) const noexcept
 	{
 		RECT rect;
-		int cyClient = 0;
-		int cyAdjust = 0;
+		std::int64_t cyClient = 0;
+		std::int64_t cyAdjust = 0;
 		SetRectEmpty(&rect);
 		::AdjustWindowRect(&rect, 
 			static_cast<DWORD>(GetWindowLongPtrW(Hwnd(), GWL_STYLE)), FALSE);
-		cyClient = (rc->bottom - rc->top) - (rect.bottom - rect.top);
+		cyClient = (static_cast<std::int64_t>(rc->bottom) - rc->top) - (static_cast<std::int64_t>(rect.bottom) - rect.top);
 		cyAdjust = cyClient % pageSize;
 
 		switch (wParam)
@@ -186,10 +186,10 @@ namespace PGUI::UI::Controls
 			case WMSZ_TOP:
 			case WMSZ_TOPLEFT:
 			case WMSZ_TOPRIGHT:
-				rc->top += cyAdjust;
+				rc->top += static_cast<LONG>(cyAdjust);
 				break;
 			default:
-				rc->bottom -= cyAdjust;
+				rc->bottom -= static_cast<LONG>(cyAdjust);
 				break;
 		}
 	}
@@ -339,7 +339,7 @@ namespace PGUI::UI::Controls
 		return Window::OnDPIChange(dpiScale, suggestedRect);
 	}
 
-	auto ScrollBar::OnCreate(UINT, WPARAM, LPARAM) -> Core::HandlerResult
+	auto ScrollBar::OnCreate(UINT /*unused*/, WPARAM /*unused*/, LPARAM /*unused*/) -> Core::HandlerResult
 	{
 		thumbPos = CalculateThumbPos();
 
@@ -350,10 +350,10 @@ namespace PGUI::UI::Controls
 		colors.normalBackground = backgroundBrush.GetParameters();
 		
 		colors.hoverBackground = backgroundBrush.GetParameters();
-		std::get<RGBA>(colors.hoverBackground).Lighten(0.02f);
+		std::get<RGBA>(colors.hoverBackground).Lighten(0.02F);
 
 		colors.clickedBackground = backgroundBrush.GetParameters();
-		std::get<RGBA>(colors.clickedBackground).Darken(0.02f);
+		std::get<RGBA>(colors.clickedBackground).Darken(0.02F);
 
 		colors.normalText = thumbBrush.GetParameters();
 		colors.hoverText = thumbBrush.GetParameters();
@@ -380,8 +380,8 @@ namespace PGUI::UI::Controls
 			downButtonParams,
 			colors
 		);
-		upButton->SetTextFormat(TextFormat::GetDefTextFormat(ScaleByDPI(12.0f)));
-		downButton->SetTextFormat(TextFormat::GetDefTextFormat(ScaleByDPI(12.0f)));
+		upButton->SetTextFormat(TextFormat::GetDefTextFormat(ScaleByDPI(12.0F)));
+		downButton->SetTextFormat(TextFormat::GetDefTextFormat(ScaleByDPI(12.0F)));
 
 		upButton->ClickedEvent().Subscribe(std::bind_front(&ScrollBar::OnButtonClicked, this, true));
 		downButton->ClickedEvent().Subscribe(std::bind_front(&ScrollBar::OnButtonClicked, this, false));
@@ -392,7 +392,7 @@ namespace PGUI::UI::Controls
 		return 0;
 	}
 
-	auto ScrollBar::OnPaint(UINT, WPARAM, LPARAM) -> Core::HandlerResult
+	auto ScrollBar::OnPaint(UINT /*unused*/, WPARAM /*unused*/, LPARAM /*unused*/) -> Core::HandlerResult
 	{
 		BeginDraw();
 
@@ -410,18 +410,18 @@ namespace PGUI::UI::Controls
 		return 0;
 	}
 
-	auto ScrollBar::OnLButtonDown(UINT, WPARAM, LPARAM lParam) noexcept -> Core::HandlerResult
+	auto ScrollBar::OnLButtonDown(UINT /*unused*/, WPARAM /*unused*/, LPARAM lParam) noexcept -> Core::HandlerResult
 	{
 		PointF p = MAKEPOINTS(lParam);
 		if (!CalculateThumbRect().IsPointInside(p))
 		{
 			if (direction == ScrollBarDirection::Vertical)
 			{
-				SetScrollPos(CalculateScrollPosFromThumbPos(p.y - CalculateThumbSize() / 2.0f));
+				SetScrollPos(CalculateScrollPosFromThumbPos(p.y - CalculateThumbSize() / 2.0F));
 			}
 			else
 			{
-				SetScrollPos(CalculateScrollPosFromThumbPos(p.x - CalculateThumbSize() / 2.0f));
+				SetScrollPos(CalculateScrollPosFromThumbPos(p.x - CalculateThumbSize() / 2.0F));
 			}
 			return 0;
 		}
@@ -441,7 +441,7 @@ namespace PGUI::UI::Controls
 
 		return 0;
 	}
-	auto ScrollBar::OnLButtonUp(UINT, WPARAM, LPARAM) noexcept -> Core::HandlerResult
+	auto ScrollBar::OnLButtonUp(UINT /*unused*/, WPARAM /*unused*/, LPARAM /*unused*/) noexcept -> Core::HandlerResult
 	{
 		if (mouseScrolling)
 		{
@@ -453,7 +453,7 @@ namespace PGUI::UI::Controls
 
 		return 0;
 	}
-	auto ScrollBar::OnMouseMove(UINT, WPARAM wParam, LPARAM lParam) -> Core::HandlerResult
+	auto ScrollBar::OnMouseMove(UINT /*unused*/, WPARAM wParam, LPARAM lParam) -> Core::HandlerResult
 	{
 		if (!(wParam & MK_LBUTTON) || GetCapture() != Hwnd())
 		{
@@ -491,7 +491,7 @@ namespace PGUI::UI::Controls
 		return 0;
 	}
 
-	auto ScrollBar::OnMouseWheel(UINT msg, WPARAM wParam, LPARAM) -> Core::HandlerResult
+	auto ScrollBar::OnMouseWheel(UINT msg, WPARAM wParam, LPARAM /*unused*/) -> Core::HandlerResult
 	{
 		const bool shouldScrollVertical = 
 			msg == WM_MOUSEWHEEL && 
@@ -511,9 +511,9 @@ namespace PGUI::UI::Controls
 		return 0;
 	}
 	
-	auto ScrollBar::OnWindowPosChanging(UINT, WPARAM, LPARAM lParam) const -> Core::HandlerResult
+	auto ScrollBar::OnWindowPosChanging(UINT /*unused*/, WPARAM /*unused*/, LPARAM lParam) const -> Core::HandlerResult
 	{
-		if (auto winPos = std::bit_cast<LPWINDOWPOS>(lParam); 
+		if (auto* winPos = std::bit_cast<LPWINDOWPOS>(lParam); 
 			!(winPos->flags & SWP_NOSIZE))
 		{
 			RECT rc = { 0, 0, winPos->cx, winPos->cy };
@@ -530,7 +530,7 @@ namespace PGUI::UI::Controls
 
 		return 0;
 	}
-	auto ScrollBar::OnSizing(UINT, WPARAM wParam, LPARAM lParam) const -> Core::HandlerResult
+	auto ScrollBar::OnSizing(UINT /*unused*/, WPARAM wParam, LPARAM lParam) -> Core::HandlerResult
 	{
 		UNREFERENCED_PARAMETER(wParam);
 		UNREFERENCED_PARAMETER(lParam);
@@ -541,7 +541,7 @@ namespace PGUI::UI::Controls
 	{
 		auto ret = DefWindowProcW(Hwnd(), msg, wParam, lParam);
 
-		auto params = std::bit_cast<LPNCCALCSIZE_PARAMS>(lParam);
+		auto* params = std::bit_cast<LPNCCALCSIZE_PARAMS>(lParam);
 
 		auto clampScroll = [this](std::int64_t pos)
 		{

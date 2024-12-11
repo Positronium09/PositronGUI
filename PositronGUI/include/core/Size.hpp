@@ -6,15 +6,13 @@
 #include <Windows.h>
 
 
-template <typename T> concept _sz_arithmetic = std::is_arithmetic_v<T>;
-
 namespace PGUI
 {
-	template <_sz_arithmetic T>
+	template<typename T> requires std::is_arithmetic_v<T>
 	struct Size
 	{
-		T cx;
-		T cy;
+		T cx = static_cast<T>(0);
+		T cy = static_cast<T>(0);
 
 		constexpr Size() noexcept = default;
 		constexpr Size(const T& cx_, const T& cy_) noexcept :
@@ -37,33 +35,32 @@ namespace PGUI
 			cx{ (T)sz.width }, cy{ (T)sz.height }
 		{
 		}
-		~Size() noexcept = default;
 
-		[[nodiscard]] constexpr bool operator==(const Size<T>& other) const noexcept = default;
+		[[nodiscard]] constexpr auto operator==(const Size<T>& other) const noexcept -> bool = default;
 
-		constexpr Size& operator*=(const T& factor) noexcept
+		constexpr auto& operator*=(const T& factor) noexcept
 		{
 			cx *= factor;
 			cx *= factor;
 			return *this;
 		}
-		constexpr Size& operator/=(const T& factor) noexcept
+		constexpr auto& operator/=(const T& factor) noexcept
 		{
 			cx /= factor;
 			cx /= factor;
 			return *this;
 		}
 
-		[[nodiscard]] constexpr Size operator*(T factor) const noexcept
+		[[nodiscard]] constexpr auto operator*(T factor) const noexcept
 		{
 			return Size(cx * factor, cy * factor);
 		}
-		[[nodiscard]] constexpr Size operator/(T factor) const noexcept
+		[[nodiscard]] constexpr auto operator/(T factor) const noexcept
 		{
 			return Size(cx / factor, cy / factor);
 		}
 
-		template<typename U>
+		template<typename U> requires std::is_arithmetic_v<U>
 		explicit(false) operator Size<U>() const noexcept
 		{
 			return Size<U>{ static_cast<U>(cx), static_cast<U>(cy) };
@@ -83,26 +80,26 @@ namespace PGUI
 		}
 	};
 
-	template<_sz_arithmetic T>
-	[[nodiscard]] constexpr Size<T> operator*(T factor, const Size<T>& v) noexcept
+	template<typename T> requires std::is_arithmetic_v<T>
+	[[nodiscard]] constexpr auto operator*(T factor, const Size<T>& v) noexcept
 	{
 		return Size<T>(v.cx * factor, v.cy * factor);
 	}
 
-	template<_sz_arithmetic T>
-	[[nodiscard]] constexpr Size<T> operator/(T factor, const Size<T>& v) noexcept
+	template<typename T> requires std::is_arithmetic_v<T>
+	[[nodiscard]] constexpr auto operator/(T factor, const Size<T>& v) noexcept
 	{
 		return Size<T>(v.cx / factor, v.cy / factor);
 	}
 
-	template<_sz_arithmetic T>
-	[[nodiscard]] constexpr Size<T> operator*(const Size<T>& v, T factor) noexcept
+	template<typename T> requires std::is_arithmetic_v<T>
+	[[nodiscard]] constexpr auto operator*(const Size<T>& v, T factor) noexcept
 	{
 		return Size<T>(v.cx * factor, v.cy * factor);
 	}
 
-	template<_sz_arithmetic T>
-	[[nodiscard]] constexpr Size<T> operator/(const Size<T>& v, T factor) noexcept
+	template<typename T> requires std::is_arithmetic_v<T>
+	[[nodiscard]] constexpr auto operator/(const Size<T>& v, T factor) noexcept
 	{
 		return Size<T>(v.cx / factor, v.cy / factor);
 	}

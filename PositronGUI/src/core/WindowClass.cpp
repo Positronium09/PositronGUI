@@ -64,14 +64,4 @@ namespace PGUI::Core
 	{
 		UnregisterClassW(className.c_str(), GetHInstance());
 	}
-
-	std::wstring_view WindowClass::GetClassName() const noexcept
-	{
-		return className;
-	}
-
-	auto WindowClass::GetAtom() const noexcept -> ATOM
-	{
-		return classAtom;
-	}
 }

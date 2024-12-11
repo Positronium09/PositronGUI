@@ -16,7 +16,7 @@ namespace PGUI::UI::Bmp
 	{
 		public:
 		Frame() noexcept = default;
-		Frame(BitmapDecoder image, UINT frameIndex) noexcept;
+		Frame(const BitmapDecoder& image, UINT frameIndex) noexcept;
 
 		[[nodiscard]] auto GetMetadata() const noexcept -> MetadataReader;
 	};

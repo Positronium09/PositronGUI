@@ -11,7 +11,7 @@ namespace PGUI
 	{
 	}
 
-	void TimerEvent::ThreadFunction(std::stop_token stopToken) const
+	void TimerEvent::ThreadFunction(const std::stop_token& stopToken) const
 	{
 		using high_res_clock = std::chrono::high_resolution_clock;
 
@@ -19,10 +19,10 @@ namespace PGUI
 
 		auto start = high_res_clock::now();
 		auto end = start + interval;
-		do
+		while (std::chrono::high_resolution_clock::now() < end && !stopToken.stop_requested())
 		{
 			std::this_thread::yield();
-		} while (std::chrono::high_resolution_clock::now() < end && !stopToken.stop_requested());
+		}
 
 		std::this_thread::sleep_for(startDelay);
 
@@ -32,10 +32,10 @@ namespace PGUI
 			
 			start = high_res_clock::now();
 			end = start + interval;
-			do
+			while (std::chrono::high_resolution_clock::now() < end)
 			{
 				std::this_thread::yield();
-			} while (std::chrono::high_resolution_clock::now() < end);
+			}
 		}
 	}
 }

@@ -10,10 +10,10 @@
 namespace PGUI::UI
 {
 	SolidColorBrush::SolidColorBrush(ComPtr<ID2D1SolidColorBrush> brush) noexcept :
-		ComPtrHolder{ brush }
+		ComPtrHolder{ std::move(brush) }
 	{ }
 
-	SolidColorBrush::SolidColorBrush(ComPtr<ID2D1RenderTarget> renderTarget, RGBA color)
+	SolidColorBrush::SolidColorBrush(const ComPtr<ID2D1RenderTarget>& renderTarget, RGBA color)
 	{
 		HRESULT hr = renderTarget->CreateSolidColorBrush(color, GetHeldPtrAddress()); HR_T(hr);
 	}
@@ -30,10 +30,10 @@ namespace PGUI::UI
 
 
 	LinearGradientBrush::LinearGradientBrush(ComPtr<ID2D1LinearGradientBrush> brush) noexcept :
-		ComPtrHolder{ brush }
+		ComPtrHolder{ std::move(brush) }
 	{ }
 
-	LinearGradientBrush::LinearGradientBrush(ComPtr<ID2D1RenderTarget> renderTarget, LinearGradient gradient,
+	LinearGradientBrush::LinearGradientBrush(const ComPtr<ID2D1RenderTarget>& renderTarget, LinearGradient gradient,
 		std::optional<RectF> referenceRect)
 	{
 		if (referenceRect.has_value() && gradient.GetPositioningMode() == PositioningMode::Relative)
@@ -68,10 +68,10 @@ namespace PGUI::UI
 
 
 	RadialGradientBrush::RadialGradientBrush(ComPtr<ID2D1RadialGradientBrush> brush) noexcept :
-		ComPtrHolder{ brush }
+		ComPtrHolder{ std::move(brush) }
 	{ }
 
-	RadialGradientBrush::RadialGradientBrush(ComPtr<ID2D1RenderTarget> renderTarget, RadialGradient gradient,
+	RadialGradientBrush::RadialGradientBrush(const ComPtr<ID2D1RenderTarget>& renderTarget, RadialGradient gradient,
 		std::optional<RectF> referenceRect)
 	{
 		if (referenceRect.has_value() && gradient.GetPositioningMode() == PositioningMode::Relative)
@@ -111,10 +111,10 @@ namespace PGUI::UI
 
 
 	BitmapBrush::BitmapBrush(ComPtr<ID2D1BitmapBrush> brush) noexcept : 
-		ComPtrHolder(brush)
+		ComPtrHolder(std::move(brush))
 	{
 	}
-	BitmapBrush::BitmapBrush(ComPtr<ID2D1RenderTarget> renderTarget, ComPtr<ID2D1Bitmap> bitmap)
+	BitmapBrush::BitmapBrush(const ComPtr<ID2D1RenderTarget>& renderTarget, const ComPtr<ID2D1Bitmap>& bitmap)
 	{
 		HRESULT hr = renderTarget->CreateBitmapBrush(bitmap.Get(), GetHeldPtrAddress()); HR_T(hr);
 	}
@@ -131,12 +131,12 @@ namespace PGUI::UI
 	Brush::Brush(ComPtr<ID2D1RenderTarget> renderTarget, BrushParameters  _parameters) noexcept :
 		parameters(std::move(_parameters))
 	{
-		CreateBrush(renderTarget);
+		CreateBrush(std::move(renderTarget));
 	}
 
 	Brush::Brush(Brush&& other) noexcept : 
 		brush{ std::move(other.brush) },
-		parameters{ other.parameters }
+		parameters{ std::move(other.parameters) }
 	{
 	}
 
@@ -154,7 +154,7 @@ namespace PGUI::UI
 		ComPtr<ID2D1RenderTarget> renderTarget, const BrushParameters& _parameters) noexcept
 	{
 		SetParameters(_parameters);
-		CreateBrush(renderTarget);
+		CreateBrush(std::move(renderTarget));
 	}
 
 	void Brush::CreateBrush(ComPtr<ID2D1RenderTarget> renderTarget) noexcept

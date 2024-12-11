@@ -14,89 +14,91 @@
 #undef max
 
 
-template <typename T> concept _rc_arithmetic = std::is_arithmetic_v<T>;
-
 namespace PGUI
 {
-	template<_rc_arithmetic T>
+	template<typename T> requires std::is_arithmetic_v<T>
 	struct Rect
 	{
-		T left = (T)0;
-		T top = (T)0;
-		T right = (T)0;
-		T bottom = (T)0;
+		T left = static_cast<T>(0);
+		T top = static_cast<T>(0);
+		T right = static_cast<T>(0);
+		T bottom = static_cast<T>(0);
 
 		constexpr Rect() noexcept = default;
 		constexpr Rect(T left_, T top_, T right_, T bottom_) noexcept :
-			left(left_), top(top_), right(right_), bottom(bottom_)
+			left{ left_ }, top{ top_ }, right{ right_ }, bottom{ bottom_ }
 		{
 		}
 		explicit(false) constexpr Rect(const RECT& rc) noexcept :
-			left((T)rc.left), top((T)rc.top), right((T)rc.right), bottom((T)rc.bottom)
+			left{ static_cast<T>(rc.left) }, top{ static_cast<T>(rc.top) }, 
+			right{ static_cast<T>(rc.right) }, bottom{ static_cast<T>(rc.bottom) }
 		{
 		}
 		explicit(false) constexpr Rect(const D2D1_RECT_F& rc) noexcept :
-			left((T)rc.left), top((T)rc.top), right((T)rc.right), bottom((T)rc.bottom)
+			left{ static_cast<T>(rc.left) }, top{ static_cast<T>(rc.top) },
+			right{ static_cast<T>(rc.right) }, bottom{ static_cast<T>(rc.bottom) }
 		{
 		}
 		explicit(false) constexpr Rect(const D2D1_RECT_U& rc) noexcept :
-			left((T)rc.left), top((T)rc.top), right((T)rc.right), bottom((T)rc.bottom)
+			left{ static_cast<T>(rc.left) }, top{ static_cast<T>(rc.top) },
+			right{ static_cast<T>(rc.right) }, bottom{ static_cast<T>(rc.bottom) }
 		{
 		}
 		constexpr Rect(Point<T> position, Size<T> size) noexcept : 
-			left(position.x), top(position.y), right(position.x + size.cx), bottom(position.y + size.cy)
+			left{ position.x }, top{ position.y }, 
+			right{ position.x + size.cx }, bottom{ position.y + size.cy }
 		{
 		}
 		~Rect() noexcept = default;
 
-		[[nodiscard]] constexpr bool operator==(const Rect<T>& other) const noexcept = default;
+		[[nodiscard]] constexpr auto operator==(const Rect<T>& other) const noexcept -> bool = default;
 
-		[[nodiscard]] constexpr Point<T> TopLeft() const noexcept
+		[[nodiscard]] constexpr auto TopLeft() const noexcept
 		{
-			return { left, top };
+			return Point<T>{ left, top };
 		}
-		[[nodiscard]] constexpr Point<T> BottomLeft() const noexcept
+		[[nodiscard]] constexpr auto BottomLeft() const noexcept
 		{
-			return { left, bottom };
+			return Point<T>{ left, bottom };
 		}
-		[[nodiscard]] constexpr Point<T> TopRight() const noexcept
+		[[nodiscard]] constexpr auto TopRight() const noexcept
 		{
-			return { right, top };
+			return Point<T>{ right, top };
 		}
-		[[nodiscard]] constexpr Point<T> BottomRight() const noexcept
+		[[nodiscard]] constexpr auto BottomRight() const noexcept
 		{
-			return { right, bottom };
+			return Point<T>{ right, bottom };
 		}
 
-		[[nodiscard]] constexpr T Width() const noexcept
+		[[nodiscard]] constexpr auto Width() const noexcept
 		{
 			return right - left;
 		}
-		[[nodiscard]] constexpr T Height() const noexcept
+		[[nodiscard]] constexpr auto Height() const noexcept
 		{
 			return bottom - top;
 		}
 
-		[[nodiscard]] constexpr Size<T> Size() const noexcept
+		[[nodiscard]] constexpr auto Size() const noexcept
 		{
-			return { Width(), Height() };
+			return PGUI::Size<T>{ Width(), Height() };
 		}
 
-		[[nodiscard]] constexpr bool IsPointInside(Point<T> p) const noexcept
+		[[nodiscard]] constexpr auto IsPointInside(Point<T> p) const noexcept
 		{
 			return
 				left <= p.x && p.x <= right &&
 				top <= p.y && p.y <= bottom;
 		}
 
-		[[nodiscard]] constexpr bool IsIntersectingRect(Rect<T> rect) const noexcept
+		[[nodiscard]] constexpr auto IsIntersectingRect(Rect<T> rect) const noexcept
 		{
 			return left < rect.right
 				&& right > rect.left
 				&& top < rect.bottom
 				&& bottom > top;
 		}
-		[[nodiscard]] constexpr Rect<T> IntersectRect(Rect<T> rect) const noexcept
+		[[nodiscard]] constexpr auto IntersectRect(Rect<T> rect) const noexcept
 		{
 			if (!IsIntersectingRect(rect))
 			{
@@ -110,7 +112,7 @@ namespace PGUI
 			};
 		}
 
-		constexpr T Area() const noexcept
+		constexpr auto Area() const noexcept
 		{
 			auto size = Size();
 			return size.cx * size.cy;
@@ -123,7 +125,7 @@ namespace PGUI
 			top += yOffset;
 			bottom += yOffset;
 		}
-		[[nodiscard]] constexpr Rect<T> Shifted(T xOffset, T yOffset) const noexcept
+		[[nodiscard]] constexpr auto Shifted(T xOffset, T yOffset) const noexcept
 		{
 			auto rect = *this;
 			rect.Shift(xOffset, yOffset);
@@ -137,14 +139,14 @@ namespace PGUI
 			top -= dy;
 			bottom += dy;
 		}
-		[[nodiscard]] constexpr Rect<T> Inflated(T dx, T dy) const noexcept
+		[[nodiscard]] constexpr auto Inflated(T dx, T dy) const noexcept
 		{
 			auto rect = *this;
 			rect.Inflate(dx, dy);
 			return rect;
 		}
 
-		[[nodiscard]] constexpr Point<T> Center() const noexcept
+		[[nodiscard]] constexpr auto Center() const noexcept
 		{
 			return Point<T>((left + right) / 2, (top + bottom) / 2);
 		}
@@ -158,7 +160,7 @@ namespace PGUI
 			top = p.y - size.cy;
 			bottom = p.y + size.cy;
 		}
-		[[nodiscard]] constexpr Rect<T> CenteredAround(Point<T> p) const noexcept
+		[[nodiscard]] constexpr auto CenteredAround(Point<T> p) const noexcept
 		{
 			auto size = Size() / static_cast<T>(2);
 
@@ -168,7 +170,7 @@ namespace PGUI
 			};
 		}
 
-		template<typename U>
+		template<typename U> requires std::is_arithmetic_v<U>
 		explicit(false) constexpr operator Rect<U>() const noexcept
 		{
 			return Rect<U>{

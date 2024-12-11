@@ -171,7 +171,7 @@ namespace PGUI::UI
 		[[nodiscard]] auto GetParameters() noexcept -> ClipParameters&;
 		void SetParameters(const ClipParameters& parameters) noexcept;
 
-		void operator=(const ClipParameters& _parameters) noexcept { parameters = _parameters; }
+		auto operator=(const ClipParameters& _parameters) noexcept -> Clip& { parameters = _parameters; return *this; }
 		[[nodiscard]] auto operator->() const noexcept -> ClipBase* { return clip.get(); }
 		[[nodiscard]] explicit(false) operator ClipBase* () const noexcept { return clip.get(); }
 		[[nodiscard]] explicit operator bool() const noexcept { return (bool)clip; }

@@ -7,7 +7,7 @@ namespace PGUI::Graphics
 		RenderTarget{ nullptr }
 	{
 	}
-	BitmapRenderTarget::BitmapRenderTarget(ComPtr<ID2D1BitmapRenderTarget> brt) noexcept :
+	BitmapRenderTarget::BitmapRenderTarget(const ComPtr<ID2D1BitmapRenderTarget>& brt) noexcept :
 		RenderTarget{ brt }
 	{
 	}

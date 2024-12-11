@@ -84,7 +84,31 @@ namespace PGUI::UI::Controls
 		RegisterMessageHandler(WM_GETTEXTLENGTH, &TextButton::OnGetTextLength);
 
 		StateChangedEvent().Subscribe(PGUI::BindMemberFunc(&TextButton::OnStateChanged, this));
-		OnStateChanged(GetState());
+		switch (GetState())
+		{
+			using enum PGUI::UI::Controls::ButtonState;
+
+			case Normal:
+			{
+				textBrush.SetParameters(colors.normalText);
+				backgroundBrush.SetParameters(colors.normalBackground);
+				break;
+			}
+			case Hover:
+			{
+				textBrush.SetParameters(colors.hoverText);
+				backgroundBrush.SetParameters(colors.hoverBackground);
+				break;
+			}
+			case Pressed:
+			{
+				textBrush.SetParameters(colors.clickedText);
+				backgroundBrush.SetParameters(colors.clickedBackground);
+				break;
+			}
+			default:
+				break;
+		}
 	}
 
 	auto TextButton::GetTextLayout() const noexcept -> TextLayout
@@ -94,7 +118,7 @@ namespace PGUI::UI::Controls
 
 	void TextButton::SetTextFormat(TextFormat _textFormat) noexcept
 	{
-		textFormat = _textFormat;
+		textFormat = std::move(_textFormat);
 
 		InitTextLayout();
 	}
@@ -200,20 +224,20 @@ namespace PGUI::UI::Controls
 		return Window::OnDPIChange(dpiScale, suggestedRect);
 	}
 
-	auto TextButton::OnNCCreate(UINT, WPARAM, LPARAM lParam) noexcept -> Core::HandlerResult
+	auto TextButton::OnNCCreate(UINT /*unused*/, WPARAM /*unused*/, LPARAM lParam) noexcept -> Core::HandlerResult
 	{
-		auto createStruct = std::bit_cast<LPCREATESTRUCTW>(lParam);
+		const auto* createStruct = std::bit_cast<LPCREATESTRUCTW>(lParam);
 
 		text = createStruct->lpszName;
 		if (!textFormat)
 		{
-			textFormat = TextFormat::GetDefTextFormat(ScaleByDPI(16.0f));
+			textFormat = TextFormat::GetDefTextFormat(ScaleByDPI(16.0F));
 		}
 
 		return 1;
 	}
 
-	auto TextButton::OnPaint(UINT, WPARAM, LPARAM) noexcept -> Core::HandlerResult
+	auto TextButton::OnPaint(UINT /*unused*/, WPARAM /*unused*/, LPARAM /*unused*/) noexcept -> Core::HandlerResult
 	{
 		BeginDraw();
 
@@ -233,16 +257,16 @@ namespace PGUI::UI::Controls
 		return 0;
 	}
 
-	auto TextButton::OnSize(UINT, WPARAM, LPARAM) noexcept -> Core::HandlerResult
+	auto TextButton::OnSize(UINT /*unused*/, WPARAM /*unused*/, LPARAM /*unused*/) noexcept -> Core::HandlerResult
 	{
 		InitTextLayout();
 
 		return 0;
 	}
 
-	auto TextButton::OnSetText(UINT, WPARAM, LPARAM lParam) noexcept -> Core::HandlerResult
+	auto TextButton::OnSetText(UINT /*unused*/, WPARAM /*unused*/, LPARAM lParam) noexcept -> Core::HandlerResult
 	{
-		if (auto newText = std::bit_cast<wchar_t*>(lParam);
+		if (const auto* newText = std::bit_cast<wchar_t*>(lParam);
 			text.data() != newText)
 		{
 			text = newText;
@@ -252,7 +276,7 @@ namespace PGUI::UI::Controls
 
 		return { 1, Core::HandlerResultFlag::PassToDefWindowProc };
 	}
-	auto TextButton::OnGetText(UINT, WPARAM wParam, LPARAM lParam) noexcept -> Core::HandlerResult
+	auto TextButton::OnGetText(UINT /*unused*/, WPARAM wParam, LPARAM lParam) noexcept -> Core::HandlerResult
 	{
 		auto minSize = std::min(text.size() + 1, wParam);
 
@@ -260,7 +284,7 @@ namespace PGUI::UI::Controls
 
 		return minSize;
 	}
-	auto TextButton::OnGetTextLength(UINT, WPARAM, LPARAM) const noexcept -> Core::HandlerResult
+	auto TextButton::OnGetTextLength(UINT /*unused*/, WPARAM /*unused*/, LPARAM /*unused*/) const noexcept -> Core::HandlerResult
 	{
 		return text.size();
 	}

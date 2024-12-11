@@ -20,14 +20,14 @@ namespace PGUI::Graphics
 		explicit GraphicsBitmap() noexcept;
 		explicit GraphicsBitmap(ComPtr<ID2D1Bitmap> bmp) noexcept;
 
-		void CopyFromBitmap(GraphicsBitmap bmp, 
+		void CopyFromBitmap(const GraphicsBitmap& bmp, 
 			std::optional<PointU> destPoint = std::nullopt, 
 			std::optional<RectU> srcRect = std::nullopt) const;
 
 		void CopyFromMemory(const void* data, UINT32 pitch,
 			std::optional<RectU> destRect = std::nullopt) const;
 
-		void CopyFromRenderTarget(RenderTarget rt,
+		void CopyFromRenderTarget(const RenderTarget& rt,
 			std::optional<PointU> destPoint = std::nullopt,
 			std::optional<RectU> srcRect = std::nullopt) const;
 

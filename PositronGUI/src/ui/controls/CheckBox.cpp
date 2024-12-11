@@ -94,7 +94,7 @@ namespace PGUI::UI::Controls
 		return colors;
 	}
 
-	CheckBox::CheckBox(CheckBoxColors  colors) noexcept :
+	CheckBox::CheckBox(CheckBoxColors colors) noexcept :
 		colors{std::move( colors )}
 	{
 		RegisterMessageHandler(WM_PAINT, &CheckBox::OnPaint);
@@ -150,7 +150,7 @@ namespace PGUI::UI::Controls
 		}
 	}
 
-	void CheckBox::OnStateChanged(ButtonState) noexcept
+	void CheckBox::OnStateChanged(ButtonState /*unused*/) noexcept
 	{
 		CheckBoxStateColors stateColors{ };
 		switch (GetSelectionState())
@@ -201,7 +201,7 @@ namespace PGUI::UI::Controls
 		Invalidate();
 	}
 
-	auto CheckBox::OnPaint(UINT, WPARAM, LPARAM) noexcept -> Core::HandlerResult
+	auto CheckBox::OnPaint(UINT /*unused*/, WPARAM /*unused*/, LPARAM /*unused*/) noexcept -> Core::HandlerResult
 	{
 		BeginDraw();
 
@@ -223,7 +223,7 @@ namespace PGUI::UI::Controls
 			case ButtonState::Unchecked:
 			{
 				g.FillRoundedRect(clientRect, backgroundBrush);
-				g.DrawRoundedRect(clientRect, foregroundBrush, ScaleByDPI(2.5f));
+				g.DrawRoundedRect(clientRect, foregroundBrush, ScaleByDPI(2.5F));
 				break;
 			}
 			case ButtonState::Checked:
@@ -234,17 +234,17 @@ namespace PGUI::UI::Controls
 
 				auto center = clientRect.Center();
 				auto scaleTransform = GetDpiScaleTransform() * D2D1::Matrix3x2F::Scale(clientSize / 50, center);
-				RectF rc{ center.x - ScaleByDPI(10.f),
+				RectF rc{ center.x - ScaleByDPI(10.F),
 					center.y, center.x,
-					center.y + ScaleByDPI(3.0f) };
-				rc.Shift(ScaleByDPI(4.0f), ScaleByDPI(3.0f));
+					center.y + ScaleByDPI(3.0F) };
+				rc.Shift(ScaleByDPI(4.0F), ScaleByDPI(3.0F));
 				g.SetTransform(D2D1::Matrix3x2F::Rotation(45, center) * scaleTransform);
 				g.FillRect(rc, foregroundBrush);
 
-				rc = RectF{ center.x - ScaleByDPI(3.0f),
-					center.y - ScaleByDPI(17.0f),
+				rc = RectF{ center.x - ScaleByDPI(3.0F),
+					center.y - ScaleByDPI(17.0F),
 					center.x, center.y };
-				rc.Shift(ScaleByDPI(4.0f), ScaleByDPI(5.0f));
+				rc.Shift(ScaleByDPI(4.0F), ScaleByDPI(5.0F));
 				g.SetTransform(D2D1::Matrix3x2F::Rotation(42, center) * scaleTransform);
 				g.FillRect(rc, foregroundBrush);
 
@@ -261,11 +261,11 @@ namespace PGUI::UI::Controls
 				rect.Inflate(12 * (clientSize.cx / 50), 3 * (clientSize.cy / 50));
 				if (clientRect.xRadius != 0)
 				{
-					rect.xRadius = 2.5f * (clientSize.cx / 50);
+					rect.xRadius = 2.5F * (clientSize.cx / 50);
 				}
 				if (clientRect.yRadius != 0)
 				{
-					rect.yRadius = 5.0f * (clientSize.cy / 50);
+					rect.yRadius = 5.0F * (clientSize.cy / 50);
 				}
 				auto prevTransform = g.GetTransform();
 				g.SetTransform(GetDpiScaleTransform());

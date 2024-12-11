@@ -18,8 +18,7 @@ namespace PGUI::UI::Controls
 
 	#pragma region HeaderTextItem
 
-	auto 
-		HeaderTextItem::GetHeaderTextItemColors() noexcept -> HeaderTextItem::HeaderTextItemColors
+	auto HeaderTextItem::GetHeaderTextItemColors() noexcept -> HeaderTextItem::HeaderTextItemColors
 	{
 		HeaderTextItemColors colors;
 
@@ -49,8 +48,7 @@ namespace PGUI::UI::Controls
 
 		return colors;
 	}
-	auto 
-		HeaderTextItem::GetHeaderTextItemAccentedColors() noexcept -> HeaderTextItem::HeaderTextItemColors
+	auto HeaderTextItem::GetHeaderTextItemAccentedColors() noexcept -> HeaderTextItem::HeaderTextItemColors
 	{
 		HeaderTextItemColors colors;
 
@@ -99,7 +97,7 @@ namespace PGUI::UI::Controls
 
 	void HeaderTextItem::SetTextFormat(TextFormat _textFormat) noexcept
 	{
-		textFormat = _textFormat;
+		textFormat = std::move(_textFormat);
 		InitTextLayout();
 	}
 
@@ -147,7 +145,7 @@ namespace PGUI::UI::Controls
 	{
 		if (!textFormat)
 		{
-			textFormat = TextFormat::GetDefTextFormat(GetHeaderWindow()->ScaleByDPI(16.0f));
+			textFormat = TextFormat::GetDefTextFormat(GetHeaderWindow()->ScaleByDPI(16.0F));
 		}
 		InitTextLayout();
 		OnStateChanged();
@@ -177,7 +175,7 @@ namespace PGUI::UI::Controls
 		}
 	}
 
-	void HeaderTextItem::DiscardDeviceResources(Graphics::Graphics)
+	void HeaderTextItem::DiscardDeviceResources(Graphics::Graphics /*g*/)
 	{
 		textBrush.ReleaseBrush();
 		backgroundBrush.ReleaseBrush();
@@ -211,19 +209,19 @@ namespace PGUI::UI::Controls
 
 		if (UIColors::IsDarkMode())
 		{
-			seperatorBrush.SetParameters(RGBA{ 0x272727 });
+			separatorBrush.SetParameters(RGBA{ 0x272727 });
 			backgroundBrush.SetParameters(RGBA{ 0x181818 });
 		}
 		else
 		{
-			seperatorBrush.SetParameters(RGBA{ 0x070707 });
+			separatorBrush.SetParameters(RGBA{ 0x070707 });
 			backgroundBrush.SetParameters(Colors::White);
 		}
 	}
 
-	void Header::SetSeperatorBrush(const Brush& _seperatorBrush) noexcept
+	void Header::SetSeparatorBrush(const Brush& _separatorBrush) noexcept
 	{
-		seperatorBrush.SetParameters(_seperatorBrush.GetParameters());
+		separatorBrush.SetParameters(_separatorBrush.GetParameters());
 		Invalidate();
 	}
 	void Header::SetBackgroundBrush(const Brush& _backgroundBrush) noexcept
@@ -236,9 +234,9 @@ namespace PGUI::UI::Controls
 	{
 		auto g = GetGraphics();
 
-		if (!seperatorBrush)
+		if (!separatorBrush)
 		{
-			g.CreateBrush(seperatorBrush);
+			g.CreateBrush(separatorBrush);
 		}
 		if (!backgroundBrush)
 		{
@@ -255,7 +253,7 @@ namespace PGUI::UI::Controls
 	{
 		auto g = GetGraphics();
 
-		seperatorBrush.ReleaseBrush();
+		separatorBrush.ReleaseBrush();
 		backgroundBrush.ReleaseBrush();
 
 		std::ranges::for_each(headerItems, [g](const auto& headerItem)
@@ -283,7 +281,7 @@ namespace PGUI::UI::Controls
 
 		return std::nullopt;
 	}
-	auto Header::IsMouseOnSeperator(long xPos) const noexcept -> bool
+	auto Header::IsMouseOnSeparator(long xPos) const noexcept -> bool
 	{
 		long totalWidth = 0;
 
@@ -306,7 +304,7 @@ namespace PGUI::UI::Controls
 	auto Header::CalculateHeaderItemWidthUpToIndex(std::size_t index) const noexcept -> long
 	{
 		return std::accumulate(
-			headerItems.cbegin(), std::next(headerItems.cbegin(), index), 0,
+			headerItems.cbegin(), std::next(headerItems.cbegin(), static_cast<std::ptrdiff_t>(index)), 0,
 			[](long x, const auto& header) { return x + header->GetWidth(); }
 		);
 	}
@@ -328,7 +326,7 @@ namespace PGUI::UI::Controls
 		return Window::OnDPIChange(dpiScale, suggestedRect);
 	}
 
-	auto Header::OnPaint(UINT, WPARAM, LPARAM) -> Core::HandlerResult
+	auto Header::OnPaint(UINT /*unused*/, WPARAM /*unused*/, LPARAM /*unused*/) -> Core::HandlerResult
 	{
 		BeginDraw();
 
@@ -364,7 +362,7 @@ namespace PGUI::UI::Controls
 			g.DrawLine(
 				PointF{ static_cast<float>(totalWidth - 1), 0 }, 
 				PointF{ static_cast<float>(totalWidth - 1), static_cast<float>(height) },
-				seperatorBrush, ScaleByDPI(1.3f));
+				separatorBrush, ScaleByDPI(1.3F));
 		}
 
 		EndDraw();
@@ -372,7 +370,7 @@ namespace PGUI::UI::Controls
 		return 0;
 	}
 	
-	auto Header::OnMouseMove(UINT, WPARAM wParam, LPARAM lParam) -> Core::HandlerResult
+	auto Header::OnMouseMove(UINT /*unused*/, WPARAM wParam, LPARAM lParam) -> Core::HandlerResult
 	{
 		TRACKMOUSEEVENT tme{ };
 		tme.cbSize = sizeof(TRACKMOUSEEVENT);
@@ -384,7 +382,7 @@ namespace PGUI::UI::Controls
 
 		if (dragging && wParam & MK_LBUTTON && hoveringIndex.has_value())
 		{
-			auto ptr = GetItem(*hoveringIndex);
+			auto* ptr = GetItem(*hoveringIndex);
 
 			if (long newWidth = mousePos.x - 
 				CalculateHeaderItemWidthUpToIndex(*hoveringIndex);
@@ -400,7 +398,7 @@ namespace PGUI::UI::Controls
 
 		const auto prevHoveredHeaderIndex = hoveringIndex;
 		hoveringIndex = GetHoveredHeaderItemIndex(mousePos.x);
-		mouseOnDivider = IsMouseOnSeperator(mousePos.x);
+		mouseOnDivider = IsMouseOnSeparator(mousePos.x);
 
 		if (mousePos.x > GetTotalHeaderWidth() + sizingMargin)
 		{
@@ -432,7 +430,7 @@ namespace PGUI::UI::Controls
 
 		return 0;
 	}
-	auto Header::OnMouseLButtonDown(UINT, WPARAM, LPARAM) -> Core::HandlerResult
+	auto Header::OnMouseLButtonDown(UINT /*unused*/, WPARAM /*unused*/, LPARAM /*unused*/) -> Core::HandlerResult
 	{
 		if (dragging)
 		{
@@ -451,7 +449,7 @@ namespace PGUI::UI::Controls
 
 		return 0;
 	}
-	auto Header::OnMouseLButtonUp(UINT, WPARAM, LPARAM) -> Core::HandlerResult
+	auto Header::OnMouseLButtonUp(UINT /*unused*/, WPARAM /*unused*/, LPARAM /*unused*/) -> Core::HandlerResult
 	{
 		if (dragging)
 		{
@@ -466,7 +464,7 @@ namespace PGUI::UI::Controls
 
 		return 0;
 	}
-	auto Header::OnMouseLeave(UINT, WPARAM, LPARAM) -> Core::HandlerResult
+	auto Header::OnMouseLeave(UINT /*unused*/, WPARAM /*unused*/, LPARAM /*unused*/) -> Core::HandlerResult
 	{
 		if (hoveringIndex.has_value())
 		{
@@ -478,7 +476,7 @@ namespace PGUI::UI::Controls
 		return 0;
 	}
 
-	auto Header::OnSetCursor(UINT, WPARAM, LPARAM) const -> Core::HandlerResult
+	auto Header::OnSetCursor(UINT /*unused*/, WPARAM /*unused*/, LPARAM /*unused*/) const -> Core::HandlerResult
 	{
 		LPCWSTR cursorName = nullptr;
 		if (mouseOnDivider)
@@ -490,7 +488,7 @@ namespace PGUI::UI::Controls
 			cursorName = IDC_ARROW;
 		}
 
-		auto hCursor = static_cast<HCURSOR>(LoadImageW(nullptr, cursorName, IMAGE_CURSOR, NULL, NULL, LR_SHARED | LR_DEFAULTSIZE));
+		auto* hCursor = static_cast<HCURSOR>(LoadImageW(nullptr, cursorName, IMAGE_CURSOR, NULL, NULL, LR_SHARED | LR_DEFAULTSIZE));
 		if (!hCursor)
 		{
 			HR_L(HresultFromWin32());
@@ -502,7 +500,7 @@ namespace PGUI::UI::Controls
 		return 1;
 	}
 
-	auto Header::OnSize(UINT, WPARAM, LPARAM) const -> Core::HandlerResult
+	auto Header::OnSize(UINT /*unused*/, WPARAM /*unused*/, LPARAM /*unused*/) const -> Core::HandlerResult
 	{
 		std::ranges::for_each(headerItems, [](const auto& item)
 		{

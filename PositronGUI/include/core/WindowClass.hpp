@@ -20,12 +20,12 @@ namespace PGUI::Core
 		WindowClass(const WindowClass&) = delete;
 		auto operator=(const WindowClass&) -> WindowClass& = delete;
 		WindowClass(WindowClass&&) noexcept = delete;
-		auto operator=(WindowClass&) noexcept -> WindowClass& = delete;
+		auto operator=(WindowClass&&) noexcept -> WindowClass& = delete;
 
 		~WindowClass() noexcept;
 
-		[[nodiscard]] std::wstring_view GetClassName() const noexcept;
-		[[nodiscard]] auto GetAtom() const noexcept -> ATOM;
+		[[nodiscard]] auto ClassName() const noexcept -> std::wstring_view { return className; }
+		[[nodiscard]] auto GetAtom() const noexcept -> ATOM { return classAtom; }
 
 		protected:
 		WindowClass(std::wstring_view _className,

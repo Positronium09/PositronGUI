@@ -2,7 +2,6 @@
 
 #include "core/Exceptions.hpp"
 #include "helpers/HelperFunctions.hpp"
-#include "helpers/HelperFunctions.hpp"
 
 
 namespace PGUI::Core
@@ -18,13 +17,10 @@ namespace PGUI::Core
 			{
 				auto errCode = GetLastError();
 				HR_L(HresultFromWin32(errCode));
-				return errCode;
+				return static_cast<int>(errCode);
 			}
-			else
-			{
-				TranslateMessage(&msg);
-				DispatchMessageW(&msg);
-			}
+			TranslateMessage(&msg);
+			DispatchMessageW(&msg);
 		}
 
 		return static_cast<int>(msg.wParam);

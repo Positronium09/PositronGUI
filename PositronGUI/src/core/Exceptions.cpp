@@ -10,15 +10,6 @@ namespace PGUI::Core
 		errorCode(_errorCode), errorMessage(GetHresultErrorMessage(_errorCode))
 	{
 	}
-	
-	auto PGUIException::GetErrorCode() const noexcept -> HRESULT
-	{
-		return errorCode;
-	}
-	auto PGUIException::GetErrorMessage() const noexcept -> const std::wstring&
-	{
-		return errorMessage;
-	}
 
 	Win32Exception::Win32Exception() noexcept :
 		PGUIException{ HresultFromWin32() }

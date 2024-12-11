@@ -13,7 +13,7 @@ namespace PGUI::Graphics
 	{
 		public:
 		BitmapRenderTarget() noexcept;
-		explicit BitmapRenderTarget(ComPtr<ID2D1BitmapRenderTarget> brt) noexcept;
+		explicit BitmapRenderTarget(const ComPtr<ID2D1BitmapRenderTarget>& brt) noexcept;
 
 		[[nodiscard]] auto GetBitmap() const -> GraphicsBitmap;
 	};

@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?> 
+<AutoVisualizer xmlns="http://schemas.microsoft.com/vstudio/debugger/natvis/2010">
+	<Type Name="PGUI::Point&lt;*&gt;">
+		<DisplayString>x={x}, y={y}</DisplayString>
+		<Expand>
+			<Item Name="x">x</Item>
+			<Item Name="y">y</Item>
+		</Expand>
+	</Type>
+	<Type Name="PGUI::Size&lt;*&gt;">
+		<DisplayString>cx={cx}, cy={cy}</DisplayString>
+		<Expand>
+			<Item Name="cx">cx</Item>
+			<Item Name="cy">cy</Item>
+		</Expand>
+	</Type>
+	<Type Name="PGUI::Rect&lt;*&gt;">
+		<DisplayString>top={top}, left={left}, bottom={bottom}, right={right}</DisplayString>
+		<Expand>
+			<Item Name="top">top</Item>
+			<Item Name="left">left</Item>
+			<Item Name="bottom">bottom</Item>
+			<Item Name="right">right</Item>
+			<Item Name="width">right - left</Item>
+			<Item Name="height">bottom - top</Item>
+		</Expand>
+	</Type>
+	<Type Name="PGUI::RoundedRect">
+		<DisplayString>{*(PGUI::RectF*)this}, radii=({xRadius}, {yRadius})</DisplayString>
+		<Expand>
+			<Item Name="top">top</Item>
+			<Item Name="left">left</Item>
+			<Item Name="bottom">bottom</Item>
+			<Item Name="right">right</Item>
+			<Item Name="width">right - left</Item>
+			<Item Name="height">bottom - top</Item>
+			<Item Name="xRadius">xRadius</Item>
+			<Item Name="yRadius">yRadius</Item>
+		</Expand>
+	</Type>
+	<Type Name="PGUI::Core::WindowClass">
+		<DisplayString>{className}</DisplayString>
+		<Expand>
+			<Item Name="Class Name">className</Item>
+			<Item Name="Class Atom">classAtom</Item>
+		</Expand>
+	</Type>
+	<Type Name="PGUI::Core::Window">
+		<DisplayString>Handle={hWnd}</DisplayString>
+		<Expand>
+			<Item Name="Handle">hWnd</Item>
+			<Item Name="Parent Handle" Condition="parenthWnd != nullptr">parenthWnd</Item>
+			<Item Name="Window Class">windowClass</Item>
+		</Expand>
+	</Type>
+</AutoVisualizer>

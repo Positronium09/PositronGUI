@@ -35,14 +35,14 @@ namespace PGUI::Core
 		using EventHandler = std::function<void(void)>;
 
 		public:
-		void Subscribe(const EventHandler& handler) noexcept
+		void Subscribe(const EventHandler& handler)
 		{
 			eventHandlers.push_back(handler);
 		}
 
 		void Emit() const
 		{
-			for (auto& handler : eventHandlers)
+			for (const auto& handler : eventHandlers)
 			{
 				std::invoke(handler);
 			}

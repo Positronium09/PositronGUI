@@ -9,7 +9,7 @@
 
 namespace PGUI::UI::Bmp
 {
-	Palette::Palette(BitmapDecoder img)
+	Palette::Palette(const BitmapDecoder& img)
 	{
 		auto wicFactory = WICFactory::GetFactory();
 
@@ -17,7 +17,7 @@ namespace PGUI::UI::Bmp
 
 		hr = img->CopyPalette(GetHeldComPtr().Get()); HR_T(hr);
 	}
-	Palette::Palette(BitmapSource img)
+	Palette::Palette(const BitmapSource& img)
 	{
 		auto wicFactory = WICFactory::GetFactory();
 
@@ -35,7 +35,7 @@ namespace PGUI::UI::Bmp
 		hr = GetHeldComPtr()->InitializeCustom(colors.data(), static_cast<UINT>(colors.size())); HR_T(hr);
 	}
 
-	Palette::Palette(ComPtr<IWICBitmapDecoder> bitmapDecoder)
+	Palette::Palette(const ComPtr<IWICBitmapDecoder>& bitmapDecoder)
 	{
 		auto wicFactory = WICFactory::GetFactory();
 
@@ -43,7 +43,7 @@ namespace PGUI::UI::Bmp
 
 		hr = bitmapDecoder->CopyPalette(GetHeldComPtr().Get()); HR_T(hr);
 	}
-	Palette::Palette(ComPtr<IWICBitmapSource> bitmapSource)
+	Palette::Palette(const ComPtr<IWICBitmapSource>& bitmapSource)
 	{
 		auto wicFactory = WICFactory::GetFactory();
 

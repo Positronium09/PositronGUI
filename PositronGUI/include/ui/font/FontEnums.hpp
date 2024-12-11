@@ -17,7 +17,7 @@ namespace PGUI::UI::Font
 		{ }
 
 		explicit(false) operator DWRITE_FONT_WEIGHT() const noexcept { return fontWeight; }
-		FontWeight& operator=(const DWRITE_FONT_WEIGHT& _fontWeight) noexcept { fontWeight = _fontWeight; return *this; }
+		auto operator=(const DWRITE_FONT_WEIGHT& _fontWeight) noexcept -> FontWeight& { fontWeight = _fontWeight; return *this; }
 
 		private:
 		DWRITE_FONT_WEIGHT fontWeight;

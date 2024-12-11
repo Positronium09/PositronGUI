@@ -13,10 +13,13 @@ namespace PGUI
 	{
 		public:
 		DXGIFactory() = delete;
-		DXGIFactory(DXGIFactory&) = delete;
-		void operator=(const DXGIFactory&) = delete;
+		DXGIFactory(const DXGIFactory&) = delete;
+		auto operator=(const DXGIFactory&) -> DXGIFactory& = delete;
+		DXGIFactory(DXGIFactory&&) = delete;
+		auto operator=(DXGIFactory&&) -> DXGIFactory& = delete;
+		~DXGIFactory() = default;
 
-		[[nodiscard]] static ComPtr<IDXGIFactory7> GetFactory()
+		[[nodiscard]] static auto GetFactory()
 		{
 			if (!dxgiFactory)
 			{

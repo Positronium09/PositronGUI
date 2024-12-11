@@ -12,8 +12,8 @@ namespace PGUI::UI::Bmp
 	class MetadataReader : public ComPtrHolder<IWICMetadataQueryReader>
 	{
 		public:
-		explicit MetadataReader(Frame frame) noexcept;
-		explicit MetadataReader(BitmapDecoder img) noexcept;
+		explicit MetadataReader(const Frame& frame) noexcept;
+		explicit MetadataReader(const BitmapDecoder& img) noexcept;
 		explicit MetadataReader(ComPtr<IWICMetadataQueryReader> reader) noexcept;
 
 		[[nodiscard]] auto GetMetadata(std::wstring_view name) const noexcept -> PropVariant;

@@ -32,11 +32,7 @@ namespace PGUI
 	{
 		return GetValue();
 	}
-	auto PropVariant::Type() const noexcept -> PropVariantType
-	{
-		return static_cast<PropVariantType>(var.vt);
-	}
-	auto PropVariant::GetValue() const noexcept -> PropVariantValue
+	auto PropVariant::GetValue() const -> PropVariantValue
 	{
 		switch (Type())
 		{

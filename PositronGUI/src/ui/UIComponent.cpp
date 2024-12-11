@@ -48,7 +48,7 @@ namespace PGUI::UI
 		return IsWindowEnabled(Hwnd());
 	}
 
-	auto UIComponent::OnCreate(UINT, WPARAM, LPARAM) const noexcept -> Core::HandlerResult
+	auto UIComponent::OnCreate(UINT /*unused*/, WPARAM /*unused*/, LPARAM /*unused*/) const noexcept -> Core::HandlerResult
 	{
 		/*
 		* Disable input by default
@@ -81,7 +81,7 @@ namespace PGUI::UI
 		return defResult;
 	}
 
-	auto UIComponent::OnSize(UINT, WPARAM, LPARAM) noexcept -> Core::HandlerResult
+	auto UIComponent::OnSize(UINT /*unused*/, WPARAM /*unused*/, LPARAM /*unused*/) noexcept -> Core::HandlerResult
 	{
 		AdjustClipForWindow(clip, this);
 		return 0;

@@ -9,13 +9,13 @@
 #include <bit>
 #include <cstring>
 #include <dwmapi.h>
-#include <shlwapi.h>
+#include <Shlwapi.h>
 #include <system_error>
 
 
 namespace PGUI
 {
-	auto PGUI::StringToWString(std::string_view string) noexcept -> std::wstring
+	auto StringToWString(std::string_view string) noexcept -> std::wstring
 	{
 		if (string.empty())
 		{
@@ -137,7 +137,7 @@ namespace PGUI
 		if (FAILED(hr))
 		{
 			using UHRESULT = std::make_unsigned_t<HRESULT>;
-			auto filename = PathFindFileNameA(location.file_name());
+			auto* filename = PathFindFileNameA(location.file_name());
 			auto part1 = std::format("In File {}", filename);
 			auto part2 = std::format("In Function {} at line {}",
 				location.function_name(), location.line()

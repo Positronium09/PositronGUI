@@ -10,19 +10,19 @@
 #include <TOM.h>
 
 
-namespace Msftedit
+struct Msftedit
 {
 	using CreateTextServicesFunc = HRESULT(_stdcall*)(IUnknown*, ITextHost*, IUnknown**);
 	using ShutdownTextServicesFunc = HRESULT(_stdcall*)(IUnknown*);
 
-	HMODULE msftedit = nullptr;
-	CreateTextServicesFunc createTextServices = nullptr;
-	ShutdownTextServicesFunc shutdownTextServices = nullptr;
-	IID* IIDITextServices2;
-	IID* IIDITextHost;
-	IID* IIDITextHost2;
+	static inline HMODULE msftedit = nullptr;
+	static inline CreateTextServicesFunc createTextServices = nullptr;
+	static inline ShutdownTextServicesFunc shutdownTextServices = nullptr;
+	static inline IID* IIDITextServices2;
+	static inline IID* IIDITextHost;
+	static inline IID* IIDITextHost2;
 
-	void LoadMsftedit()
+	static void LoadMsftedit()
 	{
 		if (!msftedit)
 		{
@@ -50,7 +50,7 @@ namespace Msftedit
 		{
 			PGUI::HR_T(PGUI::HresultFromWin32());
 		}
-		
+
 		if (!IIDITextServices2)
 		{
 			IIDITextServices2 = std::bit_cast<IID*>(GetProcAddress(msftedit, "IID_ITextServices2"));
@@ -78,7 +78,7 @@ namespace Msftedit
 			PGUI::HR_T(PGUI::HresultFromWin32());
 		}
 	}
-}
+};
 
 namespace PGUI::UI::Controls
 {
@@ -115,7 +115,8 @@ namespace PGUI::UI::Controls
 		RegisterMessageHandler(WM_DROPFILES, &Edit::ForwardToTextServices);
 		
 		charFormat.yHeight = PixelsToTwips(params.fontSize);
-		StringCchCopyW(charFormat.szFaceName, params.fontFace.length(), params.fontFace.c_str());
+		StringCchCopyW(
+			static_cast<STRSAFE_LPWSTR>(charFormat.szFaceName), params.fontFace.length(), params.fontFace.c_str());
 
 		if (UIColors::IsDarkMode())
 		{
@@ -173,7 +174,8 @@ namespace PGUI::UI::Controls
 
 	void Edit::SetFontFace(std::wstring_view fontFace) noexcept
 	{
-		StringCchCopyW(charFormat.szFaceName, fontFace.length(), fontFace.data());
+		StringCchCopyW(
+			static_cast<STRSAFE_LPWSTR>(charFormat.szFaceName), fontFace.length(), fontFace.data());
 		SetDefaultCharFormat(charFormat);
 	}
 
@@ -311,10 +313,10 @@ namespace PGUI::UI::Controls
 			propertyBits |= TXTBIT_READONLY;
 			return;
 		}
-		else
-		{
+		
+		
 			propertyBits &= ~TXTBIT_READONLY;
-		}
+	
 		textServices->OnTxPropertyBitsChange(propertyBits, propertyBits);
 	}
 
@@ -330,10 +332,10 @@ namespace PGUI::UI::Controls
 			propertyBits |= TXTBIT_USEPASSWORD;
 			return;
 		}
-		else
-		{
+		
+		
 			propertyBits &= ~TXTBIT_USEPASSWORD;
-		}
+	
 		textServices->OnTxPropertyBitsChange(propertyBits, propertyBits);
 	}
 
@@ -743,7 +745,7 @@ namespace PGUI::UI::Controls
 		HR_L(hr);
 	}
 
-	void Edit::SetOleCallack(ComPtr<IRichEditOleCallback> callback) const noexcept
+	void Edit::SetOleCallack(const ComPtr<IRichEditOleCallback>& callback) const noexcept
 	{
 		HRESULT hr =
 			textServices->TxSendMessage(EM_SETOLECALLBACK, NULL,
@@ -814,7 +816,7 @@ namespace PGUI::UI::Controls
 		backgroundBrush.ReleaseBrush();
 	}
 
-	void Edit::CaretBlinkHandler(Core::TimerId)
+	void Edit::CaretBlinkHandler(Core::TimerId /*unused*/)
 	{
 		showCaret = !showCaret;
 		Invalidate();
@@ -848,7 +850,7 @@ namespace PGUI::UI::Controls
 
 		if (msg >= WM_MOUSEFIRST && msg <= WM_MOUSELAST)
 		{
-			auto p = std::bit_cast<LPPOINTS>(&lParam);
+			auto* p = std::bit_cast<LPPOINTS>(&lParam);
 			p->x = ScaleByDPI(p->x);
 			p->y = ScaleByDPI(p->y);
 		}
@@ -862,7 +864,7 @@ namespace PGUI::UI::Controls
 		return result;
 	}
 
-	auto Edit::OnCreate(UINT, WPARAM, LPARAM lParam) -> Core::HandlerResult
+	auto Edit::OnCreate(UINT /*unused*/, WPARAM /*unused*/, LPARAM lParam) -> Core::HandlerResult
 	{
 		const auto clientRect = GetClientRect();
 		const auto clientSize = clientRect.Size();
@@ -898,7 +900,7 @@ namespace PGUI::UI::Controls
 			0x1000 | 0x2000, nullptr);
 		textServices->OnTxInPlaceActivate(nullptr);
 
-		auto createStruct = std::bit_cast<LPCREATESTRUCTW>(lParam);
+		const auto* createStruct = std::bit_cast<LPCREATESTRUCTW>(lParam);
 
 		textServices->TxSetText(createStruct->lpszName);
 
@@ -907,14 +909,14 @@ namespace PGUI::UI::Controls
 		return 0;
 	}
 
-	auto Edit::OnDestroy(UINT, WPARAM, LPARAM) noexcept -> Core::HandlerResult
+	auto Edit::OnDestroy(UINT /*unused*/, WPARAM /*unused*/, LPARAM /*unused*/) noexcept -> Core::HandlerResult
 	{
 		HRESULT hr = Msftedit::shutdownTextServices(textServices.Get()); HR_L(hr);
 		textServices.Detach();
 		return 0;
 	}
 
-	auto Edit::OnPaint(UINT, WPARAM, LPARAM) noexcept -> Core::HandlerResult
+	auto Edit::OnPaint(UINT /*unused*/, WPARAM /*unused*/, LPARAM /*unused*/) noexcept -> Core::HandlerResult
 	{
 		BeginDraw();
 
@@ -941,7 +943,7 @@ namespace PGUI::UI::Controls
 		return 0;
 	}
 
-	auto Edit::OnSetCursor(UINT, WPARAM, LPARAM) const noexcept -> Core::HandlerResult
+	auto Edit::OnSetCursor(UINT /*unused*/, WPARAM /*unused*/, LPARAM /*unused*/) const noexcept -> Core::HandlerResult
 	{
 		POINT position{};
 		GetCursorPos(&position);
@@ -986,7 +988,7 @@ namespace PGUI::UI::Controls
 
 	#pragma region ITextHost2_Impl
 
-	HRESULT __stdcall Edit::TextHost::QueryInterface(REFIID riid, void** ppvObject)
+	auto __stdcall Edit::TextHost::QueryInterface(REFIID riid, void** ppvObject) -> HRESULT
 	{
 		if (!ppvObject)
 		{
@@ -1006,11 +1008,11 @@ namespace PGUI::UI::Controls
 
 		return E_NOINTERFACE;
 	}
-	ULONG __stdcall Edit::TextHost::AddRef()
+	auto __stdcall Edit::TextHost::AddRef() -> ULONG
 	{
 		return 1;
 	}
-	ULONG __stdcall Edit::TextHost::Release()
+	auto __stdcall Edit::TextHost::Release() -> ULONG
 	{
 		return 1;
 	}
@@ -1039,12 +1041,12 @@ namespace PGUI::UI::Controls
 
 		return TRUE;
 	}
-	auto Edit::TextHost::TxEnableScrollBar(INT, INT) -> BOOL
+	auto Edit::TextHost::TxEnableScrollBar(INT /*fuSBFlags*/, INT /*fuArrowflags*/) -> BOOL
 	{
 		//ScrollBar doesnt support enabling or disabling buttons :[
 		return TRUE;
 	}
-	auto Edit::TextHost::TxSetScrollRange(INT bar, LONG minPos, INT maxPos, BOOL) -> BOOL
+	auto Edit::TextHost::TxSetScrollRange(INT bar, LONG minPos, INT maxPos, BOOL /*fRedraw*/) -> BOOL
 	{
 		const auto& scrollBar = bar == SB_HORZ ? 
 			parentWindow->horizontalScrollBar : parentWindow->verticalScrollBar;
@@ -1054,7 +1056,7 @@ namespace PGUI::UI::Controls
 
 		return TRUE;
 	}
-	auto Edit::TextHost::TxSetScrollPos(INT bar, INT pos, BOOL) -> BOOL
+	auto Edit::TextHost::TxSetScrollPos(INT bar, INT pos, BOOL /*fRedraw*/) -> BOOL
 	{
 		const auto& scrollBar = bar == SB_HORZ ? 
 			parentWindow->horizontalScrollBar : parentWindow->verticalScrollBar;
@@ -1074,7 +1076,7 @@ namespace PGUI::UI::Controls
 			UpdateWindow(parentWindow->Hwnd());
 		}
 	}
-	auto Edit::TextHost::TxCreateCaret(HBITMAP, INT width, INT height) -> BOOL
+	auto Edit::TextHost::TxCreateCaret(HBITMAP /*hbmp*/, INT width, INT height) -> BOOL
 	{
 		auto g = parentWindow->GetGraphics();
 
@@ -1141,7 +1143,7 @@ namespace PGUI::UI::Controls
 	{
 		parentWindow->RemoveTimer(idTimer);
 	}
-	void Edit::TextHost::TxScrollWindowEx(INT dx, INT dy, LPCRECT, LPCRECT, HRGN, LPRECT, UINT)
+	void Edit::TextHost::TxScrollWindowEx(INT dx, INT dy, LPCRECT /*lprcScroll*/, LPCRECT /*lprcClip*/, HRGN /*hrgnUpdate*/, LPRECT /*lprcUpdate*/, UINT /*fuScroll*/)
 	{
 		parentWindow->verticalScrollBar->ScrollRelative(dy);
 		parentWindow->horizontalScrollBar->ScrollRelative(dx);
@@ -1161,7 +1163,7 @@ namespace PGUI::UI::Controls
 	{
 		SetFocus(parentWindow->Hwnd());
 	}
-	void Edit::TextHost::TxSetCursor(HCURSOR cursorHandle, BOOL)
+	void Edit::TextHost::TxSetCursor(HCURSOR cursorHandle, BOOL /*fText*/)
 	{
 		SetCursor(cursorHandle);
 	}
@@ -1185,7 +1187,7 @@ namespace PGUI::UI::Controls
 	}
 	auto Edit::TextHost::TxDeactivate(LONG newState) -> HRESULT
 	{
-		HWND ret = SetActiveWindow(std::bit_cast<HWND>(LongToHandle(newState)));
+		const auto* ret = SetActiveWindow(std::bit_cast<HWND>(LongToHandle(newState)));
 
 		return (ret ? S_OK : E_FAIL);
 	}
@@ -1258,15 +1260,15 @@ namespace PGUI::UI::Controls
 
 		return S_OK;
 	} 
-	auto Edit::TextHost::OnTxCharFormatChange(const CHARFORMATW*) -> HRESULT
+	auto Edit::TextHost::OnTxCharFormatChange(const CHARFORMATW* /*pCF*/) -> HRESULT
 	{
 		return S_OK;
 	}
-	auto Edit::TextHost::OnTxParaFormatChange(const PARAFORMAT*) -> HRESULT
+	auto Edit::TextHost::OnTxParaFormatChange(const PARAFORMAT* /*pPF*/) -> HRESULT
 	{
 		return S_OK;
 	}
-	auto Edit::TextHost::TxGetPropertyBits(DWORD, DWORD* pdwBits) -> HRESULT
+	auto Edit::TextHost::TxGetPropertyBits(DWORD /*dwMask*/, DWORD* pdwBits) -> HRESULT
 	{
 		*pdwBits = parentWindow->propertyBits;
 
@@ -1278,14 +1280,14 @@ namespace PGUI::UI::Controls
 		{
 			case EN_CHANGE:
 			{
-				auto changeNotify = std::bit_cast<CHANGENOTIFY*>(data);
+				const auto* changeNotify = std::bit_cast<CHANGENOTIFY*>(data);
 				parentWindow->changedEvent.Emit(
 					static_cast<ChangeEventType>(changeNotify->dwChangeType));
 				break;
 			}
 			case EN_DROPFILES:
 			{
-				auto dropFiles = std::bit_cast<ENDROPFILES*>(data);
+				const auto* dropFiles = std::bit_cast<ENDROPFILES*>(data);
 				parentWindow->dropFilesEvent.Emit(dropFiles->hDrop, dropFiles->cp, dropFiles->fProtected);
 
 				break;
@@ -1298,7 +1300,7 @@ namespace PGUI::UI::Controls
 			}
 			case EN_LINK:
 			{
-				auto link = std::bit_cast<ENLINK*>(data);
+				const auto* link = std::bit_cast<ENLINK*>(data);
 				parentWindow->linkEvent.Emit(link->msg, link->wParam, link->lParam, link->chrg);
 
 				break;
@@ -1311,7 +1313,7 @@ namespace PGUI::UI::Controls
 			}
 			case EN_OLEOPFAILED:
 			{
-				auto oleOpFailed = std::bit_cast<ENOLEOPFAILED*>(data);
+				const auto* oleOpFailed = std::bit_cast<ENOLEOPFAILED*>(data);
 
 				parentWindow->oleOpFailedEvent.Emit(oleOpFailed->iob, oleOpFailed->lOper, oleOpFailed->hr);
 
@@ -1319,7 +1321,7 @@ namespace PGUI::UI::Controls
 			}
 			case EN_PROTECTED:
 			{
-				auto enProtected = std::bit_cast<ENPROTECTED*>(data);
+				const auto* enProtected = std::bit_cast<ENPROTECTED*>(data);
 
 				parentWindow->protectedEvent.Emit(enProtected->msg, enProtected->wParam, enProtected->lParam, enProtected->chrg);
 
@@ -1327,7 +1329,7 @@ namespace PGUI::UI::Controls
 			}
 			case EN_REQUESTRESIZE:
 			{
-				auto requestResize = std::bit_cast<REQRESIZE*>(data);
+				const auto* requestResize = std::bit_cast<REQRESIZE*>(data);
 
 				parentWindow->requestResizeEvent.Emit(requestResize->rc);
 
@@ -1335,7 +1337,7 @@ namespace PGUI::UI::Controls
 			}
 			case EN_SELCHANGE:
 			{
-				auto selChange = std::bit_cast<SELCHANGE*>(data);
+				const auto* selChange = std::bit_cast<SELCHANGE*>(data);
 
 				parentWindow->selectionChangeEvent.Emit(selChange->chrg, 
 					static_cast<EditSelectionFlag>(selChange->seltyp));
@@ -1354,7 +1356,7 @@ namespace PGUI::UI::Controls
 			}
 			case EN_CLIPFORMAT:
 			{
-				auto clipBoardFormat = std::bit_cast<CLIPBOARDFORMAT*>(data);
+				const auto* clipBoardFormat = std::bit_cast<CLIPBOARDFORMAT*>(data);
 
 				parentWindow->clipFormatEvent.Emit(clipBoardFormat->cf);
 
@@ -1368,7 +1370,7 @@ namespace PGUI::UI::Controls
 			}
 			case EN_LOWFIRTF:
 			{
-				auto lowfirtf = std::bit_cast<ENLOWFIRTF*>(data);
+				const auto* lowfirtf = std::bit_cast<ENLOWFIRTF*>(data);
 
 				parentWindow->lowFirtfEvent.Emit(lowfirtf->szControl);
 
@@ -1376,7 +1378,7 @@ namespace PGUI::UI::Controls
 			}
 			case EN_OBJECTPOSITIONS:
 			{
-				auto objectPos = std::bit_cast<OBJECTPOSITIONS*>(data);
+				const auto* objectPos = std::bit_cast<OBJECTPOSITIONS*>(data);
 
 				std::span<long> objectPositions(objectPos->pcpPositions, objectPos->cObjectCount);
 
@@ -1451,7 +1453,7 @@ namespace PGUI::UI::Controls
 
 		return S_OK;
 	}
-	auto Edit::TextHost::TxSetCursor2(HCURSOR cursorHandle, BOOL) -> HCURSOR
+	auto Edit::TextHost::TxSetCursor2(HCURSOR cursorHandle, BOOL /*bText*/) -> HCURSOR
 	{
 		return SetCursor(cursorHandle);
 	}
@@ -1459,7 +1461,7 @@ namespace PGUI::UI::Controls
 	{
 		// E_NOTIMPL
 	}
-	auto Edit::TextHost::TxGetEditStyle(DWORD, DWORD* pdwData) -> HRESULT
+	auto Edit::TextHost::TxGetEditStyle(DWORD /*dwItem*/, DWORD* pdwData) -> HRESULT
 	{
 		*pdwData = 0;
 
@@ -1472,7 +1474,7 @@ namespace PGUI::UI::Controls
 
 		return S_OK;
 	}
-	auto Edit::TextHost::TxShowDropCaret(BOOL, HDC, LPCRECT) -> HRESULT
+	auto Edit::TextHost::TxShowDropCaret(BOOL /*fShow*/, HDC /*hdc*/, LPCRECT /*prc*/) -> HRESULT
 	{
 		return E_NOTIMPL;
 	}
@@ -1491,18 +1493,14 @@ namespace PGUI::UI::Controls
 
 	#pragma endregion
 
-	auto BuiltinFilters::NumericOnlyFilter(Core::WindowPtr<Edit> edit, UINT& msg, WPARAM& wParam, LPARAM&) noexcept -> bool
+	auto BuiltinFilters::NumericOnlyFilter(Core::WindowPtr<Edit> edit, UINT& msg, WPARAM& wParam, LPARAM& /*unused*/) noexcept -> bool
 	{
 		if (msg == WM_KEYDOWN || msg == WM_KEYUP)
 		{
-			if ((wParam >= VK_LSHIFT && wParam <= VK_MEDIA_PLAY_PAUSE) ||
+			return (wParam >= VK_LSHIFT && wParam <= VK_MEDIA_PLAY_PAUSE) ||
 				(wParam >= VK_F1 && wParam <= VK_SCROLL) ||
 				(wParam >= VK_LWIN && wParam <= VK_NUMPAD9) ||
-				wParam <= 0x39)
-			{
-				return true;
-			}
-			return false;
+				wParam <= 0x39;
 		}
 		auto c = static_cast<wchar_t>(wParam);
 		if ((c == L'+' || c == L'-') && edit->GetTextLength() == 0)
@@ -1525,7 +1523,7 @@ namespace PGUI::UI::Controls
 		}
 		return false;
 	}
-	auto BuiltinFilters::UppercaseOnlyFilter(Core::WindowPtr<Edit>, UINT&, WPARAM& wParam, LPARAM&) noexcept -> bool
+	auto BuiltinFilters::UppercaseOnlyFilter(Core::WindowPtr<Edit> /*unused*/, UINT& /*unused*/, WPARAM& wParam, LPARAM& /*unused*/) noexcept -> bool
 	{
 		NLSVERSIONINFOEX v{ };
 		v.dwNLSVersionInfoSize = sizeof(NLSVERSIONINFO);
@@ -1551,7 +1549,7 @@ namespace PGUI::UI::Controls
 
 		return true;
 	}
-	auto BuiltinFilters::LowercaseOnlyFilter(Core::WindowPtr<Edit>, UINT&, WPARAM& wParam, LPARAM&) noexcept -> bool
+	auto BuiltinFilters::LowercaseOnlyFilter(Core::WindowPtr<Edit> /*unused*/, UINT& /*unused*/, WPARAM& wParam, LPARAM& /*unused*/) noexcept -> bool
 	{
 		NLSVERSIONINFOEX v{ };
 		v.dwNLSVersionInfoSize = sizeof(NLSVERSIONINFO);

@@ -24,11 +24,6 @@ namespace PGUI::UI
 			position = gradientStop.position;
 			color = gradientStop.color;
 		}
-
-		explicit(false) operator D2D1_GRADIENT_STOP() const noexcept
-		{
-			return *this;
-		}
 	};
 
 	using GradientStops = std::vector<GradientStop>;
@@ -60,9 +55,9 @@ namespace PGUI::UI
 		LinearGradient(PointF start, PointF end, const GradientStops& stops) noexcept;
 
 		[[nodiscard]] auto Start() const noexcept -> PointF;
-		void Start(PointF center) noexcept;
+		void Start(PointF _start) noexcept;
 		[[nodiscard]] auto End() const noexcept -> PointF;
-		void End(PointF offset) noexcept;
+		void End(PointF _end) noexcept;
 
 		void ApplyReferenceRect(RectF rect) noexcept override;
 		[[nodiscard]] auto ReferenceRectApplied(RectF rect) const noexcept -> LinearGradient;

@@ -60,12 +60,12 @@ namespace PGUI::UI::Dialogs
 	{
 		auto size = GetClientSize();
 
-		auto clipParams = RoundedRectangleClipParameters{ RoundedRect{ RectF{ }, 5.0f, 5.0f } };
+		auto clipParams = RoundedRectangleClipParameters{ RoundedRect{ RectF{ }, 5.0F, 5.0F } };
 
 		const auto createButton = [this, &size, &clipParams](std::size_t id, 
 			std::wstring_view buttonText, MessageBoxChoice buttonChoice)
 		{
-			auto button = AddChildWindow<TextButton>(
+			auto* button = AddChildWindow<TextButton>(
 				Core::WindowCreateParams{ buttonText,
 				{ size.cx - static_cast<int>(id) * (buttonSize.cx + 20), 
 				size.cy - buttonSize.cy - 20 },
@@ -220,7 +220,7 @@ namespace PGUI::UI::Dialogs
 		return size;
 	}
 
-	auto MessageBoxDialog::OnCreate(UINT, WPARAM, LPARAM) -> Core::HandlerResult
+	auto MessageBoxDialog::OnCreate(UINT /*unused*/, WPARAM /*unused*/, LPARAM /*unused*/) -> Core::HandlerResult
 	{
 		if (UIColors::IsDarkMode())
 		{
@@ -229,7 +229,7 @@ namespace PGUI::UI::Dialogs
 
 		maxSize = ScaleByDPI(SizeF{ maxSize });
 
-		textFormat = TextFormat::GetDefTextFormat(ScaleByDPI(16.0f));
+		textFormat = TextFormat::GetDefTextFormat(ScaleByDPI(16.0F));
 		textFormat.SetParagraphAlignment(Font::ParagraphAlignments::Near);
 		textFormat.SetTextAlignment(Font::TextAlignments::Leading);
 
@@ -253,7 +253,7 @@ namespace PGUI::UI::Dialogs
 
 			case Error: // Stop, Hand
 			{
-				auto hIcon = static_cast<HICON>(
+				auto* hIcon = static_cast<HICON>(
 					LoadImageW(nullptr, 
 						MAKEINTRESOURCEW(IDI_ERROR), IMAGE_ICON, iconSize.cx, iconSize.cy, LR_SHARED)
 					);
@@ -262,7 +262,7 @@ namespace PGUI::UI::Dialogs
 			}
 			case Question:
 			{
-				auto hIcon = static_cast<HICON>(
+				auto* hIcon = static_cast<HICON>(
 					LoadImageW(nullptr, 
 						MAKEINTRESOURCEW(IDI_QUESTION), IMAGE_ICON, iconSize.cx, iconSize.cy, LR_SHARED)
 					);
@@ -271,7 +271,7 @@ namespace PGUI::UI::Dialogs
 			}
 			case Warning: // Exclamation
 			{
-				auto hIcon = static_cast<HICON>(
+				auto* hIcon = static_cast<HICON>(
 					LoadImageW(nullptr, 
 						MAKEINTRESOURCEW(IDI_WARNING), IMAGE_ICON, iconSize.cx, iconSize.cy, LR_SHARED)
 					);
@@ -280,7 +280,7 @@ namespace PGUI::UI::Dialogs
 			}
 			case Information: // Asterisk
 			{
-				auto hIcon = static_cast<HICON>(
+				auto* hIcon = static_cast<HICON>(
 					LoadImageW(nullptr,
 						MAKEINTRESOURCEW(IDI_INFORMATION), IMAGE_ICON, iconSize.cx, iconSize.cy, LR_SHARED)
 					);
@@ -315,7 +315,7 @@ namespace PGUI::UI::Dialogs
 		return 0;
 	}
 
-	auto MessageBoxDialog::OnPaint(UINT, WPARAM, LPARAM) -> Core::HandlerResult
+	auto MessageBoxDialog::OnPaint(UINT /*unused*/, WPARAM /*unused*/, LPARAM /*unused*/) -> Core::HandlerResult
 	{
 		BeginDraw();
 
@@ -333,14 +333,14 @@ namespace PGUI::UI::Dialogs
 		if (iconBmp)
 		{
 			float middleY = (size.cy - 
-				static_cast<float>(buttonSize.cy + margin.top + margin.bottom)) / 2.f;
+				static_cast<float>(buttonSize.cy + margin.top + margin.bottom)) / 2.F;
 
 			g.DrawBitmap(iconBmp, RectF{
 				static_cast<float>(margin.left), 
-				middleY - static_cast<float>(iconSize.cy) / 2.f,
+				middleY - static_cast<float>(iconSize.cy) / 2.F,
 				static_cast<float>(margin.left + iconSize.cx),
 				middleY + 
-				static_cast<float>(iconSize.cy) / 2.f
+				static_cast<float>(iconSize.cy) / 2.F
 				});
 			textOrigin.x += static_cast<float>(margin.left + iconSize.cx);
 		}

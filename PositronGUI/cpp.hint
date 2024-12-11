@@ -1,0 +1,3 @@
+#define STDMETHODCALLTYPE
+#define REFIID
+#define EnableEnumFlag(T) namespace enum_flag_detail { template<> struct enum_flag_enable<T> : public std::true_type{}; }

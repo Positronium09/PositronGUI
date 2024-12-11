@@ -20,25 +20,26 @@ namespace PGUI
 	void Initialize();
 }
 
+
 namespace PGUI::Core
 {
 	class DirectCompositionWindow : public Window
 	{
 		friend void PGUI::Initialize();
-		
+
 		public:
 		explicit DirectCompositionWindow(const WindowClass::WindowClassPtr& wndClass) noexcept;
 
-		protected:
-		[[nodiscard]] static auto D3D11Device() noexcept -> ComPtr<ID3D11Device2>;
-		[[nodiscard]] static auto DXGIDevice() noexcept -> ComPtr<IDXGIDevice4>;
-		[[nodiscard]] static auto DCompositionDevice() noexcept -> ComPtr<IDCompositionDevice>;
-		[[nodiscard]] static auto D2D1Device() noexcept -> ComPtr<ID2D1Device7>;
-		[[nodiscard]] auto DXGISwapChain() const noexcept -> ComPtr<IDXGISwapChain1>;
-		[[nodiscard]] auto DCompositionTarget() const noexcept -> ComPtr<IDCompositionTarget>;
-		[[nodiscard]] auto D2D1DeviceContext() const noexcept -> ComPtr<ID2D1DeviceContext7>;
+		[[nodiscard]] auto GetGraphics() const noexcept { return Graphics::Graphics{ d2d1Dc }; }
 
-		[[nodiscard]] auto GetGraphics() const noexcept -> Graphics::Graphics;
+		protected:
+		[[nodiscard]] static auto D3D11Device() noexcept { return d3d11Device; }
+		[[nodiscard]] static auto DXGIDevice() noexcept { return dxgiDevice; }
+		[[nodiscard]] static auto DCompositionDevice() noexcept { return dcompDevice; }
+		[[nodiscard]] static auto D2D1Device() noexcept { return d2d1Device; }
+		[[nodiscard]] auto DXGISwapChain() const noexcept { return swapChain; }
+		[[nodiscard]] auto DCompositionTarget() const noexcept { return dcompTarget; }
+		[[nodiscard]] auto D2D1DeviceContext() const noexcept { return d2d1Dc; }
 
 		virtual void BeginDraw();
 		virtual auto EndDraw() -> HRESULT;

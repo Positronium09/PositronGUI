@@ -107,8 +107,8 @@ namespace PGUI::UI
 		offset.x = MapToRange(offset.y, rect.right, rect.left);
 		offset.y = MapToRange(offset.y, rect.bottom, rect.top);
 
-		ellipse.xRadius = MapToRange(ellipse.xRadius, 0.0f, size.cx);
-		ellipse.yRadius = MapToRange(ellipse.yRadius, 0.0f, size.cy);
+		ellipse.xRadius = MapToRange(ellipse.xRadius, 0.0F, size.cx);
+		ellipse.yRadius = MapToRange(ellipse.yRadius, 0.0F, size.cy);
 	}
 
 	auto RadialGradient::ReferenceRectApplied(RectF rect) const noexcept -> RadialGradient

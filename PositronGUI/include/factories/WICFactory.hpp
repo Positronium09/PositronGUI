@@ -13,10 +13,13 @@ namespace PGUI
 	{
 		public:
 		WICFactory() = delete;
-		WICFactory(WICFactory&) = delete;
-		void operator=(const WICFactory&) = delete;
+		WICFactory(const WICFactory&) = delete;
+		auto operator=(const WICFactory&) -> WICFactory& = delete;
+		WICFactory(WICFactory&&) = delete;
+		auto operator=(WICFactory&&) -> WICFactory& = delete;
+		~WICFactory() = default;
 
-		[[nodiscard]] static ComPtr<IWICImagingFactory> GetFactory()
+		[[nodiscard]] static auto GetFactory()
 		{
 			if (!wicFactory)
 			{

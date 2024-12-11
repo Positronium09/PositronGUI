@@ -20,7 +20,7 @@ namespace PGUI::UI
 		TextFormat() noexcept = default;
 		TextFormat(std::wstring_view fontFamilyName, 
 			FLOAT fontSize, std::wstring_view localeName,
-			std::optional<Font::FontCollection> fontCollection = std::nullopt,
+			const std::optional<Font::FontCollection>& fontCollection = std::nullopt,
 			Font::FontWeight fontWeight = Font::FontWeights::Medium, 
 			Font::FontStyle fontStyle = Font::FontStyles::Normal,
 			Font::FontStretch fontStretch = Font::FontStretches::Normal) noexcept;
@@ -45,7 +45,7 @@ namespace PGUI::UI
 		[[nodiscard]] auto GetIncrementalTabStop() const noexcept -> float;
 		void SetIncrementalTabStop(float incrementalTabStop) const noexcept;
 
-		[[nodiscard]] auto GetLocaleName() const noexcept -> std::wstring;
+		[[nodiscard]] auto GetLocaleName() const -> std::wstring;
 
 		[[nodiscard]] auto GetParagraphAlignment() const noexcept -> Font::ParagraphAlignment;
 		void SetParagraphAlignment(Font::ParagraphAlignment paragraphAlignment) const noexcept;
@@ -53,12 +53,12 @@ namespace PGUI::UI
 		[[nodiscard]] auto GetReadingDirection() const noexcept -> Font::ReadingDirection;
 		void SetReadingDirection(Font::ReadingDirection readingDirection) const noexcept;
 
-		[[nodiscard]] auto GetTextAlignment() const noexcept -> Font::TextAlignment;
+		[[nodiscard]] static auto GetTextAlignment() noexcept -> Font::TextAlignment;
 		void SetTextAlignment(Font::TextAlignment textAlignment) const noexcept;
 
 		[[nodiscard]] auto
 			GetTrimming() const noexcept -> std::pair<DWRITE_TRIMMING, ComPtr<IDWriteInlineObject>>;
-		void SetTrimming(const DWRITE_TRIMMING& trimming, ComPtr<IDWriteInlineObject> inlineObject) const noexcept;
+		void SetTrimming(const DWRITE_TRIMMING& trimming, const ComPtr<IDWriteInlineObject>& inlineObject) const noexcept;
 
 		[[nodiscard]] auto GetWordWrapping() const noexcept -> Font::WordWrapping;
 		void SetWordWrapping(Font::WordWrapping wordWrapping) const noexcept;
